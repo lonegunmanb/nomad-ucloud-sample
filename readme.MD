@@ -56,7 +56,7 @@ is 0.12.3. You can update by downloading from www.terraform.io/downloads.html
 "ucloud_private_key": "{{env `UCLOUD_SECRET`}}",
 ```
 
-可以手动把双引号内从花括号开始的变量替换成您的ucloud key，也可以把ucloud key设置到对应的环境变量UCLOUD_PUBKEY和UCLOUD_SECRET里
+可以手动把双引号内从花括号开始的变量替换成您的ucloud key，也可以把ucloud key设置到对应的环境变量UCLOUD_PUBKEY和UCLOUD_SECRET里，ssh_password是构建镜像所用服务器的root口令，由于构建过程中服务器可以通过公网访问，所以建议设置一个强口令（构建镜像时的口令不一定要与后续构建集群时设置的一样，在这里可以是一个临时性的口令）。ucloud_project_id变量是您的UCloud项目ID，具体取值可以用登陆控制台首页后在左上角的"项目ID"
 
 然后按照顺序执行:
 ```bash
