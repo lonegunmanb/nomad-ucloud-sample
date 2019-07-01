@@ -1,4 +1,9 @@
-本脚本利用了packer在ucloud上构建了三个主机镜像，分别是consul-server/nomad-server/nomad-client
+## 警告
+本项目仅作为概念验证，所有服务器都可从公网访问，并且没有配置ACL，请勿直接用作生产环境
+
+## 前置准备
+
+本脚本利用了packer在ucloud上构建了三个主机镜像，分别是consul-server/nomad-server/nomad-client，然后利用terraform在UCloud上编排出一个Nomad集群供测试把玩用。
 
 欲运行该脚本，需要准备的工具有：
 * golang
