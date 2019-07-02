@@ -1,6 +1,6 @@
 resource "ucloud_instance" "nomad_clients" {
   count = "${var.instance_count}"
-  name = "nomad-server-${count.index}"
+  name = "nomad-client-${count.index}"
   tag = "${var.cluster_id}"
   availability_zone = "${var.az[count.index%length(var.az)]}"
   image_id = "${var.image_id}"
