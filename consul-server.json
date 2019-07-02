@@ -27,7 +27,7 @@
   "provisioners": [
     {
     "type": "shell",
-    "scripts": ["consul-service.sh", "consul-server.sh"],
+    "scripts": ["scripts/consul-service.sh", "scripts/consul-server.sh"],
     "environment_vars": [
       "CONSUL_VERSION={{user `consul_version`}}"
     ]

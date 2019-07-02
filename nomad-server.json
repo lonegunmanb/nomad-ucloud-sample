@@ -28,7 +28,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "scripts": ["consul-service.sh", "nomad-service.sh", "nomad-server.sh"],
+      "scripts": ["scripts/consul-service.sh", "scripts/nomad-service.sh", "scripts/nomad-server.sh"],
       "environment_vars": [
         "CONSUL_VERSION={{user `consul_version`}}",
         "NOMAD_VERSION={{user `nomad_version`}}"
