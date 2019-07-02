@@ -21,4 +21,5 @@ client {
   enabled = true
 }
 EOF
+sync
 echo "done"
