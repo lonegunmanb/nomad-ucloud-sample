@@ -31,7 +31,7 @@ resource "ucloud_eip_association" "nomad_ip" {
 resource "ucloud_disk" "consul_data" {
   count = "${var.instance_count}"
   availability_zone = "${var.az[count.index%length(var.az)]}"
-  name = "consul-data-${count.index}"
+  name = "nomad-server-data-${count.index}"
   disk_size = "${var.data_volume_size}"
   tag = "${var.cluster_id}"
 }
