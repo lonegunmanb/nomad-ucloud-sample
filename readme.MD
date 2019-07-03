@@ -20,7 +20,7 @@
 
 命令行中执行
 ```bash
-go get github.com/shawnmssu/packer
+go get -u github.com/shawnmssu/packer
 ```
 
 仓库比较大，请耐心等待
