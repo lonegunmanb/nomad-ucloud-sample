@@ -58,6 +58,7 @@ resource "null_resource" "setup" {
       "mount /dev/vdb /data",
       "echo 'mount /dev/vdb /data'>>/etc/rc.d/rc.local",
       "sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.service",
+      "sed -i 's/REGION/${var.region}/g' /etc/nomad.d/client.hcl",
       "sed -i 's/DATACENTER/${var.region}/g' /etc/consul.d/consul.hcl",
       "sed -i 's/DATACENTER/${var.region}/g' /etc/nomad.d/client.hcl",
       "sed -i 's/NODENAME/${ucloud_instance.nomad_clients.*.id[count.index]}/g' /etc/nomad.d/client.hcl",

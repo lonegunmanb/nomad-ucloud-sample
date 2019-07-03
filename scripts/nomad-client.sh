@@ -15,6 +15,7 @@ EOF
 
 mkdir --parents /opt/consul/data
 cat>/etc/nomad.d/client.hcl<<-EOF
+region = "REGION"
 datacenter = "DATACENTER"
 data_dir = "/opt/consul/data"
 name = "NODENAME"

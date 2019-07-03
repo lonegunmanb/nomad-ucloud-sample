@@ -13,6 +13,7 @@ performance {
 EOF
 
 cat>/etc/nomad.d/server.hcl<<-EOF
+region = "REGION"
 datacenter = "DATACENTER"
 data_dir = "/data/nomad/data"
 name = "NODENAME"
