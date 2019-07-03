@@ -18,7 +18,7 @@ data_dir = "/data/nomad/data"
 name = "NODENAME"
 server {
   enabled          = true
-  bootstrap_expect = 3
+  bootstrap_expect = EXPECTEDSVRS
 }
 EOF
 

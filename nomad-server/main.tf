@@ -62,6 +62,7 @@ resource "null_resource" "setup" {
       "sed -i 's/DATACENTER/${var.region}/g' /etc/consul.d/consul.hcl",
       "sed -i 's/DATACENTER/${var.region}/g' /etc/nomad.d/server.hcl",
       "sed -i 's/NODENAME/${ucloud_instance.nomad_servers.*.id[count.index]}/g' /etc/nomad.d/server.hcl",
+      "sed -i 's/EXPECTEDSVRS/${var.instance_count}/g' /etc/nomad.d/server.hcl",
       "sed -i 's/NODENAME/${ucloud_instance.nomad_servers.*.id[count.index]}/g' /etc/consul.d/consul.hcl",
       "sed -i 's/CONSUL_SERVER1_IP/${var.consul_server_ips[0]}/g' /etc/consul.d/consul.hcl",
       "sed -i 's/CONSUL_SERVER2_IP/${var.consul_server_ips[1]}/g' /etc/consul.d/consul.hcl",
