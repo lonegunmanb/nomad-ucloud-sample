@@ -69,7 +69,8 @@ resource "null_resource" "setup" {
       "systemctl enable consul",
       "systemctl start consul",
       "systemctl enable nomad",
-      "systemctl start nomad"
+      "systemctl start nomad",
+      "systemctl restart docker"
     ]
   }
 }
