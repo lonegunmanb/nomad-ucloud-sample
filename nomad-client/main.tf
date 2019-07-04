@@ -10,6 +10,9 @@ resource "ucloud_instance" "nomad_clients" {
   security_group = "${var.sg_id}"
   vpc_id = "${var.vpc_id}"
   subnet_id = "${var.subnet_id}"
+  provisioner "local-exec" {
+    command = "sleep 10"
+  }
 }
 
 resource "ucloud_eip" "nomad_clients" {
