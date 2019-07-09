@@ -101,3 +101,20 @@ terraform apply --auto-approve
 terraform destroy -force
 ```
 销毁了主机后，需要等待10分钟左右再进入network文件夹，重复执行destroy销毁网络环境
+
+## 基于Consul Connect的Sidecar例子
+job文件夹中是一个在nomad上部署一组模拟服务的例子，redis.hcl中描述了这样一组模拟服务。
+
+group "redis" 定义了一个redis服务，它运行了uhub.service.ucloud.cn/lonegunmanb/redis:latest这个docker镜像，将宿主机的一个动态tcp端口映射到容器内的6379端口，然后在connect-proxy任务中启动了一个consul进程，对外暴露一个服务端口，代理到本机docker暴露的端口上。这时docker内的redis服务只能通过consul代理来访问。consul代理服务在consul集群中注册了名为redis的服务。
+
+group "web" 定义了一个模拟的web服务，实际上我偷了个懒，用uhub.service.ucloud.cn/lonegunmanb/redis:5.0.5-alpine这个镜像代替了web服务，启动时会把本机consul代理任务proxy获取的宿主机端口以名为REDIS_PORT的环境变量传入容器实例。名为proxy的任务在本机启动了一个consul进程，关键是设置了upstream，表明会把请求转发到名为redis的consul服务，并且侦听localhost的一个动态端口（就是前面以环境变量方式传入容器的那个）
+
+在nomad集群创建成功后，进入job文件夹，执行
+```bash
+terraform apply --auto-approve
+```
+就可以在nomad集群中成功创建这样一组模拟服务，访问NOMAD_SERVER_IP:4646，可以在job中观察到创建出来的job。登陆web任务所在的nomad client服务器，docker ps可以观察到uhub.service.ucloud.cn/lonegunmanb/redis:5.0.5-alpine这个容器的运行情况，进入容器，执行
+```bash
+redis-cli -h localhost -p $REDIS_PORT
+```
+就可以从容器访问到redis服务。我们可以stop redis的allocation，迫使它重新调度到新的client上，或是对redis任务所在的client主机进行断电操作，过一会redis任务会被重新调度到新的client主机上，这时在原先的容器内重复执行同样的操作，您会发现对容器来说redis服务的地址完全没有变化，而redis服务依然可用，服务的漂移对应用来说是透明的，服务发现的工作由consul代理了。
