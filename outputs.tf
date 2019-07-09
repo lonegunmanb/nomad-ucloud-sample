@@ -1,3 +1,7 @@
+
+output "az" {
+  value = "${var.az}"
+}
 output consul_servers_ips {
   value = "${module.consul_servers.public_ip}"
 }
