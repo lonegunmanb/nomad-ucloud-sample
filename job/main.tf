@@ -20,7 +20,3 @@ resource "nomad_job" "redis" {
   count = 1
   jobspec = "${local.redis-job-script}"
 }
-//resource "nomad_job" "client" {
-//  jobspec = "${local.client-job-script}"
-//}
-
