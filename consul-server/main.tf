@@ -47,7 +47,7 @@ resource "ucloud_disk_attachment" "consul_server_data" {
 
 resource "null_resource" "install_consul_server" {
   count = "${local.machine_count}"
-  depends_on = ["ucloud_instance.consul_server"]
+  depends_on = ["ucloud_instance.consul_server", "ucloud_disk_attachment.consul_server_data"]
   provisioner "remote-exec" {
     connection {
       type = "ssh"
