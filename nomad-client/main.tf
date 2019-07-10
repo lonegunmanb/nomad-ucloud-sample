@@ -31,7 +31,7 @@ resource "ucloud_eip_association" "nomad_ip" {
 }
 
 
-resource "ucloud_disk" "consul_data" {
+resource "ucloud_disk" "data-disk" {
   count = "${var.instance_count}"
   availability_zone = "${var.az[count.index%length(var.az)]}"
   name = "consul-data-${count.index}"
@@ -42,13 +42,13 @@ resource "ucloud_disk" "consul_data" {
 resource "ucloud_disk_attachment" "data_disk" {
   count = "${var.instance_count}"
   availability_zone = "${var.az[count.index%length(var.az)]}"
-  disk_id = "${ucloud_disk.consul_data.*.id[count.index]}"
+  disk_id = "${ucloud_disk.data-disk.*.id[count.index]}"
   instance_id = "${ucloud_instance.nomad_clients.*.id[count.index]}"
 }
 
 resource "null_resource" "setup" {
   count = "${var.instance_count}"
-  depends_on = ["ucloud_eip_association.nomad_ip"]
+  depends_on = ["ucloud_eip_association.nomad_ip", "ucloud_disk_attachment.data_disk"]
   provisioner "remote-exec" {
     connection {
       type = "ssh"
