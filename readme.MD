@@ -111,9 +111,10 @@ group "web" 定义了一个模拟的web服务，实际上我偷了个懒，用uh
 
 在nomad集群创建成功后，进入job文件夹，执行
 ```bash
+terraform init
 terraform apply --auto-approve
 ```
-就可以在nomad集群中成功创建这样一组模拟服务，访问NOMAD_SERVER_IP:4646，可以在job中观察到创建出来的job。登陆web任务所在的nomad client服务器，docker ps可以观察到uhub.service.ucloud.cn/lonegunmanb/redis:5.0.5-alpine这个容器的运行情况，进入容器，执行
+就可以在nomad集群中成功创建这样一组模拟服务(同理，job文件夹的terraform init只需执行一次)，访问NOMAD_SERVER_IP:4646，可以在job中观察到创建出来的job。登陆web任务所在的nomad client服务器，docker ps可以观察到uhub.service.ucloud.cn/lonegunmanb/redis:5.0.5-alpine这个容器的运行情况，进入容器，执行
 ```bash
 redis-cli -h localhost -p $REDIS_PORT
 ```
