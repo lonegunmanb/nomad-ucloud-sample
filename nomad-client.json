@@ -28,10 +28,12 @@
   "provisioners": [
     {
       "type": "shell",
-      "scripts": ["scripts/consul-service.sh",
-                  "scripts/nomad-service.sh",
-                  "scripts/install-docker.sh",
-                  "scripts/nomad-client.sh"
+      "scripts": [
+        "scripts/config-yum.sh",
+        "scripts/consul-service.sh",
+        "scripts/nomad-service.sh",
+        "scripts/install-docker.sh",
+        "scripts/nomad-client.sh"
       ],
       "environment_vars": [
         "CONSUL_VERSION={{user `consul_version`}}",

@@ -1,4 +1,4 @@
-echo "write consul.hcl"
+echo "write consul.d/consul.hcl"
 mkdir --parents /opt/consul/data
 chown --recursive consul:consul /opt/consul/data
 
@@ -12,6 +12,7 @@ performance {
 }
 EOF
 
+echo "write nomad.d/server.hcl"
 cat>/etc/nomad.d/server.hcl<<-EOF
 region = "REGION"
 datacenter = "DATACENTER"

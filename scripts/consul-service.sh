@@ -1,4 +1,3 @@
-yum upgrade -y
 yum install -y sed unzip vim
 cd /tmp
 CONSUL_VERSION=$CONSUL_VERSION

@@ -3,8 +3,8 @@
     "ucloud_public_key": "{{env `UCLOUD_PUBKEY`}}",
     "ucloud_private_key": "{{env `UCLOUD_SECRET`}}",
     "ssh_user": "root",
-    "ssh_password": "psXMKfJ6ZYcEsv9SFkhz",
-    "ucloud_project_id": "org-pjmaqy",
+    "ssh_password": "",
+    "ucloud_project_id": "",
     "image_id": "uimage-dpdgyw",
     "consul_version": "1.5.1",
     "nomad_version": "0.9.3",
@@ -19,7 +19,7 @@
     "project_id": "{{user `ucloud_project_id`}}",
     "region": "{{user `region`}}",
     "availability_zone": "{{user `az`}}",
-    "instance_type": "n-basic-2",
+    "instance_type": "n-standard-8",
     "source_image_id":"{{user `image_id`}}",
     "ssh_username":"{{user `ssh_user`}}",
     "ssh_password": "{{user `ssh_password`}}",
@@ -28,7 +28,12 @@
   "provisioners": [
     {
       "type": "shell",
-      "scripts": ["scripts/consul-service.sh", "scripts/nomad-service.sh", "scripts/nomad-server.sh"],
+      "scripts": [
+        "scripts/config-yum.sh",
+        "scripts/consul-service.sh",
+        "scripts/nomad-service.sh",
+        "scripts/nomad-server.sh"
+      ],
       "environment_vars": [
         "CONSUL_VERSION={{user `consul_version`}}",
         "NOMAD_VERSION={{user `nomad_version`}}"

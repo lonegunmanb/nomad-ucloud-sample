@@ -26,10 +26,14 @@
   }],
   "provisioners": [
     {
-    "type": "shell",
-    "scripts": ["scripts/consul-service.sh", "scripts/consul-server.sh"],
-    "environment_vars": [
-      "CONSUL_VERSION={{user `consul_version`}}"
-    ]
-  }]
+      "type": "shell",
+      "scripts": [
+        "scripts/config-yum.sh",
+        "scripts/consul-service.sh",
+        "scripts/consul-server.sh"
+      ],
+      "environment_vars": [
+        "CONSUL_VERSION={{user `consul_version`}}"
+      ]
+    }]
 }

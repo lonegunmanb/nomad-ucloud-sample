@@ -1,4 +1,4 @@
-echo "write consul.hcl"
+echo "write consul.d/consul.hcl"
 mkdir --parents /opt/consul/data
 chown --recursive consul:consul /opt/consul/data
 
@@ -13,6 +13,7 @@ performance {
 bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
 EOF
 
+echo "write nomad.d/client.hcl"
 mkdir --parents /opt/consul/data
 cat>/etc/nomad.d/client.hcl<<-EOF
 region = "REGION"
