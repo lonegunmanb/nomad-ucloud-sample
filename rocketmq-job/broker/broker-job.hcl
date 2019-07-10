@@ -17,6 +17,7 @@ job "${job-name}" {
         ]
       }
       resources {
+        cpu = 1000
         memory = 4096
         network {
           port "broker" {}

@@ -17,6 +17,8 @@ job "${job-name}" {
         args = []
       }
       resources {
+        cpu = 1000
+        memory = 4096
         network {
           port "tcp" {}
         }
