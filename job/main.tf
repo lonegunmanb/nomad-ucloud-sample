@@ -18,5 +18,5 @@ locals {
 }
 resource "nomad_job" "redis" {
   count = 1
-  jobspec = "${local.redis-job-script}"
+  jobspec = "${replace(local.redis-job-script, "JOBNAME", "redis")}"
 }
