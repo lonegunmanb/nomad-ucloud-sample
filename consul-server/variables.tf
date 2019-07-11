@@ -3,7 +3,7 @@ variable az {
   type = "list"
 }
 locals {
-  machine_count = "${length(var.az)}"
+  instance_count = "${length(var.az)}"
 }
 variable root_password {}
 variable sg_id {}
