@@ -46,6 +46,23 @@ resource "ucloud_disk_attachment" "data_disk" {
   instance_id = "${ucloud_instance.nomad_clients.*.id[count.index]}"
 }
 
+locals {
+  script-path = "${path.module}/setup.sh"
+}
+
+data "template_file" "setup-script" {
+  count = "${var.instance_count}"
+  template = "${file(local.script-path)}"
+  vars {
+    region = "${var.region}"
+    az = "${var.az[count.index%length(var.az)]}"
+    node-name = "${ucloud_instance.nomad_clients.*.id[count.index]}"
+    consul-server-ip-0 = "${var.consul_server_ips[0]}"
+    consul-server-ip-1 = "${var.consul_server_ips[1]}"
+    consul-server-ip-2 = "${var.consul_server_ips[2]}"
+  }
+}
+
 resource "null_resource" "setup" {
   count = "${var.instance_count}"
   depends_on = ["ucloud_eip_association.nomad_ip", "ucloud_disk_attachment.data_disk"]
@@ -56,26 +73,6 @@ resource "null_resource" "setup" {
       password = "${var.root_password}"
       host = "${ucloud_eip.nomad_clients.*.public_ip[count.index]}"
     }
-    inline = [
-      "mkfs.ext4 /dev/vdb",
-      "mount /dev/vdb /data",
-      "echo 'mount /dev/vdb /data'>>/etc/rc.d/rc.local",
-      "sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.service",
-      "sed -i 's/REGION/${var.region}/g' /etc/nomad.d/client.hcl",
-      "sed -i 's/DATACENTER/${var.region}/g' /etc/consul.d/consul.hcl",
-      "sed -i 's/DATACENTER/${var.region}/g' /etc/nomad.d/client.hcl",
-      "sed -i 's/AZ/${var.az[count.index%length(var.az)]}/g' /etc/nomad.d/client.hcl",
-      "sed -i 's/NODENAME/${ucloud_instance.nomad_clients.*.id[count.index]}/g' /etc/nomad.d/client.hcl",
-      "sed -i 's/NODENAME/${ucloud_instance.nomad_clients.*.id[count.index]}/g' /etc/consul.d/consul.hcl",
-      "sed -i 's/CONSUL_SERVER1_IP/${var.consul_server_ips[0]}/g' /etc/consul.d/consul.hcl",
-      "sed -i 's/CONSUL_SERVER2_IP/${var.consul_server_ips[1]}/g' /etc/consul.d/consul.hcl",
-      "sed -i 's/CONSUL_SERVER3_IP/${var.consul_server_ips[2]}/g' /etc/consul.d/consul.hcl",
-      "sed -i 's/SERVICE_DESCRIPTION/Nomad Client/g' /etc/systemd/system/nomad.service",
-      "systemctl enable consul",
-      "systemctl start consul",
-      "systemctl enable nomad",
-      "systemctl start nomad",
-      "systemctl restart docker"
-    ]
+    inline = ["${data.template_file.setup-script.*.rendered[count.index]}"]
   }
 }
