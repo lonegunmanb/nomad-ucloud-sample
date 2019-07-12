@@ -73,14 +73,15 @@ module "nomad_clients" {
   source = "./nomad-client"
   az = "${var.az}"
   cluster_id = "${local.cluster_id}"
-  consul_server_ips = "${module.consul_servers.consul_server_private_ips}"
+  consul_server_private_ips = "${module.consul_servers.consul_server_private_ips}"
   data_volume_size = 30
   image_id = "${var.nomad_client_image_id}"
-  instance_count = 4
+  instance_count = 3
   instance_type = "${var.nomad_client_type}"
   region = "${var.region}"
   root_password = "${var.nomad_client_root_password}"
   sg_id = "${ucloud_security_group.consul_server_sg.id}"
   subnet_id = "${data.terraform_remote_state.network.nomad_subnet_id}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
+  consul_server_public_ips = "${module.consul_servers.public_ips}"
 }

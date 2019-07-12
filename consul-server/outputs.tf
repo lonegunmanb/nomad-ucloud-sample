@@ -1,4 +1,4 @@
-output "public_ip" {
+output "public_ips" {
   value = "${ucloud_eip.consul_servers.*.public_ip}"
 }
 
