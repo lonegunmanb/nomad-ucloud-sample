@@ -22,6 +22,7 @@ provider "nomad" {
 
 locals {
   broker-job-hcl = "${path.module}/broker-job.hcl"
+  console-job-hcl = "${path.module}/console-job.hcl"
 }
 
 data "template_file" "broker-job" {
@@ -44,4 +45,17 @@ data "template_file" "broker-job" {
 resource "nomad_job" "broker" {
   count = "${length(local.az)}"
   jobspec = "${data.template_file.broker-job.*.rendered[count.index]}"
+}
+
+data "template_file" "console-job" {
+  template = "${file(local.console-job-hcl)}"
+  vars = {
+    cluster-id = "${local.cluster-id}"
+    console-image = "uhub.service.ucloud.cn/lonegunmanb/rocketmq-console-ng:latest"
+    namesvc-name = "${var.namesvc_name}"
+    az = "${local.az[0]}"
+  }
+}
+resource "nomad_job" "console" {
+  jobspec = "${data.template_file.console-job.rendered}"
 }
