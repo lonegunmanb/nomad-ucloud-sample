@@ -37,6 +37,12 @@ resource "ucloud_security_group" "consul_server_sg" {
     cidr_block = "${var.allow_ip}"
     policy = "accept"
   }
+  rules {
+    port_range = "20000-60000"
+    protocol = "tcp"
+    cidr_block = "${var.allow_ip}"
+    policy = "accept"
+  }
 }
 
 module "consul_servers" {
