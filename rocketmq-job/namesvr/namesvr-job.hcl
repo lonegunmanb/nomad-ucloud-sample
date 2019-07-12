@@ -1,9 +1,8 @@
 job "${job-name}" {
   datacenters = ["cn-bj2"]
-  affinity {
+  constraint {
     attribute = "$${meta.az}"
     value     = "${az}"
-    weight    = 100
   }
   group "namesvr" {
     task "namesvr" {
@@ -23,24 +22,14 @@ job "${job-name}" {
           port "tcp" {}
         }
       }
-    }
-
-    task "connect-proxy" {
-      driver = "exec"
-      config {
-        command = "consul"
-        args    = [
-          "connect", "proxy",
-          "-service", "namesvr-${cluster-id}-${index}",
-          "-service-addr", "$${NOMAD_ADDR_namesvr_tcp}",
-          "-listen", ":$${NOMAD_PORT_tcp}",
-          "-register",
-        ]
-      }
-
-      resources {
-        network {
-          port "tcp" {}
+      service {
+        name = "${namesvc-name}"
+        port = "tcp"
+        check {
+          type     = "tcp"
+          port     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
         }
       }
     }

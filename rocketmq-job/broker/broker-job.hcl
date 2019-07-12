@@ -1,12 +1,35 @@
 job "${job-name}" {
   datacenters = ["cn-bj2"]
-  affinity {
+  constraint {
     attribute = "$${meta.az}"
     value     = "${az}"
-    weight    = 100
   }
   group "broker" {
-    task "brokerTask" {
+    task "console" {
+      driver = "docker"
+      config {
+        image = "${console-image}"
+        port_map = {
+          tcp = 8080
+        }
+      }
+      template {
+        data = <<EOH
+          JAVA_OPTS="-Drocketmq.namesrv.addr={{range $index, $service := service "${namesvc-name}|any"}}{{if ne $index 0}};{{end}}{{$service.Address}}:{{$service.Port}}{{end}} -Dcom.rocketmq.sendMessageWithVIPChannel=false"
+          EOH
+
+        destination = "local/file.env"
+        env         = true
+      }
+      resources {
+        cpu = 1000
+        memory = 4096
+        network {
+          port "tcp" {}
+        }
+      }
+    }
+    task "broker" {
       driver = "docker"
       config {
         image = "${broker-image}"
@@ -24,9 +47,21 @@ job "${job-name}" {
           port "dledger" {}
         }
       }
+      service {
+        name = "${brokersvc-name}"
+        port = "dledger"
+        check {
+          type     = "tcp"
+          port     = "dledger"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
       meta {
         index = "${index}"
-        cluster-id = "${cluster-id}"
+        clusterId = "${cluster-id}"
+        namesvcName = "${namesvc-name}|any"
+        brokersvcName = "${brokersvc-name}|any"
       }
       artifact {
         source = "${broker-config}"
@@ -35,52 +70,8 @@ job "${job-name}" {
       template {
         source = "local/conf/broker.conf.tpl"
         destination = "local/conf/broker.conf"
+        change_mode = "noop"
       }
     }
-    task "broker-proxy" {
-      driver = "exec"
-      config {
-        command = "consul"
-        args    = [
-          "connect", "proxy",
-          "-service", "broker-${cluster-id}-${index}",
-          "-service-addr", "$${NOMAD_ADDR_brokerTask_broker}",
-          "-listen", ":$${NOMAD_PORT_tcp}",
-          "-register",
-        ]
-      }
-      resources {
-        network {
-          port "tcp" {}
-        }
-      }
-    }
-    task "dledgerProxy" {
-      driver = "exec"
-      config {
-        command = "consul"
-        args    = [
-          "connect", "proxy",
-          "-service", "dledger-${cluster-id}-${index}",
-          "-service-addr", "$${NOMAD_ADDR_brokerTask_dledger}",
-          "-listen", ":$${NOMAD_PORT_tcp}",
-          "-register",
-        ]
-      }
-      resources {
-        network {
-          port "tcp" {}
-        }
-      }
-    }
-
-//sidecar
-    ${task-dledger-sidecar0}
-    ${task-dledger-sidecar1}
-    ${task-dledger-sidecar2}
-
-    ${task-namesvr-sidecar0}
-    ${task-namesvr-sidecar1}
-    ${task-namesvr-sidecar2}
   }
 }

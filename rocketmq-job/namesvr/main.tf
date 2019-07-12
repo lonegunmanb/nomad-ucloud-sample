@@ -1,38 +1,35 @@
 variable "rocketmq_version" {}
 variable "rocketmq_docker_image" {}
-
-data "terraform_remote_state" "nomad" {
-  backend = "local"
-  config = {
-    path = "${path.module}/../../terraform.tfstate"
-  }
+variable "namesvc-name" {}
+variable "az" {
+  type = "list"
 }
+variable "cluster-id" {}
+variable "nomad-server-ip" {}
 
-locals {
-  az = "${data.terraform_remote_state.nomad.az}"
-  cluster-id = "${data.terraform_remote_state.nomad.cluster_id}"
-}
 
 provider "nomad" {
-  address = "http://${data.terraform_remote_state.nomad.nomad_servers_ips[0]}:4646"
+  address = "http://${var.nomad-server-ip}:4646"
   region  = "cn-bj2"
 }
 locals {
   job-hcl = "${path.module}/namesvr-job.hcl"
 }
+
 data "template_file" "namesvr-job" {
-  count = "${length(local.az)}"
+  count = "${length(var.az)}"
   template = "${file(local.job-hcl)}"
   vars = {
-    job-name = "namesvr-${local.cluster-id}-${count.index}"
+    job-name = "namesvr-${var.cluster-id}-${count.index}"
     namesvr-image = "${var.rocketmq_docker_image}:${var.rocketmq_version}"
     cmd = "./mqnamesrv"
-    cluster-id = "${local.cluster-id}"
-    az = "${local.az[count.index]}"
+    cluster-id = "${var.cluster-id}"
+    namesvc-name = "${var.namesvc-name}"
+    az = "${var.az[count.index]}"
     index = "${count.index}"
   }
 }
 resource "nomad_job" "namesvr" {
-  count = "${length(local.az)}"
+  count = "${length(var.az)}"
   jobspec = "${data.template_file.namesvr-job.*.rendered[count.index]}"
 }

@@ -1,12 +1,13 @@
-brokerClusterName = {{ env "NOMAD_META_cluster-id" }}
+brokerClusterName = {{ env "NOMAD_META_clusterId" }}
 brokerName=RaftNode0{{ env "NOMAD_META_index" }}
-listenPort={{ env "NOMAD_PORT_broker-task_broker" }}
-namesrvAddr=localhost:{{ env "NOMAD_PORT_namesvr0_tcp" }};localhost:{{ env "NOMAD_PORT_namesvr1_tcp" }};localhost:{{ env "NOMAD_PORT_namesvr2_tcp" }}
+brokerIP1={{ env "NOMAD_IP_broker" }}
+listenPort={{ env "NOMAD_PORT_broker" }}
+namesrvAddr={{ with env "NOMAD_META_namesvcName" }}{{range $index, $service := service . }}{{if ne $index 0}};{{end}}{{$service.Address}}:{{$service.Port}}{{end}}{{ end }}
 storePathRootDir=/tmp/rmqstore/node00
 storePathCommitLog=/tmp/rmqstore/node00/commitlog
 enableDLegerCommitLog=true
-dLegerGroup={{ env "NOMAD_META_cluster-id" }}
-dLegerPeers=n0-localhost:{{ env "NOMAD_PORT_dledger0_tcp" }};n1-localhost:{{ env "NOMAD_PORT_dledger1_tcp" }};n2-localhost:{{ env "NOMAD_PORT_dledger2_tcp" }}
+dLegerGroup={{ env "NOMAD_META_clusterId" }}
+dLegerPeers={{ with env "NOMAD_META_brokersvcName" }}{{ range $index, $service := service . }}{{ if ne $index 0 }};{{ end }}n{{ $index }}-{{ $service.Address }}:{{ $service.Port }}{{ end }}{{ end }}
 ## must be unique
 dLegerSelfId=n{{ env "NOMAD_META_index" }}
 sendMessageThreadPoolNums=16

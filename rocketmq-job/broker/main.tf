@@ -1,5 +1,7 @@
-variable "rocketmq_version" {}
 variable "rocketmq_docker_image" {}
+variable "rocketmq_version" {}
+variable "namesvc_name" {}
+variable "brokersvc_name" {}
 
 data "terraform_remote_state" "nomad" {
   backend = "local"
@@ -19,27 +21,7 @@ provider "nomad" {
 }
 
 locals {
-  namesvr-sidecar-hcl = "${path.module}/namesvr-sidecar.hcl"
-  dledger-sidecar-hcl = "${path.module}/dledger-sidecar.hcl"
   broker-job-hcl = "${path.module}/broker-job.hcl"
-}
-
-data "template_file" "namesvr-sidecar" {
-  count = "${length(local.az)}"
-  template = "${file(local.namesvr-sidecar-hcl)}"
-  vars = {
-    index = "${count.index}"
-    cluster-id = "${local.cluster-id}"
-  }
-}
-
-data "template_file" "dledger-sidecar" {
-  count = "${length(local.az)}"
-  template = "${file(local.dledger-sidecar-hcl)}"
-  vars = {
-    index = "${count.index}"
-    cluster-id = "${local.cluster-id}"
-  }
 }
 
 data "template_file" "broker-job" {
@@ -52,17 +34,14 @@ data "template_file" "broker-job" {
     az = "${local.az[count.index]}"
     index = "${count.index}"
     broker-image = "${var.rocketmq_docker_image}:${var.rocketmq_version}"
+    console-image = "uhub.service.ucloud.cn/lonegunmanb/rocketmq-console-ng:latest"
     rockermq-version = "${var.rocketmq_version}"
     broker-config = "http://nomad-jobfile.cn-bj.ufileos.com/broker.conf.tpl"
-    task-namesvr-sidecar0 = "${data.template_file.namesvr-sidecar.*.rendered[0]}"
-    task-namesvr-sidecar1 = "${data.template_file.namesvr-sidecar.*.rendered[1]}"
-    task-namesvr-sidecar2 = "${data.template_file.namesvr-sidecar.*.rendered[2]}"
-    task-dledger-sidecar0 = "${data.template_file.dledger-sidecar.*.rendered[0]}"
-    task-dledger-sidecar1 = "${data.template_file.dledger-sidecar.*.rendered[1]}"
-    task-dledger-sidecar2 = "${data.template_file.dledger-sidecar.*.rendered[2]}"
+    namesvc-name = "${var.namesvc_name}"
+    brokersvc-name = "${var.brokersvc_name}"
   }
 }
-resource "nomad_job" "namesvr" {
+resource "nomad_job" "broker" {
   count = "${length(local.az)}"
   jobspec = "${data.template_file.broker-job.*.rendered[count.index]}"
 }
