@@ -10,7 +10,10 @@ variable cluster_id {}
 variable instance_count {}
 variable image_id {}
 variable instance_type {}
-variable consul_server_ips {
+variable consul_server_private_ips {
+  type = "list"
+}
+variable consul_server_public_ips {
   type = "list"
 }
 variable data_volume_size {}
