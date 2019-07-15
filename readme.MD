@@ -20,23 +20,23 @@
 
 命令行中执行
 ```bash
-go get -u github.com/shawnmssu/packer
+go get -u github.com/hashicorp/packer
 ```
 
 仓库比较大，请耐心等待
 
 go get结束后，执行以下语句：
 ```bash
-cd $GOPATH/src/github.com/shawnmssu/packer
-go build .
-go install github.com/shawnmssu/packer
+go install github.com/hashicorp/packer
 ```
 
 成功安装后执行packer -version，看到正确输出即可
 ```bash
 $ packer -version
-1.4.2
+1.4.3
 ```
+
+（注：本文写作时UCloud Packer Builder已整合进master分支，但已发布的1.4.2版本并未包含该Builder，所以在1.4.3正式版推出之前，各位老爷们只能先麻烦自己go install一下，1.4.3正式推出后直接下载使用官方二进制版本即可）
 
 ## 安装Hashicorp Terraform
 本教程采用terraform 0.11编写，目前最新的terraform版本为0.12，并且两者语法不兼容，所以请安装0.11版本terraform
