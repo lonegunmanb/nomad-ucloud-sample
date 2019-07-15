@@ -33,5 +33,25 @@ job "${job-name}" {
         }
       }
     }
+
+    task "connect-proxy" {
+      driver = "exec"
+      config {
+        command = "consul"
+        args    = [
+          "connect", "proxy",
+          "-service", "namesvc-${cluster-id}-${index}",
+          "-service-addr", "$${NOMAD_ADDR_namesvr_tcp}",
+          "-listen", ":$${NOMAD_PORT_tcp}",
+          "-register",
+        ]
+      }
+
+      resources {
+        network {
+          port "tcp" {}
+        }
+      }
+    }
   }
 }

@@ -76,18 +76,3 @@ resource "null_resource" "setup" {
     inline = ["${data.template_file.setup-script.*.rendered[count.index]}"]
   }
 }
-
-
-# Configure the Consul provider
-provider "consul" {
-  address    = "${var.consul_server_public_ips[0]}:8500"
-  datacenter = "${var.region}"
-}
-
-resource "consul_keys" "app" {
-  count = "${var.instance_count}"
-  key {
-    path  = "nomad_client_index/${ucloud_instance.nomad_clients.*.private_ip[count.index]}"
-    value = "${count.index}"
-  }
-}

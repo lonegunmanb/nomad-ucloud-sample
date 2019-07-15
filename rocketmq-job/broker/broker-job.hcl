@@ -14,6 +14,7 @@ job "${job-name}" {
         volumes = [
           "local/conf:/opt/rocketmq-${rockermq-version}/conf/dledger",
         ]
+        network_mode = "host"
       }
       resources {
         cpu = 1000
@@ -49,5 +50,8 @@ job "${job-name}" {
         change_mode = "noop"
       }
     }
+    ${task-namesvr-sidecar0}
+    ${task-namesvr-sidecar1}
+    ${task-namesvr-sidecar2}
   }
 }

@@ -38,6 +38,12 @@ resource "ucloud_security_group" "consul_server_sg" {
     policy = "accept"
   }
   rules {
+    port_range = "8080"
+    protocol = "tcp"
+    cidr_block = "${var.allow_ip}"
+    policy = "accept"
+  }
+  rules {
     port_range = "20000-60000"
     protocol = "tcp"
     cidr_block = "${var.allow_ip}"
@@ -71,7 +77,7 @@ module "nomad_servers" {
   sg_id = "${ucloud_security_group.consul_server_sg.id}"
   vpc_id = "${data.terraform_remote_state.network.vpc_id}"
   subnet_id = "${data.terraform_remote_state.network.nomad_subnet_id}"
-  consul_server_ips = "${module.consul_servers.consul_server_private_ips}"
+  consul_server_ips = "${module.consul_servers.private_ips}"
   data_volume_size = 30
 }
 
@@ -79,7 +85,7 @@ module "nomad_clients" {
   source = "./nomad-client"
   az = "${var.az}"
   cluster_id = "${local.cluster_id}"
-  consul_server_private_ips = "${module.consul_servers.consul_server_private_ips}"
+  consul_server_private_ips = "${module.consul_servers.private_ips}"
   data_volume_size = 30
   image_id = "${var.nomad_client_image_id}"
   instance_count = 3
