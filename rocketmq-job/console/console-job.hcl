@@ -1,10 +1,9 @@
 job "console-${cluster-id}" {
-  datacenters = [
-    "cn-bj2"]
-  constraint {
-    attribute = "$${meta.az}"
-    value = "${az}"
-  }
+  datacenters = ["${az}"]
+//  constraint {
+//    attribute = "$${meta.az}"
+//    value = "${az}"
+//  }
   group "console" {
     task "console" {
       driver = "docker"

@@ -1,9 +1,9 @@
 job "${job-name}" {
-  datacenters = ["cn-bj2"]
-  constraint {
-    attribute = "$${meta.az}"
-    value     = "${az}"
-  }
+  datacenters = ["${az}"]
+//  constraint {
+//    attribute = "$${meta.az}"
+//    value     = "${az}"
+//  }
   group "broker" {
     task "broker" {
       driver = "docker"

@@ -22,9 +22,6 @@ data_dir = "/opt/consul/data"
 name = "NODENAME"
 client {
   enabled = true
-  meta {
-    "az" = "AZ"
-  }
 }
 EOF
 sync

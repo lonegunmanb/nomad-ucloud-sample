@@ -1,5 +1,5 @@
 job "${job-name}" {
-  datacenters = ["cn-bj2"]
+  datacenters = ["cn-bj2-02"]
 
   group "redis" {
     task "server" {

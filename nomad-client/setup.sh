@@ -4,7 +4,7 @@ echo 'mount /dev/vdb /data'>>/etc/rc.d/rc.local
 sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.service
 sed -i 's/REGION/${region}/g' /etc/nomad.d/client.hcl
 sed -i 's/DATACENTER/${region}/g' /etc/consul.d/consul.hcl
-sed -i 's/DATACENTER/${region}/g' /etc/nomad.d/client.hcl
+sed -i 's/DATACENTER/${az}/g' /etc/nomad.d/client.hcl
 sed -i 's/AZ/${az}/g' /etc/nomad.d/client.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/nomad.d/client.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/consul.d/consul.hcl
