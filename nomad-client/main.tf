@@ -57,9 +57,9 @@ data "template_file" "setup-script" {
     region = "${var.region}"
     az = "${var.az[count.index%length(var.az)]}"
     node-name = "${ucloud_instance.nomad_clients.*.id[count.index]}"
-    consul-server-ip-0 = "${var.consul_server_ips[0]}"
-    consul-server-ip-1 = "${var.consul_server_ips[1]}"
-    consul-server-ip-2 = "${var.consul_server_ips[2]}"
+    consul-server-ip-0 = "${var.consul_server_private_ips[0]}"
+    consul-server-ip-1 = "${var.consul_server_private_ips[1]}"
+    consul-server-ip-2 = "${var.consul_server_private_ips[2]}"
   }
 }
 
