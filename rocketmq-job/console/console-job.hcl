@@ -9,9 +9,6 @@ job "console-${cluster-id}" {
       driver = "docker"
       config {
         image = "${console-image}"
-        port_map = {
-          tcp = 8080
-        }
         network_mode = "host"
       }
       template {
@@ -26,7 +23,9 @@ job "console-${cluster-id}" {
         cpu = 1000
         memory = 4096
         network {
-          port "tcp" {}
+          port "tcp" {
+            static = "8080"
+          }
         }
       }
     }
