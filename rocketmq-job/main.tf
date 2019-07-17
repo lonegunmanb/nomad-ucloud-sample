@@ -5,9 +5,6 @@ variable "rocketmq_version" {
   default = "4.5.1"
 }
 
-# Configure the Consul provider
-
-
 data "terraform_remote_state" "nomad" {
   backend = "local"
   config = {
@@ -21,21 +18,6 @@ locals {
   brokersvc-name = "brokersvc-service-${local.cluster-id}"
   region = "${data.terraform_remote_state.nomad.region}"
 }
-
-provider "consul" {
-  address    = "${data.terraform_remote_state.nomad.consul_servers_public_ips[0]}:8500"
-  datacenter = "${local.region}"
-}
-
-resource "consul_keys" "app" {
-  count = "${length(data.terraform_remote_state.nomad.nomad_client_private_ips)}"
-  key {
-    path  = "nomad_client_index/${data.terraform_remote_state.nomad.nomad_client_private_ips[count.index]}"
-    value = "${count.index}"
-  }
-}
-
-
 
 module "namesvr" {
   source = "./namesvr"

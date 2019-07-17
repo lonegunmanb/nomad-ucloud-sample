@@ -55,6 +55,7 @@ data "template_file" "setup-script" {
   template = "${file(local.script-path)}"
   vars {
     region = "${var.region}"
+    az = "${var.az[count.index%length(var.az)]}"
     node-name = "${ucloud_instance.nomad_servers.*.id[count.index]}"
     instance-count = "${var.instance_count}"
     consul-server-ip-0 = "${var.consul_server_ips[0]}"

@@ -22,7 +22,10 @@ data_dir = "/opt/consul/data"
 name = "NODENAME"
 client {
   enabled = true
+  node_class = "CLASS"
+  META
 }
+
 EOF
 sync
 echo "done"

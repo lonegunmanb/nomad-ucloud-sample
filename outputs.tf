@@ -19,10 +19,18 @@ output nomad_servers_ips {
   value = "${module.nomad_servers.public_ips}"
 }
 
-output nomad_client_public_ips {
-  value = "${module.nomad_clients.public_ips}"
+output nomad_broker_public_ips {
+  value = "${module.broker.public_ips}"
 }
 
-output nomad_client_private_ips {
-  value = "${module.nomad_clients.private_ips}"
+output nomad_broker_private_ips {
+  value = "${module.broker.private_ips}"
+}
+
+output nomad_namesvr_public_ips {
+  value = "${module.nameServer.public_ips}"
+}
+
+output nomad_namesvr_private_ips {
+  value = "${module.nameServer.private_ips}"
 }

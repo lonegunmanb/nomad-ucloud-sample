@@ -27,6 +27,7 @@ data "template_file" "namesvr-job" {
     namesvc-name = "${var.namesvc-name}"
     az = "${var.az[count.index]}"
     index = "${count.index}"
+    node-class = "nameServer"
   }
 }
 resource "nomad_job" "namesvr" {

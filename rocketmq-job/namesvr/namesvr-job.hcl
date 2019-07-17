@@ -1,9 +1,9 @@
 job "${job-name}" {
   datacenters = ["${az}"]
-//  constraint {
-//    attribute = "$${meta.az}"
-//    value     = "${az}"
-//  }
+  constraint {
+    attribute = "$${node.class}"
+    value     = "${node-class}"
+  }
   group "namesvr" {
     task "namesvr" {
       driver = "docker"
@@ -17,24 +17,24 @@ job "${job-name}" {
       }
       resources {
         cpu = 1000
-        memory = 4096
+        memory = 2048
         network {
           port "tcp" {}
         }
       }
-      service {
-        name = "${namesvc-name}"
-        port = "tcp"
-        check {
-          type     = "tcp"
-          port     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
+//      service {
+//        name = "${namesvc-name}"
+//        port = "tcp"
+//        check {
+//          type     = "tcp"
+//          port     = "tcp"
+//          interval = "10s"
+//          timeout  = "2s"
+//        }
+//      }
     }
 
-    task "connect-proxy" {
+    task "connect-proxy-${index}" {
       driver = "exec"
       config {
         command = "consul"

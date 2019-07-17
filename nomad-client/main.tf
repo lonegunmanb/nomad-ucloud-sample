@@ -1,6 +1,6 @@
 resource "ucloud_instance" "nomad_clients" {
   count = "${var.instance_count}"
-  name = "nomad-client-${count.index}"
+  name = "nomad-client-${var.class}-${count.index}"
   tag = "${var.cluster_id}"
   availability_zone = "${var.az[count.index%length(var.az)]}"
   image_id = "${var.image_id}"
@@ -56,7 +56,9 @@ data "template_file" "setup-script" {
   vars {
     region = "${var.region}"
     az = "${var.az[count.index%length(var.az)]}"
-    node-name = "${ucloud_instance.nomad_clients.*.id[count.index]}"
+    node-name = "${var.class}-${ucloud_instance.nomad_clients.*.id[count.index]}"
+    node-class = "${var.class}"
+    node-meta = "meta {}"
     consul-server-ip-0 = "${var.consul_server_private_ips[0]}"
     consul-server-ip-1 = "${var.consul_server_private_ips[1]}"
     consul-server-ip-2 = "${var.consul_server_private_ips[2]}"

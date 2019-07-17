@@ -17,3 +17,4 @@ variable consul_server_public_ips {
   type = "list"
 }
 variable data_volume_size {}
+variable class {}
