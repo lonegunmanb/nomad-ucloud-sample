@@ -24,6 +24,5 @@ data "template_file" "redis-job" {
 }
 
 resource "nomad_job" "redis" {
-  count = 1
   jobspec = "${data.template_file.redis-job.rendered}"
 }
