@@ -36,12 +36,12 @@ job "${job-name}" {
         brokerName=RaftNode0{{ env "NOMAD_META_index" }}
         brokerIP1={{ env "NOMAD_IP_broker" }}
         listenPort={{ env "NOMAD_PORT_broker" }}
-        namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outputProxy_namesvrTcp%d" $i)}}{{end}}
+        namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
         storePathRootDir=/tmp/rmqstore/node00
         storePathCommitLog=/tmp/rmqstore/node00/commitlog
         enableDLegerCommitLog=true
         dLegerGroup={{ env "NOMAD_META_clusterId" }}
-        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := env "NOMAD_META_index"|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outputProxy_namesvrTcp%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
+        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := env "NOMAD_META_index"|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
         ## must be unique
         dLegerSelfId=n{{ env "NOMAD_META_index" }}
         sendMessageThreadPoolNums=16
@@ -50,7 +50,7 @@ job "${job-name}" {
         change_mode = "noop"
       }
     }
-    task "inputProxy" {
+    task "inboundProxy" {
       driver = "exec"
       config {
         command = "consul"
@@ -69,7 +69,7 @@ job "${job-name}" {
         }
       }
     }
-    task "outputProxy" {
+    task "outboundProxy" {
       driver = "exec"
       config {
         command = "consul"
