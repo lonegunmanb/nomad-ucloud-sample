@@ -22,16 +22,16 @@ job "${job-name}" {
           port "tcp" {}
         }
       }
-//      service {
-//        name = "${namesvc-name}"
-//        port = "tcp"
-//        check {
-//          type     = "tcp"
-//          port     = "tcp"
-//          interval = "10s"
-//          timeout  = "2s"
-//        }
-//      }
+      service {
+        name = "nameServer${cluster-id}"
+        port = "tcp"
+        check {
+          type = "tcp"
+          port = "tcp"
+          interval = "10s"
+          timeout = "2s"
+        }
+      }
     }
 
     task "connect-proxy-${index}" {

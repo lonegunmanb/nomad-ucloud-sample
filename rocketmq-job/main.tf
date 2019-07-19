@@ -1,10 +1,3 @@
-variable "rocketmq_docker_image" {
-  default = "uhub.service.ucloud.cn/lonegunmanb/rocketmq"
-}
-variable "rocketmq_version" {
-  default = "4.5.1"
-}
-
 data "terraform_remote_state" "nomad" {
   backend = "local"
   config = {
@@ -17,6 +10,20 @@ locals {
   namesvr-name = "namesvc-service-${local.cluster-id}"
   brokersvc-name = "brokersvc-service-${local.cluster-id}"
   region = "${data.terraform_remote_state.nomad.region}"
+}
+
+module "consulKeys" {
+  source = "./consulKeys"
+  address = "${data.terraform_remote_state.nomad.consul_servers_public_ips[0]}:8500"
+  clusterId = "${local.cluster-id}"
+  region = "${local.region}"
+  pubkey = "${var.ucloud_pubkey}"
+  secret = "${var.ucloud_secret}"
+  vpcId = "${data.terraform_remote_state.nomad.vpcId}"
+  nomadSubnetId = "${data.terraform_remote_state.nomad.nomadSubnetId}"
+  nameServerIds = "${data.terraform_remote_state.nomad.namesvr_ids}"
+  nameServerPrivateIps = "${data.terraform_remote_state.nomad.namesvr_private_ips}"
+  projectId = "${data.terraform_remote_state.nomad.projectId}"
 }
 
 module "namesvr" {
@@ -40,4 +47,14 @@ module "broker" {
 module "console" {
   source = "./console"
   namesvc_name = "${local.namesvr-name}"
+}
+
+module "loadBalanceWatcher" {
+  source = "./loadBalancer"
+  az = "${data.terraform_remote_state.nomad.az[0]}"
+  nomad-server-ip = "${data.terraform_remote_state.nomad.nomad_servers_ips[0]}"
+  region = "${data.terraform_remote_state.nomad.region}"
+  terraform-image = "${var.terraform-image}"
+  clusterId = "${local.cluster-id}"
+  jobName = "loadBalanceWatcher-${local.cluster-id}"
 }

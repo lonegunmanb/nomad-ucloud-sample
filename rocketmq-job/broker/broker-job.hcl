@@ -33,7 +33,8 @@ job "${job-name}" {
       template {
         data = <<EOF
         brokerClusterName = {{ env "NOMAD_META_clusterId" }}
-        brokerName=RaftNode0{{ env "NOMAD_META_index" }}
+        #brokerName=RaftNode0{{ env "NOMAD_META_index" }}
+        brokerName=broker-{{env "NOMAD_META_clusterId"}}
         brokerIP1={{ env "NOMAD_IP_broker" }}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}

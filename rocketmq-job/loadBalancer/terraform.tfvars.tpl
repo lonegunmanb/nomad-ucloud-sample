@@ -1,0 +1,7 @@
+ucloud_pub_key = "{{key "cluster/pubkey"}}"
+ucloud_secret = "{{key "cluster/secret"}}"
+cluster-id = "{{key "cluster/id"}}"
+project_id = "{{key "cluster/projectId"}}"
+region = "{{key "cluster/region"}}"
+vpcId = "{{key "cluster/vpcId"}}"
+subnet_id = "{{key "cluster/nomadSubnetId"}}"

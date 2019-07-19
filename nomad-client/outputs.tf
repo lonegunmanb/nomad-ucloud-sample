@@ -5,3 +5,7 @@ output public_ips {
 output private_ips {
   value = "${ucloud_instance.nomad_clients.*.private_ip}"
 }
+
+output ids {
+  value = "${ucloud_instance.nomad_clients.*.id}"
+}
