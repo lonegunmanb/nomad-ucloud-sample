@@ -42,10 +42,11 @@ job "${job-name}" {
         storePathCommitLog=/tmp/rmqstore/node00/commitlog
         enableDLegerCommitLog=true
         dLegerGroup={{ env "NOMAD_META_clusterId" }}
-        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := env "NOMAD_META_index"|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
+        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := env "NOMAD_META_index"|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
         ## must be unique
         dLegerSelfId=n{{ env "NOMAD_META_index" }}
         sendMessageThreadPoolNums=16
+        clientCloseSocketIfTimeout=true
         EOF
         destination = "local/conf/broker.conf"
         change_mode = "noop"
