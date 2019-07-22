@@ -33,7 +33,6 @@ job "${job-name}" {
       template {
         data = <<EOF
         brokerClusterName = {{ env "NOMAD_META_clusterId" }}
-        #brokerName=RaftNode0{{ env "NOMAD_META_index" }}
         brokerName=broker-{{env "NOMAD_META_clusterId"}}
         brokerIP1={{ env "NOMAD_IP_broker" }}
         listenPort={{ env "NOMAD_PORT_broker" }}
