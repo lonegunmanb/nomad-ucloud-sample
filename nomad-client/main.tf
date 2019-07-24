@@ -47,12 +47,14 @@ resource "ucloud_disk_attachment" "data_disk" {
 }
 
 locals {
-  script-path = "${path.module}/setup.sh"
+  setup-script-path = "${path.module}/setup.sh"
+  reconfig-ssh-keys-script-path = "${path.module}/reconfig_ssh_keys.sh"
+  reconfig-ssh-keys-script = "${file(local.reconfig-ssh-keys-script-path)}"
 }
 
 data "template_file" "setup-script" {
   count = "${var.instance_count}"
-  template = "${file(local.script-path)}"
+  template = "${file(local.setup-script-path)}"
   vars {
     region = "${var.region}"
     az = "${var.az[count.index%length(var.az)]}"
@@ -67,7 +69,9 @@ data "template_file" "setup-script" {
 
 resource "null_resource" "setup" {
   count = "${var.instance_count}"
-  depends_on = ["ucloud_eip_association.nomad_ip", "ucloud_disk_attachment.data_disk"]
+  depends_on = [
+    "ucloud_eip_association.nomad_ip",
+    "ucloud_disk_attachment.data_disk"]
   provisioner "remote-exec" {
     connection {
       type = "ssh"
@@ -75,6 +79,9 @@ resource "null_resource" "setup" {
       password = "${var.root_password}"
       host = "${ucloud_eip.nomad_clients.*.public_ip[count.index]}"
     }
-    inline = ["${data.template_file.setup-script.*.rendered[count.index]}"]
+    inline = [
+      "${data.template_file.setup-script.*.rendered[count.index]}",
+      "${local.reconfig-ssh-keys-script}"
+    ]
   }
 }

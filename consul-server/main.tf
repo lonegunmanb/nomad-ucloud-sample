@@ -46,12 +46,14 @@ resource "ucloud_disk_attachment" "consul_server_data" {
 }
 
 locals {
-  script-path = "${path.module}/setup.sh"
+  setup-script-path = "${path.module}/setup.sh"
+  reconfig-ssh-keys-script-path = "${path.module}/reconfig_ssh_keys.sh"
+  reconfig-ssh-keys-script = "${file(local.reconfig-ssh-keys-script-path)}"
 }
 
 data "template_file" "setup-script" {
   count = "${local.instance_count}"
-  template = "${file(local.script-path)}"
+  template = "${file(local.setup-script-path)}"
   vars {
     region = "${var.region}"
     node-name = "${ucloud_instance.consul_server.*.id[count.index]}"
@@ -63,7 +65,9 @@ data "template_file" "setup-script" {
 
 resource "null_resource" "install_consul_server" {
   count = "${local.instance_count}"
-  depends_on = ["ucloud_instance.consul_server", "ucloud_disk_attachment.consul_server_data"]
+  depends_on = [
+    "ucloud_instance.consul_server",
+    "ucloud_disk_attachment.consul_server_data"]
   provisioner "remote-exec" {
     connection {
       type = "ssh"
@@ -71,6 +75,9 @@ resource "null_resource" "install_consul_server" {
       password = "${var.root_password}"
       host = "${ucloud_eip.consul_servers.*.public_ip[count.index]}"
     }
-    inline = ["${data.template_file.setup-script.*.rendered[count.index]}"]
+    inline = [
+      "${data.template_file.setup-script.*.rendered[count.index]}",
+      "${local.reconfig-ssh-keys-script}"
+    ]
   }
 }
