@@ -24,6 +24,8 @@ module "consulKeys" {
   nameServerIds = "${data.terraform_remote_state.nomad.namesvr_ids}"
   nameServerPrivateIps = "${data.terraform_remote_state.nomad.namesvr_private_ips}"
   projectId = "${data.terraform_remote_state.nomad.projectId}"
+  brokerServerIds = "${data.terraform_remote_state.nomad.brokersvr_ids}"
+  brokerServerPrivateIps = "${data.terraform_remote_state.nomad.brokersvr_private_ips}"
 }
 
 module "namesvr" {

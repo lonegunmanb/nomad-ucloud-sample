@@ -13,7 +13,7 @@ job "console-${cluster-id}" {
       }
       template {
         data = <<EOH
-          JAVA_OPTS="-Drocketmq.namesrv.addr=localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr0"}};localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr1"}};localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr2"}} -Dcom.rocketmq.sendMessageWithVIPChannel=false"
+          JAVA_OPTS="-Drocketmq.namesrv.addr=localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr0"}};localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr1"}};localhost:{{env "NOMAD_PORT_namesvc${cluster-id}_namesvr2"}} -Dcom.rocketmq.sendMessageWithVIPChannel=false -Dserver.port={{env "NOMAD_PORT_tcp"}}"
           EOH
 
         destination = "local/file.env"
@@ -23,9 +23,17 @@ job "console-${cluster-id}" {
         cpu = 500
         memory = 2048
         network {
-          port "tcp" {
-            static = "8080"
-          }
+          port "tcp" {}
+        }
+      }
+      service {
+        name = "console${cluster-id}"
+        port = "tcp"
+        check {
+          type     = "tcp"
+          port     = "tcp"
+          interval = "10s"
+          timeout  = "2s"
         }
       }
     }

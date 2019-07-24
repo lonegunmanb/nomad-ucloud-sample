@@ -48,7 +48,7 @@ job "${jobName}" {
     template {
       data = <<EOF
               output lbId {
-                value = "$${ucloud_lb.nameServerLb.*.id}"
+                value = "$${ucloud_lb.rocketMQLoadBalancer.*.id}"
               }
              EOF
       destination = "local/tf/outputs.tf"

@@ -9,7 +9,13 @@ variable "projectId" {}
 variable nameServerIds {
   type = "list"
 }
+variable brokerServerIds {
+  type = "list"
+}
 variable nameServerPrivateIps {
+  type = "list"
+}
+variable brokerServerPrivateIps {
   type = "list"
 }
 
@@ -63,8 +69,16 @@ resource "consul_keys" "nomadSubnetId" {
 resource "consul_keys" "nameServerIds" {
   count = "${length(var.nameServerIds)}"
   key {
-    path = "nameServersIp2Id/${var.nameServerPrivateIps[count.index]}"
+    path = "serversIp2Id/${var.nameServerPrivateIps[count.index]}"
     value = "${var.nameServerIds[count.index]}"
+  }
+}
+
+resource "consul_keys" "brokerServerIds" {
+  count = "${length(var.brokerServerIds)}"
+  key {
+    path = "serversIp2Id/${var.brokerServerPrivateIps[count.index]}"
+    value = "${var.brokerServerIds[count.index]}"
   }
 }
 
