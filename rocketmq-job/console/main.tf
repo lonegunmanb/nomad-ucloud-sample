@@ -7,16 +7,17 @@ data "terraform_remote_state" "nomad" {
   }
 }
 
-provider "nomad" {
-  address = "http://${data.terraform_remote_state.nomad.nomad_servers_ips[0]}:4646"
-  region  = "cn-bj2"
-}
-
 locals {
-  az = "${data.terraform_remote_state.nomad.az}"
+  region = "${data.terraform_remote_state.nomad.region}"
   cluster-id = "${data.terraform_remote_state.nomad.cluster_id}"
   console-job-hcl = "${path.module}/console-job.hcl"
 }
+
+provider "nomad" {
+  address = "http://${data.terraform_remote_state.nomad.nomad_servers_ips[0]}:4646"
+  region  = "${local.region}"
+}
+
 
 data "template_file" "console-job" {
   template = "${file(local.console-job-hcl)}"
@@ -24,7 +25,7 @@ data "template_file" "console-job" {
     cluster-id = "${local.cluster-id}"
     console-image = "uhub.service.ucloud.cn/lonegunmanb/rocketmq-console-ng:latest"
     namesvc-name = "${var.namesvc_name}"
-    az = "${local.az[0]}"
+    region = "${local.region}"
   }
 }
 

@@ -5,7 +5,7 @@ sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.servic
 mkdir --parents /data/nomad
 sed -i 's/REGION/${region}/g' /etc/nomad.d/server.hcl
 sed -i 's/DATACENTER/${region}/g' /etc/consul.d/consul.hcl
-sed -i 's/DATACENTER/${az}/g' /etc/nomad.d/server.hcl
+sed -i 's/DATACENTER/${region}/g' /etc/nomad.d/server.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/nomad.d/server.hcl
 sed -i 's/EXPECTEDSVRS/${instance-count}/g' /etc/nomad.d/server.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/consul.d/consul.hcl

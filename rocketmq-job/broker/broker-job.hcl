@@ -1,10 +1,14 @@
 job "${job-name}" {
-  datacenters = ["${az}"]
+  datacenters = ["${region}"]
   constraint {
     attribute = "$${node.class}"
     value     = "${node-class}"
   }
   group "broker" {
+    count = ${count}
+    spread {
+      attribute = "$${meta.az}"
+    }
     task "broker" {
       driver = "docker"
       config {
@@ -25,7 +29,6 @@ job "${job-name}" {
         }
       }
       meta {
-        index = "${index}"
         clusterId = "${cluster-id}"
         namesrvCount = "3"
         brokerCount = "3"
@@ -41,9 +44,9 @@ job "${job-name}" {
         storePathCommitLog=/tmp/rmqstore/node00/commitlog
         enableDLegerCommitLog=true
         dLegerGroup={{ env "NOMAD_META_clusterId" }}
-        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := env "NOMAD_META_index"|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
+        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := (env "NOMAD_ALLOC_INDEX")|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
         ## must be unique
-        dLegerSelfId=n{{ env "NOMAD_META_index" }}
+        dLegerSelfId=n{{ env "NOMAD_ALLOC_INDEX" }}
         sendMessageThreadPoolNums=16
         clientCloseSocketIfTimeout=true
         EOF
@@ -57,7 +60,7 @@ job "${job-name}" {
         command = "consul"
         args    = [
           "connect", "proxy",
-          "-service", "${brokersvc-name}${index}",
+          "-service", "${brokersvc-name}$${NOMAD_ALLOC_INDEX}",
           "-service-addr", "$${NOMAD_ADDR_broker_dledger}",
           "-listen", ":$${NOMAD_PORT_tcp}",
           "-register",
@@ -76,17 +79,17 @@ job "${job-name}" {
         command = "consul"
         args    = [
           "connect", "proxy",
-          "-service", "namesvc-sidecar-${cluster-id}-${index}-0",
+          "-service", "namesvc-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-0",
           "-upstream", "namesvc-${cluster-id}-0:$${NOMAD_PORT_namesvrTcp0}",
-          "-service", "namesvc-sidecar-${cluster-id}-${index}-1",
+          "-service", "namesvc-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-1",
           "-upstream", "namesvc-${cluster-id}-1:$${NOMAD_PORT_namesvrTcp1}",
-          "-service", "namesvc-sidecar-${cluster-id}-${index}-2",
+          "-service", "namesvc-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-2",
           "-upstream", "namesvc-${cluster-id}-2:$${NOMAD_PORT_namesvrTcp2}",
-          "-service", "broker-dledger-sidecar-${cluster-id}-${index}-0",
+          "-service", "broker-dledger-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-0",
           "-upstream", "${brokersvc-name}0:$${NOMAD_PORT_dledger0}",
-          "-service", "broker-dledger-sidecar-${cluster-id}-${index}-1",
+          "-service", "broker-dledger-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-1",
           "-upstream", "${brokersvc-name}1:$${NOMAD_PORT_dledger1}",
-          "-service", "broker-dledger-sidecar-${cluster-id}-${index}-2",
+          "-service", "broker-dledger-sidecar-${cluster-id}-$${NOMAD_ALLOC_INDEX}-2",
           "-upstream", "${brokersvc-name}2:$${NOMAD_PORT_dledger2}",
         ]
       }

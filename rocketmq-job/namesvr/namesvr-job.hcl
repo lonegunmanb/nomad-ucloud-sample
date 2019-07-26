@@ -1,10 +1,14 @@
 job "${job-name}" {
-  datacenters = ["${az}"]
+  datacenters = ["${region}"]
   constraint {
     attribute = "$${node.class}"
     value     = "${node-class}"
   }
   group "namesvr" {
+    count = ${count}
+    spread {
+      attribute = "$${meta.az}"
+    }
     task "namesvr" {
       driver = "docker"
       config {
@@ -34,13 +38,13 @@ job "${job-name}" {
       }
     }
 
-    task "connect-proxy-${index}" {
+    task "connect-proxy" {
       driver = "exec"
       config {
         command = "consul"
         args    = [
           "connect", "proxy",
-          "-service", "namesvc-${cluster-id}-${index}",
+          "-service", "namesvc-${cluster-id}-$${NOMAD_ALLOC_INDEX}",
           "-service-addr", "$${NOMAD_ADDR_namesvr_tcp}",
           "-listen", ":$${NOMAD_PORT_tcp}",
           "-register",

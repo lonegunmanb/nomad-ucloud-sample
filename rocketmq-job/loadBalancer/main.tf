@@ -8,7 +8,7 @@ data template_file tf-content {
 data "template_file" "job" {
   template = "${file(local.job-hcl)}"
   vars {
-    az = "${var.az}"
+    region = "${var.region}"
     cluster-id = "${var.clusterId}"
     terraform-image = "${var.terraform-image}"
     tfvars = "${local.tf-vars-content}"

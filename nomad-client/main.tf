@@ -60,7 +60,7 @@ data "template_file" "setup-script" {
     az = "${var.az[count.index%length(var.az)]}"
     node-name = "${var.class}-${ucloud_instance.nomad_clients.*.id[count.index]}"
     node-class = "${var.class}"
-    node-meta = "meta {}"
+    node-meta =  "meta {\\naz=\"${var.az[count.index%length(var.az)]}\"\\n}"
     consul-server-ip-0 = "${var.consul_server_private_ips[0]}"
     consul-server-ip-1 = "${var.consul_server_private_ips[1]}"
     consul-server-ip-2 = "${var.consul_server_private_ips[2]}"

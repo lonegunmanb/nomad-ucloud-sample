@@ -36,6 +36,7 @@ module "namesvr" {
   az = "${local.az}"
   cluster-id = "${local.cluster-id}"
   nomad-server-ip = "${data.terraform_remote_state.nomad.nomad_servers_ips[0]}"
+  region = "${data.terraform_remote_state.nomad.region}"
 }
 
 module "broker" {

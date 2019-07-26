@@ -1,5 +1,5 @@
 job "${jobName}" {
-  datacenters = ["${az}"]
+  datacenters = ["${region}"]
   task "terraform" {
     driver = "docker"
     config {
