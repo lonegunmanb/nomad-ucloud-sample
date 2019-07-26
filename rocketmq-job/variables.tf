@@ -7,9 +7,5 @@ variable "rocketmq_version" {
 variable terraform-image {
   default = "uhub.service.ucloud.cn/lonegunmanb/terraform:0.11.14"
 }
-variable ucloud_pubkey {
-  default = "mBpLavCXClh7vtW5hrzKA2/LcTm+JnmCHmItMpm3Z4hGxUuFmuMuDw4myeNn31nz"
-}
-variable ucloud_secret {
-  default = "nUPm/5epJeT1ogHIVwYnmWvP0YP2opetFVDiw2QxfMNMWGgj9RGgKKjmQpH4VOPm"
-}
+variable ucloud_pubkey {}
+variable ucloud_secret {}
