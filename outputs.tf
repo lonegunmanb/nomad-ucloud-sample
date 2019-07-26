@@ -54,3 +54,11 @@ output namesvr_private_ips {
 output namesvr_ids {
   value = "${module.nameServer.ids}"
 }
+
+output brokersvr_private_ips {
+  value = "${module.broker.private_ips}"
+}
+
+output brokersvr_ids {
+  value = "${module.broker.ids}"
+}
