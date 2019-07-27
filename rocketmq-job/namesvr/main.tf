@@ -7,6 +7,7 @@ variable az {
 variable region {}
 variable cluster-id {}
 variable nomad-server-ip {}
+variable allow-multiple-tasks-in-az {}
 
 
 provider "nomad" {
@@ -27,7 +28,9 @@ data "template_file" "namesvr-job" {
     namesvc-name = "${var.namesvc-name}"
     region = "${var.region}"
     count = "${length(var.az)}"
+    min-az-count = "${length(distinct(var.az))}"
     node-class = "nameServer"
+    task-limit-per-az = "${var.allow-multiple-tasks-in-az ? length(var.az) : 1}"
   }
 }
 resource "nomad_job" "namesvr" {

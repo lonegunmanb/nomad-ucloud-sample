@@ -1,7 +1,8 @@
-variable "rocketmq_docker_image" {}
-variable "rocketmq_version" {}
-variable "namesvc_name" {}
-variable "brokersvc_name" {}
+variable rocketmq_docker_image {}
+variable rocketmq_version {}
+variable namesvc_name {}
+variable brokersvc_name {}
+variable allow-multiple-tasks-in-az {}
 
 data "terraform_remote_state" "nomad" {
   backend = "local"
@@ -22,6 +23,7 @@ provider "nomad" {
   address = "http://${data.terraform_remote_state.nomad.nomad_servers_ips[0]}:4646"
   region  = "${local.region}"
 }
+
 data "template_file" "broker-job" {
   template = "${file(local.broker-job-hcl)}"
   vars = {
@@ -31,6 +33,7 @@ data "template_file" "broker-job" {
     az = "${local.az[count.index]}"
     region = "${local.region}"
     count = "${length(local.az)}"
+    min-az-count = "${length(distinct(local.az))}"
     broker-image = "${var.rocketmq_docker_image}:${var.rocketmq_version}"
     console-image = "uhub.service.ucloud.cn/lonegunmanb/rocketmq-console-ng:latest"
     rockermq-version = "${var.rocketmq_version}"
@@ -38,6 +41,7 @@ data "template_file" "broker-job" {
     namesvc-name = "${var.namesvc_name}"
     brokersvc-name = "${var.brokersvc_name}"
     node-class = "broker"
+    task-limit-per-az = "${var.allow-multiple-tasks-in-az ? length(local.az) : 1}"
   }
 }
 

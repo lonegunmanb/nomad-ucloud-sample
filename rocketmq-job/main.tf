@@ -37,6 +37,7 @@ module "namesvr" {
   cluster-id = "${local.cluster-id}"
   nomad-server-ip = "${data.terraform_remote_state.nomad.nomad_servers_ips[0]}"
   region = "${data.terraform_remote_state.nomad.region}"
+  allow-multiple-tasks-in-az = true
 }
 
 module "broker" {
@@ -45,6 +46,7 @@ module "broker" {
   rocketmq_version = "${var.rocketmq_version}"
   brokersvc_name = "${local.brokersvc-name}"
   namesvc_name = "${local.namesvr-name}"
+  allow-multiple-tasks-in-az = true
 }
 
 module "console" {

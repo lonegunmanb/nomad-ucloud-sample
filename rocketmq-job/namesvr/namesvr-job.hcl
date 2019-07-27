@@ -2,12 +2,24 @@ job "${job-name}" {
   datacenters = ["${region}"]
   constraint {
     attribute = "$${node.class}"
-    value     = "${node-class}"
+    value = "${node-class}"
+  }
+  constraint {
+    attribute = "$${meta.az}"
+    operator = "distinct_property"
+    value = "${task-limit-per-az}"
   }
   group "namesvr" {
     count = ${count}
     spread {
       attribute = "$${meta.az}"
+    }
+    update {
+      max_parallel = 1
+      health_check = "checks"
+      min_healthy_time = "1m"
+      healthy_deadline = "5m"
+      progress_deadline = "10m"
     }
     task "namesvr" {
       driver = "docker"
@@ -42,11 +54,15 @@ job "${job-name}" {
       driver = "exec"
       config {
         command = "consul"
-        args    = [
-          "connect", "proxy",
-          "-service", "namesvc-${cluster-id}-$${NOMAD_ALLOC_INDEX}",
-          "-service-addr", "$${NOMAD_ADDR_namesvr_tcp}",
-          "-listen", ":$${NOMAD_PORT_tcp}",
+        args = [
+          "connect",
+          "proxy",
+          "-service",
+          "namesvc-${cluster-id}-$${NOMAD_ALLOC_INDEX}",
+          "-service-addr",
+          "$${NOMAD_ADDR_namesvr_tcp}",
+          "-listen",
+          ":$${NOMAD_PORT_tcp}",
           "-register",
         ]
       }

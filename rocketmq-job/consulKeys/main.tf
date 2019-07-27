@@ -92,6 +92,6 @@ resource "consul_keys" "ucloudProjectId" {
 resource "consul_keys" "lbCount" {
   key {
     path = "lb-${var.clusterId}/lbCount"
-    value = "0"
+    value = "1"
   }
 }
