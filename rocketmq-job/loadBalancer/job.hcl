@@ -8,6 +8,7 @@ job "${jobName}" {
       args = ["/tf/tf.sh"]
       volumes = [
         "local/tf:/tf",
+        "secret/tf:/secret",
         "/plugin:/plugin"
       ]
       network_mode = "host"
@@ -23,7 +24,7 @@ job "${jobName}" {
         terraform init
         while true
         do
-          terraform apply --auto-approve -lock=false
+          terraform apply --auto-approve -lock=false -var-file="/secret/terraform.tfvars"
           sleep 10
         done
         EOF
@@ -34,7 +35,7 @@ job "${jobName}" {
       data = <<EOF
         ${tfvars}
         EOF
-      destination = "local/tf/terraform.tfvars"
+      destination = "secret/tf/terraform.tfvars"
       change_mode = "noop"
     }
     template {

@@ -5,13 +5,30 @@ data template_file tf-content {
   }
 }
 
+locals {
+  tf-vars-tpl = "${path.module}/terraform.tfvars.tpl"
+}
+
+data "template_file" "tf-vars-content" {
+  template = "${file(local.tf-vars-tpl)}"
+  vars {
+    clusterId = "${var.clusterId}"
+    region = "${var.region}"
+    vpcId = "${var.vpcId}"
+    subnetId = "${var.subnetId}"
+    ucloudPubKey = "${var.ucloud_pubkey}"
+    ucloudPriKey = "${var.ucloud_secret}"
+    projectId = "${var.projectId}"
+  }
+}
+
 data "template_file" "job" {
   template = "${file(local.job-hcl)}"
   vars {
     region = "${var.region}"
     cluster-id = "${var.clusterId}"
     terraform-image = "${var.terraform-image}"
-    tfvars = "${local.tf-vars-content}"
+    tfvars = "${data.template_file.tf-vars-content.rendered}"
     tf = "${data.template_file.tf-content.rendered}"
     jobName = "${var.jobName}"
   }

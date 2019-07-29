@@ -85,3 +85,17 @@ resource "null_resource" "setup" {
     ]
   }
 }
+
+provider "consul" {
+  address = "http://${var.consul_server_public_ips[0]}:8500"
+  datacenter = "${var.region}"
+}
+
+resource consul_keys ip2id {
+  depends_on = [null_resource.setup]
+  count = "${var.instance_count}"
+  key {
+    path = "serversIp2Id/${ucloud_instance.nomad_clients.*.private_ip[count.index]}"
+    value = "${ucloud_instance.nomad_clients.*.id[count.index]}"
+  }
+}

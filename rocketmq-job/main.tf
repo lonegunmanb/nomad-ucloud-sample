@@ -17,15 +17,6 @@ module "consulKeys" {
   address = "${data.terraform_remote_state.nomad.consul_servers_public_ips[0]}:8500"
   clusterId = "${local.cluster-id}"
   region = "${local.region}"
-  pubkey = "${var.ucloud_pubkey}"
-  secret = "${var.ucloud_secret}"
-  vpcId = "${data.terraform_remote_state.nomad.vpcId}"
-  nomadSubnetId = "${data.terraform_remote_state.nomad.nomadSubnetId}"
-  nameServerIds = "${data.terraform_remote_state.nomad.namesvr_ids}"
-  nameServerPrivateIps = "${data.terraform_remote_state.nomad.namesvr_private_ips}"
-  projectId = "${data.terraform_remote_state.nomad.projectId}"
-  brokerServerIds = "${data.terraform_remote_state.nomad.brokersvr_ids}"
-  brokerServerPrivateIps = "${data.terraform_remote_state.nomad.brokersvr_private_ips}"
 }
 
 module "namesvr" {
@@ -37,7 +28,7 @@ module "namesvr" {
   cluster-id = "${local.cluster-id}"
   nomad-server-ip = "${data.terraform_remote_state.nomad.nomad_servers_ips[0]}"
   region = "${data.terraform_remote_state.nomad.region}"
-  allow-multiple-tasks-in-az = true
+  allow-multiple-tasks-in-az = false
 }
 
 module "broker" {
@@ -46,7 +37,7 @@ module "broker" {
   rocketmq_version = "${var.rocketmq_version}"
   brokersvc_name = "${local.brokersvc-name}"
   namesvc_name = "${local.namesvr-name}"
-  allow-multiple-tasks-in-az = true
+  allow-multiple-tasks-in-az = false
 }
 
 module "console" {
@@ -62,4 +53,9 @@ module "loadBalanceWatcher" {
   terraform-image = "${var.terraform-image}"
   clusterId = "${local.cluster-id}"
   jobName = "loadBalanceWatcher-${local.cluster-id}"
+  projectId = "${data.terraform_remote_state.nomad.projectId}"
+  vpcId = "${data.terraform_remote_state.nomad.vpcId}"
+  subnetId = "${data.terraform_remote_state.nomad.nomadSubnetId}"
+  ucloud_pubkey = "${var.ucloud_pubkey}"
+  ucloud_secret = "${var.ucloud_secret}"
 }
