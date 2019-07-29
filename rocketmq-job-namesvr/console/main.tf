@@ -1,4 +1,5 @@
 variable namesvc_name {}
+variable clusterId {}
 
 data "terraform_remote_state" "nomad" {
   backend = "local"
@@ -9,7 +10,6 @@ data "terraform_remote_state" "nomad" {
 
 locals {
   region          = data.terraform_remote_state.nomad.outputs.region
-  cluster-id      = data.terraform_remote_state.nomad.outputs.cluster_id
   console-job-hcl = "${path.module}/console-job.hcl"
 }
 
@@ -21,7 +21,7 @@ provider "nomad" {
 data "template_file" "console-job" {
   template = file(local.console-job-hcl)
   vars = {
-    cluster-id    = local.cluster-id
+    cluster-id    = var.clusterId
     console-image = "uhub.service.ucloud.cn/lonegunmanb/rocketmq-console-ng:latest"
     namesvc-name  = var.namesvc_name
     region        = local.region

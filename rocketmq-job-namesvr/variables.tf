@@ -1,3 +1,4 @@
+variable clusterId {}
 variable rocketmq_docker_image {
   default = "uhub.service.ucloud.cn/lonegunmanb/rocketmq"
 }
