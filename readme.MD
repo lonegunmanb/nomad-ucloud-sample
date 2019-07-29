@@ -39,19 +39,14 @@ $ packer -version
 （注：本文写作时UCloud Packer Builder已整合进master分支，但已发布的1.4.2版本并未包含该Builder，所以在1.4.3正式版推出之前，各位老爷们只能先麻烦自己go install一下，1.4.3正式推出后直接下载使用官方二进制版本即可）
 
 ## 安装Hashicorp Terraform
-本教程采用terraform 0.11编写，目前最新的terraform版本为0.12，并且两者语法不兼容，所以请安装0.11版本terraform
+本教程已改用Terraform 0.12版本，如果要使用0.11版本，请使用terraform@0.11分支（已停止继续开发），并使用0.11版本可执行文件：
 
 [terraform 0.11](https://releases.hashicorp.com/terraform/0.11.14/)
 
 下载对应版本后，设置好Path，执行terraform -version能够正确看到输出结果即可
 ```bash
 $ terraform -version
-Terraform v0.11.14
-+ provider.null v2.1.2
-+ provider.ucloud v1.10.1
-
-Your version of Terraform is out of date! The latest version
-is 0.12.3. You can update by downloading from www.terraform.io/downloads.html
+Terraform v0.12.5
 ```
 
 ## 构建镜像
