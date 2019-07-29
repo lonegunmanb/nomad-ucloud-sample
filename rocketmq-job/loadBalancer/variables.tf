@@ -11,5 +11,6 @@ variable ucloud_pubkey {}
 variable ucloud_secret {}
 locals {
   job-hcl = "${path.module}/job.hcl"
-  tf-tpl = "${path.module}/lb.tf.tpl"
+  tf-tpl  = "${path.module}/lb.tf.tpl"
 }
+

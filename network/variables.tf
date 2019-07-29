@@ -1,6 +1,4 @@
-variable az {
-  default = "cn-bj2-02"
-}
+variable az {}
 variable ucloud_pub_key {}
 variable region {}
 variable ucloud_secret {}

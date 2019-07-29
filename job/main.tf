@@ -6,23 +6,24 @@ data "terraform_remote_state" "nomad" {
 }
 
 locals {
-  az = "${data.terraform_remote_state.nomad.az}"
+  az = data.terraform_remote_state.nomad.outputs.az
 }
 
 provider "nomad" {
-  address = "http://${data.terraform_remote_state.nomad.nomad_servers_ips[0]}:4646"
+  address = "http://${data.terraform_remote_state.nomad.outputs.nomad_servers_ips[0]}:4646"
   region  = "cn-bj2"
 }
 
 data "template_file" "redis-job" {
-  template = "${file("./redis-job.hcl")}"
+  template = file("./redis-job.hcl")
   vars = {
-    job-name = "redis"
-    redis-server-image = "${var.redis-server-image}"
-    web-server-image = "${var.web-server-image}"
+    job-name           = "redis"
+    redis-server-image = var.redis-server-image
+    web-server-image   = var.web-server-image
   }
 }
 
 resource "nomad_job" "redis" {
-  jobspec = "${data.template_file.redis-job.rendered}"
+  jobspec = data.template_file.redis-job.rendered
 }
+
