@@ -92,7 +92,7 @@ provider "consul" {
 }
 
 resource consul_keys ip2id {
-  depends_on = [null_resource.setup]
+  depends_on = ["null_resource.setup"]
   count = "${var.instance_count}"
   key {
     path = "serversIp2Id/${ucloud_instance.nomad_clients.*.private_ip[count.index]}"
