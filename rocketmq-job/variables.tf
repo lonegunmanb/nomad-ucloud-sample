@@ -1,7 +1,7 @@
-variable "rocketmq_docker_image" {
+variable rocketmq_docker_image {
   default = "uhub.service.ucloud.cn/lonegunmanb/rocketmq"
 }
-variable "rocketmq_version" {
+variable rocketmq_version {
   default = "4.5.1"
 }
 variable terraform-image {

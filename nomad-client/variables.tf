@@ -1,6 +1,6 @@
 variable region {}
 variable az {
-  type = "list"
+  type = list(string)
 }
 variable root_password {}
 variable sg_id {}
@@ -11,10 +11,10 @@ variable instance_count {}
 variable image_id {}
 variable instance_type {}
 variable consul_server_private_ips {
-  type = "list"
+  type = list(string)
 }
 variable consul_server_public_ips {
-  type = "list"
+  type = list(string)
 }
 variable data_volume_size {}
 variable class {}

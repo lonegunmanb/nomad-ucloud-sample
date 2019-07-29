@@ -1,9 +1,9 @@
 variable region {}
 variable az {
-  type = "list"
+  type = list(string)
 }
 locals {
-  instance_count = "${length(var.az)}"
+  instance_count = length(var.az)
 }
 variable root_password {}
 variable sg_id {}
