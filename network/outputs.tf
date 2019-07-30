@@ -1,16 +1,19 @@
-output "vpc_id" {
-  value = ucloud_vpc.consul_vpc.id
+output mgrVpcId {
+  value = module.mgrVpc.vpc_id
 }
 
-output "consul_subnet_id" {
-  value = ucloud_subnet.consul_server.id
+output clientVpcId {
+  value = module.clientVpc.vpc_id
 }
 
-output "nomad_subnet_id" {
-  value = ucloud_subnet.nomad.id
+output mgrSubnetId {
+  value = module.mgrVpc.subnetId
 }
 
-output "cluster_id" {
+output clientSubnetId {
+  value = module.clientVpc.subnetId
+}
+
+output cluster_id {
   value = var.cluster_id
 }
-

@@ -1,17 +1,13 @@
-output "projectId" {
+output projectId {
   value = var.project_id
 }
 
-output "vpcId" {
-  value = data.terraform_remote_state.network.outputs.vpc_id
+output clientVpcId {
+  value = data.terraform_remote_state.network.outputs.clientVpcId
 }
 
-output "consulSubnetId" {
-  value = data.terraform_remote_state.network.outputs.consul_subnet_id
-}
-
-output "nomadSubnetId" {
-  value = data.terraform_remote_state.network.outputs.nomad_subnet_id
+output clientSubnetId {
+  value = data.terraform_remote_state.network.outputs.clientSubnetId
 }
 
 output "cluster_id" {

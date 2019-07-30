@@ -5,7 +5,7 @@ provider "ucloud" {
   region      = var.region
 }
 
-data "terraform_remote_state" "network" {
+data terraform_remote_state network {
   backend = "local"
   config = {
     path = "./network/terraform.tfstate"
@@ -16,7 +16,7 @@ locals {
   cluster_id = data.terraform_remote_state.network.outputs.cluster_id
 }
 
-resource "ucloud_security_group" "consul_server_sg" {
+resource ucloud_security_group consul_server_sg {
   rules {
     port_range = "22"
     protocol   = "tcp"
@@ -53,7 +53,7 @@ resource "ucloud_security_group" "consul_server_sg" {
   }
 }
 
-module "consul_servers" {
+module consul_servers {
   source           = "./consul-server"
   region           = var.region
   instance_type    = var.consul_server_type
@@ -62,12 +62,12 @@ module "consul_servers" {
   cluster_id       = local.cluster_id
   sg_id            = ucloud_security_group.consul_server_sg.id
   root_password    = var.consul_server_root_password
-  vpc_id           = data.terraform_remote_state.network.outputs.vpc_id
-  subnet_id        = data.terraform_remote_state.network.outputs.consul_subnet_id
+  vpc_id           = data.terraform_remote_state.network.outputs.mgrVpcId
+  subnet_id        = data.terraform_remote_state.network.outputs.mgrSubnetId
   data_volume_size = 30
 }
 
-module "nomad_servers" {
+module nomad_servers {
   source            = "./nomad-server"
   region            = var.region
   az                = var.az
@@ -77,13 +77,13 @@ module "nomad_servers" {
   instance_type     = var.nomad_server_type
   root_password     = var.nomad_server_root_password
   sg_id             = ucloud_security_group.consul_server_sg.id
-  vpc_id            = data.terraform_remote_state.network.outputs.vpc_id
-  subnet_id         = data.terraform_remote_state.network.outputs.nomad_subnet_id
+  vpc_id            = data.terraform_remote_state.network.outputs.mgrVpcId
+  subnet_id         = data.terraform_remote_state.network.outputs.mgrSubnetId
   consul_server_ips = module.consul_servers.private_ips
   data_volume_size  = 30
 }
 
-module "nameServer" {
+module nameServer {
   source                    = "./nomad-client"
   az                        = var.az
   cluster_id                = local.cluster_id
@@ -95,13 +95,13 @@ module "nameServer" {
   region                    = var.region
   root_password             = var.nomad_client_root_password
   sg_id                     = ucloud_security_group.consul_server_sg.id
-  subnet_id                 = data.terraform_remote_state.network.outputs.nomad_subnet_id
-  vpc_id                    = data.terraform_remote_state.network.outputs.vpc_id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
 }
 
-module "broker" {
+module broker {
   source                    = "./nomad-client"
   az                        = var.az
   cluster_id                = local.cluster_id
@@ -113,8 +113,8 @@ module "broker" {
   region                    = var.region
   root_password             = var.nomad_client_root_password
   sg_id                     = ucloud_security_group.consul_server_sg.id
-  subnet_id                 = data.terraform_remote_state.network.outputs.nomad_subnet_id
-  vpc_id                    = data.terraform_remote_state.network.outputs.vpc_id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
 }

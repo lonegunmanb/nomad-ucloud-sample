@@ -46,8 +46,8 @@ module "loadBalanceWatcher" {
   clusterId       = var.clusterId
   jobName         = "loadBalanceWatcher-${var.clusterId}"
   projectId       = data.terraform_remote_state.nomad.outputs.projectId
-  vpcId           = data.terraform_remote_state.nomad.outputs.vpcId
-  subnetId        = data.terraform_remote_state.nomad.outputs.nomadSubnetId
+  vpcId           = data.terraform_remote_state.nomad.outputs.clientVpcId
+  subnetId        = data.terraform_remote_state.nomad.outputs.clientSubnetId
   ucloud_pubkey   = var.ucloud_pubkey
   ucloud_secret   = var.ucloud_secret
 }
