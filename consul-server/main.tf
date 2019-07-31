@@ -60,6 +60,8 @@ data "template_file" "setup-script" {
     consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
     consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
     consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
+    mgrSubnetCidr = var.mgrSubnetCidr
+    clientSubnetCidr = var.clientSubnetCidr
   }
 }
 

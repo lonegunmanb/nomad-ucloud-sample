@@ -13,3 +13,9 @@ locals {
   clientVpcName = "nomadClientVpc-${var.cluster_id}"
   clientSubnetName = "nomadClientSubnet-${var.cluster_id}"
 }
+
+variable externalVpcCidr {}
+locals {
+  externalVpcName = "externalVpc-${var.cluster_id}"
+  externalSubnetName = "externalVpc-${var.cluster_id}"
+}

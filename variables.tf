@@ -28,6 +28,9 @@ variable "az" {
 variable "project_id" {
 }
 
+variable clientSubnetCidr {}
+variable mgrSubnetCidr {}
+
 variable "consul_server_type" {
   default = "n-highcpu-1"
 }

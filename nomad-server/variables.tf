@@ -7,6 +7,8 @@ variable sg_id {}
 variable vpc_id {}
 variable subnet_id {}
 variable cluster_id {}
+variable mgrSubnetCidr {}
+variable clientSubnetCidr {}
 variable instance_count {}
 variable image_id {}
 variable instance_type {}

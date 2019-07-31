@@ -65,6 +65,8 @@ module consul_servers {
   vpc_id           = data.terraform_remote_state.network.outputs.mgrVpcId
   subnet_id        = data.terraform_remote_state.network.outputs.mgrSubnetId
   data_volume_size = 30
+  mgrSubnetCidr = var.mgrSubnetCidr
+  clientSubnetCidr = var.clientSubnetCidr
 }
 
 module nomad_servers {
@@ -81,6 +83,8 @@ module nomad_servers {
   subnet_id         = data.terraform_remote_state.network.outputs.mgrSubnetId
   consul_server_ips = module.consul_servers.private_ips
   data_volume_size  = 30
+  mgrSubnetCidr = var.mgrSubnetCidr
+  clientSubnetCidr = var.clientSubnetCidr
 }
 
 module nameServer {
@@ -90,7 +94,7 @@ module nameServer {
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
-  instance_count            = 6
+  instance_count            = 3
   instance_type             = var.nomad_client_namesvr_type
   region                    = var.region
   root_password             = var.nomad_client_root_password
@@ -99,6 +103,8 @@ module nameServer {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
+  mgrSubnetCidr = var.mgrSubnetCidr
+  clientSubnetCidr = var.clientSubnetCidr
 }
 
 module broker {
@@ -108,7 +114,7 @@ module broker {
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
-  instance_count            = 6
+  instance_count            = 3
   instance_type             = var.nomad_client_broker_type
   region                    = var.region
   root_password             = var.nomad_client_root_password
@@ -117,5 +123,7 @@ module broker {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
+  mgrSubnetCidr = var.mgrSubnetCidr
+  clientSubnetCidr = var.clientSubnetCidr
 }
 
