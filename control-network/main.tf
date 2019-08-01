@@ -82,7 +82,7 @@ resource ucloud_lb controllerLb {
   subnet_id = ucloud_subnet.subnet.id
 }
 
-resource ucloud_eip lbEip {
+resource ucloud_eip controlerLbEip {
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"
@@ -92,7 +92,7 @@ resource ucloud_eip lbEip {
 }
 
 resource ucloud_eip_association lb {
-  eip_id = ucloud_eip.lbEip.id
+  eip_id = ucloud_eip.controlerLbEip.id
   resource_id = ucloud_lb.controllerLb.id
 }
 
@@ -148,14 +148,40 @@ data template_file provision-consul-backends {
   }
 }
 
-output vpcId {
-  value = ucloud_vpc.vpc.id
+resource null_resource provision_consul_backend {
+  depends_on = [null_resource.setupScript]
+  provisioner remote-exec {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = ucloud_eip.eip[0].public_ip
+    }
+    inline = [
+      data.template_file.provision-consul-backends.rendered
+    ]
+  }
 }
 
-output lbIp {
-  value = ucloud_eip.lbEip.public_ip
+data ucloud_lbs consul_lb {
+  depends_on = [null_resource.provision_consul_backend]
+  vpc_id = ucloud_vpc.vpc.id
+  subnet_id = ucloud_subnet.subnet.id
+  name_regex = "consulLb"
 }
 
-output controlerIps {
-  value = ucloud_eip.eip.*.public_ip
+resource null_resource set_consul_lb_url {
+  depends_on = [ucloud_lb_attachment.ssh]
+  count = local.instanceCount
+  provisioner remote-exec {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = ucloud_eip.eip[count.index].public_ip
+    }
+    inline = [
+      "echo export CONSUL=${data.ucloud_lbs.consul_lb.private_ip} >> ~/.bashrc"
+    ]
+  }
 }
