@@ -6,6 +6,7 @@ variable project_id {}
 variable cluster_id {}
 variable mgrVpcCidr {}
 variable clientVpcCidr {}
+variable controllerVpcId {}
 
 locals {
   mgrVpcName = "nomadMgrVpc-${var.cluster_id}"

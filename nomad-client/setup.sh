@@ -22,8 +22,8 @@ systemctl start nomad
 systemctl start firewalld
 firewall-cmd --zone=trusted --permanent --add-source="${mgrSubnetCidr}"
 firewall-cmd --zone=trusted --permanent --add-source="${clientSubnetCidr}"
+firewall-cmd --zone=trusted --permanent --add-source="${controllerCidr}"
 #TEMPORARY
-firewall-cmd --zone=public --permanent --add-service=ssh
 firewall-cmd --zone=public --permanent --add-port="20000-32000/tcp"
 firewall-cmd --reload
 #restart docker service MUST be the LAST command of setup

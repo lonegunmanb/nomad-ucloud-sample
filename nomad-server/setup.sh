@@ -20,8 +20,5 @@ systemctl start nomad
 systemctl start firewalld
 firewall-cmd --zone=trusted --permanent --add-source="${mgrSubnetCidr}"
 firewall-cmd --zone=trusted --permanent --add-source="${clientSubnetCidr}"
-#TEMPORARY
-firewall-cmd --zone=public --permanent --add-service=ssh
-#TEMPORARY
-firewall-cmd --zone=public --permanent --add-port="4646/tcp"
+firewall-cmd --zone=trusted --permanent --add-source="${controllerCidr}"
 firewall-cmd --reload
