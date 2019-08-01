@@ -9,6 +9,8 @@ wget -O terraform.zip http://hashicorpfile.cn-bj.ufileos.com/terraform_${TERRAFO
 unzip terraform
 install terraform /usr/local/bin/terraform
 terraform version
+mkdir /plugin
+echo plugin_cache_dir = \"/plugin\" >> ~/.terraformrc
 
 wget -O consul.zip http://hashicorpfile.cn-bj.ufileos.com/consul_${CONSUL_VERSION}_linux_amd64.zip
 unzip consul.zip
