@@ -93,6 +93,7 @@ resource ucloud_lb_attachment consul {
   listener_id = ucloud_lb_listener.consul_listener.id
   load_balancer_id = ucloud_lb.consul_lb.id
   resource_id = ucloud_instance.consul_server[count.index].id
+  port = 8500
 }
 
 output consul_lb_ip {
