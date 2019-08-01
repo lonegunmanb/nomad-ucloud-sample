@@ -13,7 +13,7 @@ resource "ucloud_instance" "consul_server" {
   image_id          = var.image_id
   instance_type     = var.instance_type
   root_password     = var.root_password
-  charge_type       = "dynamic"
+  charge_type       = var.charge_type
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
   provisioner "local-exec" {
@@ -27,6 +27,7 @@ resource "ucloud_disk" "consul_data" {
   name              = "consul-data-${count.index}"
   disk_size         = var.data_volume_size
   tag               = var.tag
+  charge_type = var.charge_type
 }
 
 resource "ucloud_disk_attachment" "consul_server_data" {

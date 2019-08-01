@@ -15,3 +15,6 @@ variable subnet_id {}
 variable data_volume_size {}
 variable image_id {}
 variable instance_type {}
+variable charge_type {
+  default = "dynamic"
+}
