@@ -1,3 +1,6 @@
+variable project_id {}
+variable ucloud_secret {}
+variable ucloud_pub_key {}
 variable region {}
 variable az {
   type = list(string)

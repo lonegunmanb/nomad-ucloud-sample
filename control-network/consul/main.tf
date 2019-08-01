@@ -1,3 +1,10 @@
+provider "ucloud" {
+  public_key  = var.ucloud_pub_key
+  private_key = var.ucloud_secret
+  project_id  = var.project_id
+  region      = var.region
+}
+
 resource "ucloud_instance" "consul_server" {
   count             = local.instance_count
   name              = "consul-server-${count.index}"
