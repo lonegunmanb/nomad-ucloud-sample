@@ -86,6 +86,7 @@ resource ucloud_lb consul_lb {
 resource ucloud_lb_listener consul_listener {
   load_balancer_id = ucloud_lb.consul_lb.id
   protocol = "tcp"
+  listen_type = "request_proxy"
   name = "consul"
   port = 8500
 }
