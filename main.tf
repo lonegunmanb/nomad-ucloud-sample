@@ -12,10 +12,6 @@ data terraform_remote_state network {
   }
 }
 
-locals {
-  cluster_id = data.terraform_remote_state.network.outputs.cluster_id
-}
-
 resource ucloud_security_group consul_server_sg {
   rules {
     port_range = "22"
@@ -59,7 +55,7 @@ module consul_servers {
   instance_type    = var.consul_server_type
   image_id         = var.consul_server_image_id
   az               = var.az
-  cluster_id       = local.cluster_id
+  cluster_id       = var.cluster_id
   sg_id            = ucloud_security_group.consul_server_sg.id
   root_password    = var.consul_server_root_password
   vpc_id           = data.terraform_remote_state.network.outputs.mgrVpcId
@@ -73,7 +69,7 @@ module nomad_servers {
   source            = "./nomad-server"
   region            = var.region
   az                = var.az
-  cluster_id        = local.cluster_id
+  cluster_id        = var.cluster_id
   image_id          = var.nomad_server_image_id
   instance_count    = 3
   instance_type     = var.nomad_server_type
@@ -90,7 +86,7 @@ module nomad_servers {
 module nameServer {
   source                    = "./nomad-client"
   az                        = var.az
-  cluster_id                = local.cluster_id
+  cluster_id                = var.cluster_id
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
@@ -110,7 +106,7 @@ module nameServer {
 module broker {
   source                    = "./nomad-client"
   az                        = var.az
-  cluster_id                = local.cluster_id
+  cluster_id                = var.cluster_id
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id

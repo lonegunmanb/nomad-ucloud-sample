@@ -20,3 +20,7 @@ locals {
   externalVpcName = "externalVpc-${var.cluster_id}"
   externalSubnetName = "externalVpc-${var.cluster_id}"
 }
+
+variable consul_backend {
+  default = ""
+}

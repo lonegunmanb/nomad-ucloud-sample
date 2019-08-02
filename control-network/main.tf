@@ -27,6 +27,7 @@ resource ucloud_security_group sg {
   }
 }
 
+
 resource ucloud_instance controller {
   count = local.instanceCount
   name              = "controller-${count.index}"
@@ -37,7 +38,7 @@ resource ucloud_instance controller {
   vpc_id = ucloud_vpc.vpc.id
   subnet_id = ucloud_subnet.subnet.id
   root_password     = var.root_password
-  charge_type       = "dynamic"
+  charge_type       = var.charge_type
   security_group    = ucloud_security_group.sg.id
   provisioner local-exec {
     command = "sleep 10"
@@ -50,6 +51,7 @@ resource ucloud_disk dataDisk {
   disk_size = 100
   name = "controllerDisk-${count.index}"
   tag = var.tag
+  charge_type = var.charge_type
 }
 
 resource ucloud_disk_attachment attachment {
@@ -63,7 +65,7 @@ resource ucloud_eip eip {
   count = local.instanceCount
   internet_type = "bgp"
   charge_mode   = "traffic"
-  charge_type   = "dynamic"
+  charge_type   = var.charge_type
   bandwidth     = 200
   name = "controller-${count.index}"
   tag           = var.tag
@@ -85,7 +87,7 @@ resource ucloud_lb controllerLb {
 resource ucloud_eip controlerLbEip {
   internet_type = "bgp"
   charge_mode   = "traffic"
-  charge_type   = "dynamic"
+  charge_type   = var.charge_type
   bandwidth     = 200
   name = "controllerLb"
   tag           = var.tag
@@ -111,8 +113,19 @@ resource ucloud_lb_attachment ssh {
   port = "22"
 }
 
-locals {
-  reconfig_ssh_keys_script = file("./reconfig_ssh_keys.sh")
+data template_file mount_disk_script {
+  template = file("./mount-disk.sh")
+  vars = {
+    project_root_dir = var.project_root_dir
+  }
+}
+
+data template_file clone_project_script {
+  template = file("./clone-tf-project.sh")
+  vars = {
+    terraform_project_url = var.terraform_project_url
+    project_dir = "/project/${var.project_dir}"
+  }
 }
 
 resource null_resource setupScript {
@@ -126,18 +139,22 @@ resource null_resource setupScript {
       host     = ucloud_eip.eip[count.index].public_ip
     }
     inline = [
-      local.reconfig_ssh_keys_script,
+      data.template_file.mount_disk_script.rendered,
+      data.template_file.clone_project_script.rendered,
+      file("./reconfig_ssh_keys.sh"),
     ]
   }
 }
 
-data template_file provision-consul-backends {
+data template_file provision_consul_backends_script {
   template = file("./provision-consul-backends.sh")
-  vars {
-    terraform_project_url = var.terraform_project_url
-    project_dir = var.project_dir
+  vars = {
+    project_id = var.project_id
+    ucloud_pub_key = var.ucloud_pub_key
+    ucloud_secret = var.ucloud_secret
+    project_dir = "/project/${var.project_dir}"
     region = var.region
-    az = "[${join(",", var.az)}]"
+    az = "[${join(",", formatlist("\"%s\"", var.az))}]"
     root_password = var.consul_root_password
     tag = var.tag
     vpc_id = ucloud_vpc.vpc.id
@@ -145,11 +162,19 @@ data template_file provision-consul-backends {
     data_volume_size = var.consul_data_volume_size
     image_id = var.consul_image_id
     instance_type = var.consul_instance_type
+    charge_type = var.charge_type
+  }
+}
+
+data template_file destroy_consul_backends_script {
+  template = file("./destroy-consul-backends.sh")
+  vars = {
+    project_dir = "/project/${var.project_dir}"
   }
 }
 
 resource null_resource provision_consul_backend {
-  depends_on = [null_resource.setupScript]
+  depends_on = [null_resource.setupScript, ucloud_eip_association.association, ucloud_disk_attachment.attachment, ucloud_security_group.sg]
   provisioner remote-exec {
     connection {
       type     = "ssh"
@@ -158,7 +183,19 @@ resource null_resource provision_consul_backend {
       host     = ucloud_eip.eip[0].public_ip
     }
     inline = [
-      data.template_file.provision-consul-backends.rendered
+      data.template_file.provision_consul_backends_script.rendered
+    ]
+  }
+  provisioner remote-exec {
+    when = "destroy"
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = ucloud_eip.eip[0].public_ip
+    }
+    inline = [
+      data.template_file.destroy_consul_backends_script.rendered
     ]
   }
 }
@@ -181,7 +218,7 @@ resource null_resource set_consul_lb_url {
       host     = ucloud_eip.eip[count.index].public_ip
     }
     inline = [
-      "echo export CONSUL=${data.ucloud_lbs.consul_lb.private_ip} >> ~/.bashrc"
+      "echo export TF_VAR_consul_backend=${data.ucloud_lbs.consul_lb.lbs.0.private_ip} >> ~/.bashrc"
     ]
   }
 }

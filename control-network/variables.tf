@@ -23,7 +23,12 @@ locals {
 }
 
 variable terraform_project_url {}
+variable project_root_dir {}
 variable project_dir {}
 variable consul_root_password {}
 variable consul_data_volume_size {}
 variable consul_instance_type {}
+
+variable charge_type {
+  default = "dynamic"
+}

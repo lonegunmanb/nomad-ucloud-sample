@@ -1,13 +1,10 @@
-mkdir /project
-cd /project
-git clone ${terraform_project_url}
-cd ${project_dir}/constrol-network/consul
-cat <<EOF
+cd ${project_dir}/control-network/consul
+cat > terraform.tfvars <<EOF
+      project_id = "${project_id}"
+      ucloud_pub_key = "${ucloud_pub_key}"
+      ucloud_secret = "${ucloud_secret}"
       region = "${region}"
       az = ${az}
-      locals {
-        instance_count = length(var.az)
-      }
       root_password = "${root_password}"
       tag = "${tag}"
       vpc_id = "${vpc_id}"
@@ -15,6 +12,8 @@ cat <<EOF
       data_volume_size = ${data_volume_size}
       image_id = "${image_id}"
       instance_type = "${instance_type}"
-      EOF > terraform.tfvars
-terraform init
+      charge_type = "${charge_type}"
+EOF
+export TF_LOG=DEBUG
+terraform init -plugin-dir=/plugin
 terraform apply --auto-approve -input=false

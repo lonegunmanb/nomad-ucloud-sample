@@ -98,7 +98,3 @@ resource ucloud_lb_attachment consul {
   resource_id = ucloud_instance.consul_server[count.index].id
   port = 8500
 }
-
-output consul_lb_ip {
-  value = ucloud_lb.consul_lb.private_ip
-}
