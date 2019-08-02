@@ -61,7 +61,3 @@ variable "nomad_client_image_id" {
 }
 
 variable cluster_id {}
-
-variable consul_backend {
-  default = ""
-}
