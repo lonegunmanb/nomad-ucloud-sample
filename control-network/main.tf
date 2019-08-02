@@ -218,7 +218,7 @@ resource null_resource set_consul_lb_url {
       host     = ucloud_eip.eip[count.index].public_ip
     }
     inline = [
-      "echo export TF_VAR_consul_backend=${data.ucloud_lbs.consul_lb.lbs.0.private_ip} >> ~/.bashrc"
+      "echo ${data.ucloud_lbs.consul_lb.lbs.0.private_ip} consul_backend >> /etc/hosts"
     ]
   }
 }

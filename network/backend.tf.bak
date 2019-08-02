@@ -1,9 +1,7 @@
-variable consul_backend {}
-
 terraform {
   backend "consul" {
-    address = "${var.consul_backend}:8500"
+    address = "consul_backend:8500"
     scheme = "http"
-    path = "terraform/${var.cluster_id}/network_state"
+    path = "terraform/network_state"
   }
 }
