@@ -77,6 +77,7 @@ resource "null_resource" "install_consul_server" {
 
 resource ucloud_lb consul_lb {
   name = "consulLb"
+  internal = true
   tag = var.tag
   vpc_id = var.vpc_id
   subnet_id = var.subnet_id
