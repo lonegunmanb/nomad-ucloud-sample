@@ -208,7 +208,7 @@ data ucloud_lbs consul_lb {
 }
 
 resource null_resource set_consul_lb_url {
-  depends_on = [ucloud_lb_attachment.ssh]
+  depends_on = [ucloud_lb_attachment.ssh, ucloud_vpc.vpc]
   count = local.instanceCount
   provisioner remote-exec {
     connection {
@@ -218,7 +218,8 @@ resource null_resource set_consul_lb_url {
       host     = ucloud_eip.eip[count.index].public_ip
     }
     inline = [
-      "echo ${data.ucloud_lbs.consul_lb.lbs.0.private_ip} consul_backend >> /etc/hosts"
+      "echo ${data.ucloud_lbs.consul_lb.lbs.0.private_ip} consul_backend >> /etc/hosts",
+      "echo export TF_VAR_controllerVpcId=\"${ucloud_vpc.vpc.id}\" >> ~/.bashrc"
     ]
   }
 }

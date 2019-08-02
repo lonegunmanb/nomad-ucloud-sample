@@ -5,13 +5,6 @@ provider "ucloud" {
   region      = var.region
 }
 
-data terraform_remote_state network {
-  backend = "local"
-  config = {
-    path = "./network/terraform.tfstate"
-  }
-}
-
 resource ucloud_security_group consul_server_sg {
   rules {
     port_range = "22"
