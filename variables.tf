@@ -61,3 +61,4 @@ variable "nomad_client_image_id" {
 }
 
 variable cluster_id {}
+variable controllerCidr {}

@@ -219,7 +219,8 @@ resource null_resource set_consul_lb_url {
     }
     inline = [
       "echo ${data.ucloud_lbs.consul_lb.lbs.0.private_ip} consul_backend >> /etc/hosts",
-      "echo export TF_VAR_controllerVpcId=\"${ucloud_vpc.vpc.id}\" >> ~/.bashrc"
+      "echo export TF_VAR_controllerVpcId=\"${ucloud_vpc.vpc.id}\" >> ~/.bashrc",
+      "echo export TF_VAR_controllerCidr=\"${var.cidr}\" >> ~/.bashrc"
     ]
   }
 }

@@ -16,3 +16,4 @@ variable consul_server_ips {
   type = list(string)
 }
 variable data_volume_size {}
+variable controllerCidr {}

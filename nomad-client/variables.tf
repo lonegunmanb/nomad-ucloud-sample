@@ -9,6 +9,7 @@ variable subnet_id {}
 variable cluster_id {}
 variable mgrSubnetCidr {}
 variable clientSubnetCidr {}
+variable controllerCidr {}
 variable instance_count {}
 variable image_id {}
 variable instance_type {}

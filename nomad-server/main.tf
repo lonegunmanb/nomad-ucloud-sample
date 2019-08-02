@@ -64,6 +64,7 @@ data "template_file" "setup-script" {
     consul-server-ip-2 = var.consul_server_ips[2]
     mgrSubnetCidr = var.mgrSubnetCidr
     clientSubnetCidr = var.clientSubnetCidr
+    controllerCidr = var.controllerCidr
   }
 }
 

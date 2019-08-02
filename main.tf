@@ -56,6 +56,7 @@ module consul_servers {
   data_volume_size = 30
   mgrSubnetCidr = var.mgrSubnetCidr
   clientSubnetCidr = var.clientSubnetCidr
+  controllerCidr = var.controllerCidr
 }
 
 module nomad_servers {
@@ -74,6 +75,7 @@ module nomad_servers {
   data_volume_size  = 30
   mgrSubnetCidr = var.mgrSubnetCidr
   clientSubnetCidr = var.clientSubnetCidr
+  controllerCidr = var.controllerCidr
 }
 
 module nameServer {
@@ -94,6 +96,7 @@ module nameServer {
   class                     = "nameServer"
   mgrSubnetCidr = var.mgrSubnetCidr
   clientSubnetCidr = var.clientSubnetCidr
+  controllerCidr = var.controllerCidr
 }
 
 module broker {
@@ -114,5 +117,6 @@ module broker {
   class                     = "broker"
   mgrSubnetCidr = var.mgrSubnetCidr
   clientSubnetCidr = var.clientSubnetCidr
+  controllerCidr = var.controllerCidr
 }
 

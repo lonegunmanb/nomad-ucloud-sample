@@ -11,6 +11,7 @@ variable vpc_id {}
 variable subnet_id {}
 variable mgrSubnetCidr {}
 variable clientSubnetCidr {}
+variable controllerCidr {}
 variable data_volume_size {}
 variable image_id {}
 variable cluster_id {}
