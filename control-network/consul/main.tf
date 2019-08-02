@@ -5,6 +5,21 @@ provider "ucloud" {
   region      = var.region
 }
 
+resource ucloud_lb consul_lb {
+  name = "consulLb"
+  internal = true
+  tag = var.tag
+  vpc_id = var.vpc_id
+  subnet_id = var.subnet_id
+}
+
+resource ucloud_lb_listener consul_listener {
+  load_balancer_id = ucloud_lb.consul_lb.id
+  protocol = "tcp"
+  name = "consul"
+  port = 8500
+}
+
 resource "ucloud_instance" "consul_server" {
   count             = local.instance_count
   name              = "consul-server-${count.index}"
@@ -52,6 +67,7 @@ data "template_file" "setup-script" {
     consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
     consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
     consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
+    consul-vip = ucloud_lb.consul_lb.private_ip
   }
 }
 
@@ -73,22 +89,6 @@ resource "null_resource" "install_consul_server" {
       local.reconfig-ssh-keys-script,
     ]
   }
-}
-
-resource ucloud_lb consul_lb {
-  name = "consulLb"
-  internal = true
-  tag = var.tag
-  vpc_id = var.vpc_id
-  subnet_id = var.subnet_id
-}
-
-resource ucloud_lb_listener consul_listener {
-  load_balancer_id = ucloud_lb.consul_lb.id
-  protocol = "tcp"
-  listen_type = "request_proxy"
-  name = "consul"
-  port = 8500
 }
 
 resource ucloud_lb_attachment consul {
