@@ -17,8 +17,3 @@ systemctl enable consul
 systemctl start consul
 systemctl enable nomad
 systemctl start nomad
-systemctl start firewalld
-firewall-cmd --zone=trusted --permanent --add-source="${mgrSubnetCidr}"
-firewall-cmd --zone=trusted --permanent --add-source="${clientSubnetCidr}"
-firewall-cmd --zone=trusted --permanent --add-source="${controllerCidr}"
-firewall-cmd --reload

@@ -29,13 +29,7 @@ resource ucloud_security_group consul_server_sg {
     policy     = "accept"
   }
   rules {
-    port_range = "8080"
-    protocol   = "tcp"
-    cidr_block = var.allow_ip
-    policy     = "accept"
-  }
-  rules {
-    port_range = "20000-60000"
+    port_range = "20000-32000"
     protocol   = "tcp"
     cidr_block = var.allow_ip
     policy     = "accept"
@@ -54,9 +48,6 @@ module consul_servers {
   vpc_id           = data.terraform_remote_state.network.outputs.mgrVpcId
   subnet_id        = data.terraform_remote_state.network.outputs.mgrSubnetId
   data_volume_size = 30
-  mgrSubnetCidr = var.mgrSubnetCidr
-  clientSubnetCidr = var.clientSubnetCidr
-  controllerCidr = var.controllerCidr
 }
 
 module nomad_servers {
@@ -73,9 +64,6 @@ module nomad_servers {
   subnet_id         = data.terraform_remote_state.network.outputs.mgrSubnetId
   consul_server_ips = module.consul_servers.private_ips
   data_volume_size  = 30
-  mgrSubnetCidr = var.mgrSubnetCidr
-  clientSubnetCidr = var.clientSubnetCidr
-  controllerCidr = var.controllerCidr
 }
 
 module nameServer {
@@ -94,9 +82,6 @@ module nameServer {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
-  mgrSubnetCidr = var.mgrSubnetCidr
-  clientSubnetCidr = var.clientSubnetCidr
-  controllerCidr = var.controllerCidr
 }
 
 module broker {
@@ -115,8 +100,5 @@ module broker {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
-  mgrSubnetCidr = var.mgrSubnetCidr
-  clientSubnetCidr = var.clientSubnetCidr
-  controllerCidr = var.controllerCidr
 }
 

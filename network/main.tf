@@ -35,11 +35,13 @@ resource ucloud_vpc_peering_connection peering {
 }
 
 resource ucloud_vpc_peering_connection controller_peering0 {
+  count = var.controllerVpcId == "" ? 0 : 1
   peer_vpc_id = module.mgrVpc.vpc_id
   vpc_id = var.controllerVpcId
 }
 
 resource ucloud_vpc_peering_connection controller_peering1 {
+  count = var.controllerVpcId == "" ? 0 : 1
   peer_vpc_id = module.clientVpc.vpc_id
   vpc_id = var.controllerVpcId
 }

@@ -10,6 +10,7 @@ resource "ucloud_instance" "consul_server" {
   security_group    = var.sg_id
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
+  data_disk_size    = var.data_volume_size
   provisioner "local-exec" {
     command = "sleep 10"
   }
@@ -30,21 +31,6 @@ resource "ucloud_eip_association" "consul_ip" {
   resource_id = ucloud_instance.consul_server[count.index].id
 }
 
-resource "ucloud_disk" "consul_data" {
-  count             = local.instance_count
-  availability_zone = var.az[count.index % length(var.az)]
-  name              = "consul-data-${count.index}"
-  disk_size         = var.data_volume_size
-  tag               = var.cluster_id
-}
-
-resource "ucloud_disk_attachment" "consul_server_data" {
-  count             = local.instance_count
-  availability_zone = var.az[count.index % length(var.az)]
-  disk_id           = ucloud_disk.consul_data[count.index].id
-  instance_id       = ucloud_instance.consul_server[count.index].id
-}
-
 locals {
   setup-script-path             = "${path.module}/setup.sh"
   reconfig-ssh-keys-script-path = "${path.module}/reconfig_ssh_keys.sh"
@@ -60,9 +46,6 @@ data "template_file" "setup-script" {
     consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
     consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
     consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
-    mgrSubnetCidr = var.mgrSubnetCidr
-    clientSubnetCidr = var.clientSubnetCidr
-    controllerCidr = var.controllerCidr
   }
 }
 
@@ -70,7 +53,6 @@ resource "null_resource" "install_consul_server" {
   count = local.instance_count
   depends_on = [
     ucloud_instance.consul_server,
-    ucloud_disk_attachment.consul_server_data,
   ]
   provisioner "remote-exec" {
     connection {

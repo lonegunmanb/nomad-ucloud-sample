@@ -32,7 +32,8 @@
       "type": "shell",
       "scripts": [
         "../scripts/config-yum.sh",
-        "../scripts/install-controller.sh"
+        "../scripts/install-controller.sh",
+        "../scripts/build-terraform-plugin-cache.sh"
       ],
       "environment_vars": [
         "TERRAFORM_VERSION={{user `terraform_version`}}",

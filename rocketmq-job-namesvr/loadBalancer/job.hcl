@@ -21,7 +21,7 @@ job "${jobName}" {
         set -e
         cd /tf
         cat main.tf
-        terraform init
+        terraform init -plugin-dir=/plugin
         while true
         do
           terraform apply --auto-approve -lock=false -var-file="/secret/terraform.tfvars"
