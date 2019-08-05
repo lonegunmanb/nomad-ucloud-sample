@@ -1,0 +1,2 @@
+variable "namespace" {}
+variable "controllerImage" {}

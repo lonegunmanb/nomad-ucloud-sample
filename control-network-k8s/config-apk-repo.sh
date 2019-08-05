@@ -1,0 +1,1 @@
+echo "https://mirrors.cloud.tencent.com/alpine/latest-stable/main/" > /etc/apk/repositories
