@@ -32,3 +32,4 @@ echo export PATH=$PATH:/usr/local/go/bin:~/go/bin >> ~/.bashrc
 go version
 
 rm -rf /tmp/*
+sync
