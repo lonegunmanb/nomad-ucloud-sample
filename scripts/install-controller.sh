@@ -22,7 +22,7 @@ unzip nomad.zip
 install nomad /usr/local/bin/nomad
 nomad version
 
-wget -nv -O go.tar.gz https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz
+wget -nv -O go.tar.gz http://hashicorpfile.cn-bj.ufileos.com/go${GO_VERSION}.linux-amd64.tar.gz
 tar -C /usr/local -xzf go.tar.gz
 mkdir ~/go
 mkdir ~/go/bin
