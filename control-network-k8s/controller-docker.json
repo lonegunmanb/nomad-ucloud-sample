@@ -1,21 +1,26 @@
 {
   "variables": {
-    "terraform_version": "0.12.5",
+    "terraform_version": "0.12.6",
     "consul_version": "1.5.1",
     "nomad_version": "0.9.3",
     "go_version": "1.12.7",
     "tf_plugin_consul_version": "2.5.0",
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
-    "tf_plugin_ucloud_version": "1.11.1"
+    "tf_plugin_ucloud_version": "1.11.1",
+    "docker_repo": "",
+    "image_tag": "",
+    "docker_login_server": "",
+    "docker_login_username": "",
+    "docker_login_password": ""
   },
 
   "builders": [{
     "type": "docker",
-    "image": "alpine:3.10.1",
+    "image": "centos:7",
     "commit": true,
     "changes": [
-      "ENV GOPATH ~/go",
+      "ENV GOPATH /root/go",
       "ENV PATH $PATH:/usr/local/go/bin:~/go/bin",
       "CMD [\"\"]",
       "ENTRYPOINT [\"\"]"
@@ -25,7 +30,7 @@
     {
       "type": "shell",
       "scripts": [
-        "config-apk-repo.sh",
+        "config-yum.sh",
         "install-controller.sh",
         "build-terraform-plugin-cache.sh"
       ],
@@ -44,8 +49,15 @@
         [
           {
             "type": "docker-tag",
-            "repository": "uhub.service.ucloud.cn/lonegunmanb/terraform-controller",
-            "tag": "0.1"
+            "repository": "{{user `docker_repo`}}",
+            "tag": "{{user `image_tag`}}"
+          },
+          {
+            "type": "docker-push",
+            "login_server": "{{user `docker_login_server`}}",
+            "login_username": "{{user `docker_login_username`}}",
+            "login_password": "{{user `docker_login_password`}}",
+            "login": true
           }
         ]
       ]

@@ -1,4 +1,4 @@
-apk add unzip wget git
+yum install -y unzip wget curl git ca-certificates
 cd /tmp
 
 wget -nv -O terraform.zip http://hashicorpfile.cn-bj.ufileos.com/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
@@ -11,7 +11,6 @@ unzip consul.zip
 install consul /usr/local/bin/consul
 consul --version
 consul -autocomplete-install
-complete -C /usr/local/bin/consul consul
 
 wget -nv -O nomad.zip http://hashicorpfile.cn-bj.ufileos.com/nomad_${NOMAD_VERSION}_linux_amd64.zip
 unzip nomad.zip
