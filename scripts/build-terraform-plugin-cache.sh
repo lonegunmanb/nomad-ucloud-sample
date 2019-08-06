@@ -1,9 +1,5 @@
 mkdir /plugin
 cd /plugin
-TF_PLUGIN_CONSUL_VERSION = $TF_PLUGIN_CONSUL_VERSION
-TF_PLUGIN_NULL_VERSION = $TF_PLUGIN_NULL_VERSION
-TF_PLUGIN_TEMPLATE_VERSION = $TF_PLUGIN_TEMPLATE_VERSION
-TF_PLUGIN_UCLOUD_VERSION = $TF_PLUGIN_UCLOUD_VERSION
 wget -nv http://hashicorpfile.cn-bj.ufileos.com/terraform-provider-consul_v${TF_PLUGIN_CONSUL_VERSION}_x4
 wget -nv http://hashicorpfile.cn-bj.ufileos.com/terraform-provider-null_v${TF_PLUGIN_NULL_VERSION}_x4
 wget -nv http://hashicorpfile.cn-bj.ufileos.com/terraform-provider-template_v${TF_PLUGIN_TEMPLATE_VERSION}_x4

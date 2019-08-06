@@ -33,8 +33,17 @@ resource "ucloud_eip_association" "nomad_ip" {
 
 locals {
   setup-script-path             = "${path.module}/setup.sh"
-  build-terraform-plugin-cache-script = file("${path.module}/../scripts/build-terraform-plugin-cache.sh")
   reconfig-ssh-keys-script      = file("${path.module}/reconfig_ssh_keys.sh")
+}
+
+data "template_file" "build-terraform-plugin-cache-script" {
+  template = file("${path.module}/../scripts/build-terraform-plugin-cache.sh")
+  vars = {
+    TF_PLUGIN_CONSUL_VERSION = var.TF_PLUGIN_CONSUL_VERSION
+    TF_PLUGIN_NULL_VERSION = var.TF_PLUGIN_NULL_VERSION
+    TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
+    TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
+  }
 }
 
 data "template_file" "setup-script" {
@@ -66,7 +75,7 @@ resource "null_resource" "setup" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      local.build-terraform-plugin-cache-script,
+      data.template_file.build-terraform-plugin-cache-script.rendered,
       local.reconfig-ssh-keys-script,
     ]
   }

@@ -1,10 +1,3 @@
-data "terraform_remote_state" "nomad" {
-  backend = "local"
-  config = {
-    path = "${path.module}/../terraform.tfstate"
-  }
-}
-
 locals {
   az             = data.terraform_remote_state.nomad.outputs.az
   namesvr-name   = "namesvc-service-${var.clusterId}"

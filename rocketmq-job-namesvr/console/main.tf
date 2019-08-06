@@ -1,10 +1,12 @@
 variable namesvc_name {}
 variable clusterId {}
 
-data "terraform_remote_state" "nomad" {
-  backend = "local"
+data terraform_remote_state nomad {
+  backend = "consul"
   config = {
-    path = "${path.module}/../../terraform.tfstate"
+    address = ""
+    scheme = "http"
+    path = "terraform/rktClusterState"
   }
 }
 

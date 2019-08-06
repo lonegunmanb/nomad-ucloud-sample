@@ -1,10 +1,3 @@
-data "terraform_remote_state" "nomad" {
-  backend = "local"
-  config = {
-    path = "../terraform.tfstate"
-  }
-}
-
 locals {
   namesvc-name = "namesvc-service-${var.clusterId}"
   brokersvc-name = "brokersvc-service-${var.clusterId}"

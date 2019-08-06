@@ -1,7 +1,7 @@
 data terraform_remote_state network {
   backend = "consul"
   config = {
-    address = "consul_backend:8500"
+    address = ""
     scheme = "http"
     path = "terraform/network_state"
   }
