@@ -91,6 +91,8 @@ data template_file clone_project_script {
   vars = {
     terraform_project_url = var.terraform_project_url
     project_dir = "/project/${var.project_dir}"
+    branch = var.git_branch
+    project_dir = var.project_dir
   }
 }
 
@@ -118,7 +120,8 @@ data template_file provision_consul_backends_script {
     project_id = var.project_id
     ucloud_pub_key = var.ucloud_pub_key
     ucloud_secret = var.ucloud_secret
-    project_dir = "/project/${var.project_dir}"
+    project_root_dir = var.project_root_dir
+    project_dir = var.project_dir
     region = var.region
     az = "[${join(",", formatlist("\"%s\"", var.az))}]"
     root_password = var.consul_root_password
@@ -164,4 +167,22 @@ resource null_resource provision_consul_backend {
       data.template_file.destroy_consul_backends_script.rendered
     ]
   }
+}
+
+data "ucloud_lbs" "consul_lb" {
+  depends_on = [null_resource.provision_consul_backend]
+  vpc_id = ucloud_vpc.vpc.id
+  subnet_id = ucloud_subnet.subnet.id
+  name_regex = "consulLb"
+}
+
+module consul_lb_ipv6 {
+  source = "../ipv6"
+  api_server_url = var.ipv6_api_url
+  region_id = var.region_id
+  resourceId = data.ucloud_lbs.consul_lb.lbs[0].id
+}
+
+output consul_lb_ipv6 {
+  value = module.consul_lb_ipv6.ipv6
 }

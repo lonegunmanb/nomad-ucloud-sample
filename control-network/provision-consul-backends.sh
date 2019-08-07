@@ -1,4 +1,4 @@
-cd ${project_dir}/control-network/consul-backend
+cd /${project_root_dir}/${project_dir}/control-network/consul-backend
 cat > terraform.tfvars <<EOF
       project_id = "${project_id}"
       ucloud_pub_key = "${ucloud_pub_key}"

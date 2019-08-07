@@ -1,6 +1,7 @@
 variable az {}
 variable ucloud_pub_key {}
 variable region {}
+variable region_id {}
 variable ucloud_secret {}
 variable project_id {}
 variable cidr {
@@ -23,6 +24,7 @@ locals {
 }
 
 variable terraform_project_url {}
+variable git_branch {}
 variable project_root_dir {}
 variable project_dir {}
 variable consul_root_password {}
@@ -34,3 +36,4 @@ variable charge_type {
 }
 
 variable "controller_count" {}
+variable "ipv6_api_url" {}
