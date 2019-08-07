@@ -1,3 +1,4 @@
+set -e
 cd /${project_root_dir}/${project_dir}/control-network/consul-backend
 cat > terraform.tfvars <<EOF
       project_id = "${project_id}"
@@ -14,6 +15,5 @@ cat > terraform.tfvars <<EOF
       instance_type = "${instance_type}"
       charge_type = "${charge_type}"
 EOF
-export TF_LOG=DEBUG
 terraform init -plugin-dir=/plugin
 terraform apply --auto-approve -input=false

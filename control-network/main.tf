@@ -93,6 +93,7 @@ data template_file clone_project_script {
     project_dir = "/project/${var.project_dir}"
     branch = var.git_branch
     project_dir = var.project_dir
+    project_root_dir = var.project_root_dir
   }
 }
 
@@ -138,12 +139,19 @@ data template_file provision_consul_backends_script {
 data template_file destroy_consul_backends_script {
   template = file("./destroy-consul-backends.sh")
   vars = {
-    project_dir = "/project/${var.project_dir}"
+    project_dir = var.project_dir
+    project_root_dir = var.project_root_dir
   }
 }
 
 resource null_resource provision_consul_backend {
-  depends_on = [null_resource.setupScript, ucloud_eip_association.association, ucloud_disk_attachment.attachment, ucloud_security_group.sg]
+  depends_on = [
+    ucloud_instance.controller,
+    null_resource.setupScript,
+    ucloud_eip_association.association,
+    ucloud_disk_attachment.attachment,
+    ucloud_security_group.sg
+  ]
   provisioner remote-exec {
     connection {
       type     = "ssh"
@@ -176,13 +184,13 @@ data "ucloud_lbs" "consul_lb" {
   name_regex = "consulLb"
 }
 
-module consul_lb_ipv6 {
-  source = "../ipv6"
-  api_server_url = var.ipv6_api_url
-  region_id = var.region_id
-  resourceId = data.ucloud_lbs.consul_lb.lbs[0].id
-}
-
-output consul_lb_ipv6 {
-  value = module.consul_lb_ipv6.ipv6
-}
+//module consul_lb_ipv6 {
+//  source = "../ipv6"
+//  api_server_url = var.ipv6_api_url
+//  region_id = var.region_id
+//  resourceId = data.ucloud_lbs.consul_lb.lbs[0].id
+//}
+//
+//output consul_lb_ipv6 {
+//  value = module.consul_lb_ipv6.ipv6
+//}
