@@ -8,17 +8,19 @@ provider "ucloud" {
 resource ucloud_vpc vpc {
   name = var.vpcName
   cidr_blocks = [var.cidr]
-  tag = "${var.tag}"
+  tag = var.tag
 }
 
 resource ucloud_subnet subnet {
   name = var.subnetName
   cidr_block = var.cidr
   vpc_id = ucloud_vpc.vpc.id
-  tag = "${var.tag}"
+  tag = var.tag
 }
 
 resource ucloud_security_group sg {
+  count = var.controller_count
+  name = "rktmq-control-temp-sg"
   rules {
     port_range = "22"
     protocol   = "tcp"
@@ -29,25 +31,25 @@ resource ucloud_security_group sg {
 
 
 resource ucloud_instance controller {
-  count = local.instanceCount
-  name              = "controller-${count.index}"
+  count = var.controller_count
+  name              = "controller"
   tag               = var.tag
-  availability_zone = var.az[count.index % length(var.az)]
+  availability_zone = var.az[0]
   image_id = var.controller_image_id
   instance_type = var.controler_instance_type
   vpc_id = ucloud_vpc.vpc.id
   subnet_id = ucloud_subnet.subnet.id
   root_password     = var.root_password
   charge_type       = var.charge_type
-  security_group    = ucloud_security_group.sg.id
+  security_group    = ucloud_security_group.sg.*.id[count.index]
   provisioner local-exec {
     command = "sleep 10"
   }
 }
 
 resource ucloud_disk dataDisk {
-  count = local.instanceCount
-  availability_zone = var.az[count.index % length(var.az)]
+  count = var.controller_count
+  availability_zone = var.az[0]
   disk_size = 100
   name = "controllerDisk-${count.index}"
   tag = var.tag
@@ -55,62 +57,26 @@ resource ucloud_disk dataDisk {
 }
 
 resource ucloud_disk_attachment attachment {
-  count = local.instanceCount
-  availability_zone = var.az[count.index % length(var.az)]
+  count = var.controller_count
+  availability_zone = var.az[0]
   disk_id = ucloud_disk.dataDisk.*.id[count.index]
   instance_id = ucloud_instance.controller.*.id[count.index]
 }
 
 resource ucloud_eip eip {
-  count = local.instanceCount
+  count = var.controller_count
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
   bandwidth     = 200
-  name = "controller-${count.index}"
+  name = "controller"
   tag           = var.tag
 }
 
 resource ucloud_eip_association association {
-  count = local.instanceCount
+  count = var.controller_count
   eip_id = ucloud_eip.eip.*.id[count.index]
   resource_id = ucloud_instance.controller.*.id[count.index]
-}
-
-resource ucloud_lb controllerLb {
-  name = "controllerLb"
-  tag = var.tag
-  vpc_id = ucloud_vpc.vpc.id
-  subnet_id = ucloud_subnet.subnet.id
-}
-
-resource ucloud_eip controlerLbEip {
-  internet_type = "bgp"
-  charge_mode   = "traffic"
-  charge_type   = var.charge_type
-  bandwidth     = 200
-  name = "controllerLb"
-  tag           = var.tag
-}
-
-resource ucloud_eip_association lb {
-  eip_id = ucloud_eip.controlerLbEip.id
-  resource_id = ucloud_lb.controllerLb.id
-}
-
-resource ucloud_lb_listener ssh {
-  load_balancer_id = ucloud_lb.controllerLb.id
-  protocol = "tcp"
-  listen_type = "request_proxy"
-  port = "22"
-}
-
-resource ucloud_lb_attachment ssh {
-  count = local.instanceCount
-  listener_id = ucloud_lb_listener.ssh.id
-  load_balancer_id = ucloud_lb.controllerLb.id
-  resource_id = ucloud_instance.controller.*.id[count.index]
-  port = "22"
 }
 
 data template_file mount_disk_script {
@@ -129,8 +95,8 @@ data template_file clone_project_script {
 }
 
 resource null_resource setupScript {
-  depends_on = [ucloud_lb_attachment.ssh]
-  count = local.instanceCount
+  depends_on = [ucloud_eip_association.association]
+  count = var.controller_count
   provisioner remote-exec {
     connection {
       type     = "ssh"
@@ -196,31 +162,6 @@ resource null_resource provision_consul_backend {
     }
     inline = [
       data.template_file.destroy_consul_backends_script.rendered
-    ]
-  }
-}
-
-data ucloud_lbs consul_lb {
-  depends_on = [null_resource.provision_consul_backend]
-  vpc_id = ucloud_vpc.vpc.id
-  subnet_id = ucloud_subnet.subnet.id
-  name_regex = "consulLb"
-}
-
-resource null_resource set_consul_lb_url {
-  depends_on = [ucloud_lb_attachment.ssh, ucloud_vpc.vpc]
-  count = local.instanceCount
-  provisioner remote-exec {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = ucloud_eip.eip[count.index].public_ip
-    }
-    inline = [
-      "echo ${data.ucloud_lbs.consul_lb.lbs.0.private_ip} consul_backend >> /etc/hosts",
-      "echo export TF_VAR_controllerVpcId=\"${ucloud_vpc.vpc.id}\" >> ~/.bashrc",
-      "echo export TF_VAR_controllerCidr=\"${var.cidr}\" >> ~/.bashrc"
     ]
   }
 }

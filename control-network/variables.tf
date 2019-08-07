@@ -32,3 +32,5 @@ variable consul_instance_type {}
 variable charge_type {
   default = "dynamic"
 }
+
+variable "controller_count" {}
