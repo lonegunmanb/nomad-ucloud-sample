@@ -5,13 +5,6 @@ locals {
   region         = data.terraform_remote_state.nomad.outputs.region
 }
 
-module "consulKeys" {
-  source    = "./consulKeys"
-  address   = "${data.terraform_remote_state.nomad.outputs.consul_servers_public_ips[0]}:8500"
-  clusterId = local.namesvr_clusterId
-  region    = local.region
-}
-
 module "namesvr" {
   source                     = "./namesvr"
   rocketmq_docker_image      = var.rocketmq_docker_image

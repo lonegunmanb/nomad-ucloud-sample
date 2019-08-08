@@ -12,5 +12,6 @@ variable ucloud_secret {}
 locals {
   job-hcl = "${path.module}/job.hcl"
   tf-tpl  = "${path.module}/lb.tf.tpl"
+  tf-vars-tpl = "${path.module}/terraform.tfvars.tpl"
 }
 

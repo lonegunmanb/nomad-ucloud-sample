@@ -1,21 +1,59 @@
+provider "ucloud" {
+  public_key = var.ucloud_pubkey
+  private_key = var.ucloud_secret
+  project_id = var.projectId
+  region = var.region
+}
+
+resource ucloud_lb rocketMQLoadBalancer {
+  name = "RocketMQLb-${var.clusterId}"
+  tag = var.clusterId
+  internal = "false"
+  vpc_id = var.vpcId
+  subnet_id = var.subnetId
+}
+
+resource ucloud_eip rocketMQLoadBalancer {
+  bandwidth            = 200
+  charge_mode          = "traffic"
+  name                 = "rocketmq-${var.clusterId}"
+  tag                  = var.clusterId
+  internet_type        = "bgp"
+}
+
+resource ucloud_eip_association rocketMQLoadBalancer {
+  resource_id   = ucloud_lb.rocketMQLoadBalancer.id
+  eip_id        = ucloud_eip.rocketMQLoadBalancer.id
+}
+
+resource ucloud_lb_listener nameServerListener {
+  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.id
+  protocol         = "tcp"
+  listen_type      = "request_proxy"
+  port             = 9876
+}
+
+resource ucloud_lb_listener consoleListener {
+  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.id
+  protocol         = "tcp"
+  listen_type      = "request_proxy"
+  port             = 8080
+}
+
 data "template_file" "tf-content" {
   template = file(local.tf-tpl)
   vars = {
     cluster-id = var.clusterId
+    load_balancer_id = ucloud_lb.rocketMQLoadBalancer.id
+    nameServerListenerId = ucloud_lb_listener.nameServerListener.id
+    consoleListenerId = ucloud_lb_listener.consoleListener.id
   }
-}
-
-locals {
-  tf-vars-tpl = "${path.module}/terraform.tfvars.tpl"
 }
 
 data "template_file" "tf-vars-content" {
   template = file(local.tf-vars-tpl)
   vars = {
-    clusterId    = var.clusterId
     region       = var.region
-    vpcId        = var.vpcId
-    subnetId     = var.subnetId
     ucloudPubKey = var.ucloud_pubkey
     ucloudPriKey = var.ucloud_secret
     projectId    = var.projectId
@@ -40,6 +78,11 @@ provider "nomad" {
 }
 
 resource "nomad_job" "terraform_docker" {
+  depends_on = [
+    ucloud_eip_association.rocketMQLoadBalancer,
+    ucloud_lb_listener.consoleListener,
+    ucloud_lb_listener.nameServerListener
+  ]
   jobspec = data.template_file.job.rendered
 }
 

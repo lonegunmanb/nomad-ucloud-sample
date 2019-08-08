@@ -21,9 +21,9 @@ job "${jobName}" {
         set -e
         cd /tf
         cat main.tf
-        terraform init -plugin-dir=/plugin
         while true
         do
+          terraform init -plugin-dir=/plugin
           terraform apply --auto-approve -lock=false -var-file="/secret/terraform.tfvars"
           sleep 10
         done
@@ -44,15 +44,6 @@ job "${jobName}" {
             EOF
       destination = "local/tf/main.tf"
       change_mode = "noop"
-    }
-    # add an output file to guard terraform apply, fail execution when tf code's not exist
-    template {
-      data = <<EOF
-              output lbId {
-                value = "$${ucloud_lb.rocketMQLoadBalancer.*.id}"
-              }
-             EOF
-      destination = "local/tf/outputs.tf"
     }
 //    template {
 //      data = "TF_LOG=trace"
