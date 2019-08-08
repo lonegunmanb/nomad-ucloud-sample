@@ -60,4 +60,6 @@ variable "nomad_server_image_id" {
 variable "nomad_client_image_id" {
 }
 
-variable cluster_id {}
+locals  {
+  cluster_id = terraform.workspace
+}

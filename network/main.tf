@@ -1,7 +1,7 @@
 module mgrVpc {
   source = "./vpc"
   cidr = var.mgrVpcCidr
-  cluster_id = var.cluster_id
+  cluster_id = local.cluster_id
   project_id = var.project_id
   region = var.region
   ucloud_pub_key = var.ucloud_pub_key
@@ -13,7 +13,7 @@ module mgrVpc {
 module clientVpc {
   source = "./vpc"
   cidr = var.clientVpcCidr
-  cluster_id = var.cluster_id
+  cluster_id = local.cluster_id
   project_id = var.project_id
   region = var.region
   ucloud_pub_key = var.ucloud_pub_key

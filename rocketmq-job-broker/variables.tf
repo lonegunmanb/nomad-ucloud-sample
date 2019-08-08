@@ -1,6 +1,7 @@
 locals {
-  namesvc-name = "namesvc-service-${var.clusterId}"
-  brokersvc-name = "brokersvc-service-${var.clusterId}"
+  namesvc-name = "namesvc-service-${var.namesvr_clusterId}"
+  broker_clusterId = terraform.workspace
+  brokersvc-name = "brokersvc-service-${local.broker_clusterId}"
   broker-job-hcl  = "${path.module}/broker-job.hcl"
   console-job-hcl = "${path.module}/console-job.hcl"
   az = data.terraform_remote_state.nomad.outputs.az
@@ -9,7 +10,5 @@ locals {
 variable rocketmq_docker_image {}
 variable rocketmq_version {}
 variable allow-multiple-tasks-in-az {}
-variable clusterId {}
-variable nomad_cluster_id {
-  default = ""
-}
+variable namesvr_clusterId {}
+variable nomad_cluster_id {}

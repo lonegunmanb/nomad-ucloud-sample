@@ -6,9 +6,10 @@ provider "nomad" {
 data "template_file" "broker-job" {
   template = file(local.broker-job-hcl)
   vars = {
-    job-name          = "broker-${var.clusterId}"
+    job-name          = "broker-${local.broker_clusterId}"
     cmd               = "./mqbroker"
-    cluster-id        = var.clusterId
+    cluster-id        = local.broker_clusterId
+    namesvr_clusterId = var.namesvr_clusterId
     region            = local.region
     count             = length(local.az)
     broker-image      = "${var.rocketmq_docker_image}:${var.rocketmq_version}"

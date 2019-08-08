@@ -1,4 +1,3 @@
-variable clusterId {}
 variable rocketmq_docker_image {
   default = "uhub.service.ucloud.cn/lonegunmanb/rocketmq"
 }
@@ -10,6 +9,4 @@ variable terraform-image {
 }
 variable ucloud_pubkey {}
 variable ucloud_secret {}
-variable nomad_cluster_id {
-  default = ""
-}
+variable nomad_cluster_id {}
