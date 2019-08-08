@@ -10,3 +10,6 @@ variable terraform-image {
 }
 variable ucloud_pubkey {}
 variable ucloud_secret {}
+variable nomad_cluster_id {
+  default = ""
+}

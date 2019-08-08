@@ -10,3 +10,6 @@ variable rocketmq_docker_image {}
 variable rocketmq_version {}
 variable allow-multiple-tasks-in-az {}
 variable clusterId {}
+variable nomad_cluster_id {
+  default = ""
+}
