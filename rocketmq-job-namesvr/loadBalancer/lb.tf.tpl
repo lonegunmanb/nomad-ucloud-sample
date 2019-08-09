@@ -19,21 +19,21 @@ provider "ucloud" {
 }
 
 {{range service "nameServer${cluster-id}"}}
-{{$name := key (printf "serversIp2Id/%s" .Address)}}
-resource "ucloud_lb_attachment" "{{printf "nameServer%s" $name}}" {
+resource "ucloud_lb_attachment" "nameServer-{{.Node}}" {
+#{{.Address}}
     load_balancer_id = "${load_balancer_id}"
     listener_id      = "${nameServerListenerId}"
-    resource_id      = "{{key (printf "serversIp2Id/%s" .Address)}}"
+    resource_id      = "{{.Node}}"
     port             = {{.Port}}
 }
 {{end}}
 
 {{range service "console${cluster-id}"}}
-{{$name := key (printf "serversIp2Id/%s" .Address)}}
-resource "ucloud_lb_attachment" "{{printf "console%s" $name}}" {
+resource "ucloud_lb_attachment" "console-{{.Node}}" {
+#{{.Address}}
     load_balancer_id = "${load_balancer_id}"
     listener_id      = "${consoleListenerId}"
-    resource_id      = "{{key (printf "serversIp2Id/%s" .Address)}}"
+    resource_id      = "{{.Node}}"
     port             = {{.Port}}
 }
 {{end}}

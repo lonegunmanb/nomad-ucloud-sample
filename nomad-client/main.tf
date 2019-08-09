@@ -52,7 +52,7 @@ data "template_file" "setup-script" {
   vars = {
     region             = var.region
     az                 = var.az[count.index % length(var.az)]
-    node-name          = "${var.class}-${ucloud_instance.nomad_clients[count.index].id}"
+    node-name          = ucloud_instance.nomad_clients[count.index].id
     node-class         = var.class
     node-meta          = "meta {\\naz=\"${var.az[count.index % length(var.az)]}\"\\n}"
     consul-server-ip-0 = var.consul_server_private_ips[0]
@@ -80,18 +80,3 @@ resource "null_resource" "setup" {
     ]
   }
 }
-
-provider "consul" {
-  address    = "http://${var.consul_server_public_ips[0]}:8500"
-  datacenter = var.region
-}
-
-resource "consul_keys" "ip2id" {
-  depends_on = [null_resource.setup]
-  count      = var.instance_count
-  key {
-    path  = "serversIp2Id/${ucloud_instance.nomad_clients[count.index].private_ip}"
-    value = ucloud_instance.nomad_clients[count.index].id
-  }
-}
-

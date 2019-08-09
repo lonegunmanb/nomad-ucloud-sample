@@ -20,9 +20,9 @@ job "${jobName}" {
       data = <<EOF
         set -e
         cd /tf
-        cat main.tf
         while true
         do
+          cat main.tf
           terraform init -plugin-dir=/plugin
           terraform apply --auto-approve -lock=false -var-file="/secret/terraform.tfvars"
           sleep 10
