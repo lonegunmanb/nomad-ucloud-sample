@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  path = var.nomad_cluster_id == "" ? "rktClusterState" : "rktClusterState-env:${var.nomad_cluster_id}"
+  remote_state = var.nomad_cluster_id == "" ? "rktClusterState" : "rktClusterState-env:${var.nomad_cluster_id}"
 }
 
 data terraform_remote_state nomad {
@@ -15,6 +15,6 @@ data terraform_remote_state nomad {
   config = {
     address = ""
     scheme = "http"
-    path = "terraform/${local.path}"
+    path = "terraform/${local.remote_state}"
   }
 }
