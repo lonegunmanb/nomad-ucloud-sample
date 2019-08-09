@@ -60,6 +60,19 @@ variable "nomad_server_image_id" {
 variable "nomad_client_image_id" {
 }
 
+variable "TF_PLUGIN_CONSUL_VERSION" {
+  default = "2.5.0"
+}
+variable "TF_PLUGIN_NULL_VERSION" {
+  default = "2.1.2"
+}
+variable "TF_PLUGIN_TEMPLATE_VERSION" {
+  default = "2.1.2"
+}
+variable "TF_PLUGIN_UCLOUD_VERSION" {
+  default = "1.11.1"
+}
+
 locals  {
   cluster_id = terraform.workspace
 }

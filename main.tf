@@ -82,6 +82,10 @@ module nameServer {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
+  TF_PLUGIN_CONSUL_VERSION  = var.TF_PLUGIN_CONSUL_VERSION
+  TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
+  TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
+  TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
 }
 
 module broker {
@@ -91,7 +95,7 @@ module broker {
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
-  instance_count            = 6
+  instance_count            = 1
   instance_type             = var.nomad_client_broker_type
   region                    = var.region
   root_password             = var.nomad_client_root_password
@@ -100,5 +104,9 @@ module broker {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
+  TF_PLUGIN_CONSUL_VERSION  = var.TF_PLUGIN_CONSUL_VERSION
+  TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
+  TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
+  TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
 }
 
