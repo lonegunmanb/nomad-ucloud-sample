@@ -6,6 +6,7 @@ provider "ucloud" {
 }
 
 resource ucloud_security_group consul_server_sg {
+  name = "rktmq-public-firewall-${local.cluster_id}"
   rules {
     port_range = "22"
     protocol   = "tcp"

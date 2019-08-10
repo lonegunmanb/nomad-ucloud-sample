@@ -1,3 +1,8 @@
+//resource ucloud_isolation_group isolation_group {
+//  count = length(var.az)
+//  name = "nomad-client-${var.cluster_id}-${count.index}"
+//}
+
 resource "ucloud_instance" "nomad_clients" {
   count             = var.instance_count
   name              = "nomad-client-${var.class}-${count.index}"
@@ -11,6 +16,7 @@ resource "ucloud_instance" "nomad_clients" {
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
   data_disk_size    = var.data_volume_size
+//  isolation_group   = ucloud_isolation_group.isolation_group.*.id[count.index % length(var.az)]
   provisioner "local-exec" {
     command = "sleep 10"
   }
