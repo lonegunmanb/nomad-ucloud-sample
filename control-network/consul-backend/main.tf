@@ -52,45 +52,6 @@ resource "ucloud_disk_attachment" "consul_server_data" {
   instance_id       = ucloud_instance.consul_server[count.index].id
 }
 
-locals {
-  setup-script-path             = "${path.module}/setup.sh"
-  reconfig-ssh-keys-script-path = "${path.module}/reconfig_ssh_keys.sh"
-  reconfig-ssh-keys-script      = file(local.reconfig-ssh-keys-script-path)
-}
-
-data "template_file" "setup-script" {
-  count    = local.instance_count
-  template = file(local.setup-script-path)
-  vars = {
-    region             = var.region
-    node-name          = ucloud_instance.consul_server[count.index].id
-    consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
-    consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
-    consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
-    consul-vip = ucloud_lb.consul_lb.private_ip
-  }
-}
-
-resource "null_resource" "install_consul_server" {
-  count = local.instance_count
-  depends_on = [
-    ucloud_instance.consul_server,
-    ucloud_disk_attachment.consul_server_data,
-  ]
-  provisioner "remote-exec" {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = ucloud_instance.consul_server[count.index].private_ip
-    }
-    inline = [
-      data.template_file.setup-script[count.index].rendered,
-      local.reconfig-ssh-keys-script,
-    ]
-  }
-}
-
 resource ucloud_lb_attachment consul {
   count = local.instance_count
   listener_id = ucloud_lb_listener.consul_listener.id

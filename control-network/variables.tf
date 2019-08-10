@@ -11,7 +11,7 @@ variable vpcName {}
 variable subnetName {}
 variable tag {
   type = "string"
-  default = "rocketmq"
+  default = "rocketmqbackend"
 }
 variable consul_image_id {}
 variable controller_image_id {}
@@ -37,3 +37,10 @@ variable charge_type {
 
 variable "controller_count" {}
 variable "ipv6_api_url" {}
+variable provision_from_kun {
+  type = bool
+  default = false
+}
+locals {
+  reconfig_ssh_keys_script = file("./reconfig_ssh_keys.sh")
+}

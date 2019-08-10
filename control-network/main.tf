@@ -18,8 +18,12 @@ resource ucloud_subnet subnet {
   tag = var.tag
 }
 
+locals {
+  controller_count = var.provision_from_kun ? 0 : var.controller_count
+}
+
 resource ucloud_security_group sg {
-  count = var.controller_count
+  count = local.controller_count
   name = "rktmq-control-temp-sg"
   rules {
     port_range = "22"
@@ -29,9 +33,8 @@ resource ucloud_security_group sg {
   }
 }
 
-
 resource ucloud_instance controller {
-  count = var.controller_count
+  count = local.controller_count
   name              = "controller"
   tag               = var.tag
   availability_zone = var.az[0]
@@ -48,7 +51,7 @@ resource ucloud_instance controller {
 }
 
 resource ucloud_disk dataDisk {
-  count = var.controller_count
+  count = local.controller_count
   availability_zone = var.az[0]
   disk_size = 100
   name = "controllerDisk-${count.index}"
@@ -57,14 +60,14 @@ resource ucloud_disk dataDisk {
 }
 
 resource ucloud_disk_attachment attachment {
-  count = var.controller_count
+  count = local.controller_count
   availability_zone = var.az[0]
   disk_id = ucloud_disk.dataDisk.*.id[count.index]
   instance_id = ucloud_instance.controller.*.id[count.index]
 }
 
-resource ucloud_eip eip {
-  count = var.controller_count
+resource ucloud_eip controller_eip {
+  count = local.controller_count
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
@@ -74,8 +77,8 @@ resource ucloud_eip eip {
 }
 
 resource ucloud_eip_association association {
-  count = var.controller_count
-  eip_id = ucloud_eip.eip.*.id[count.index]
+  count = local.controller_count
+  eip_id = ucloud_eip.controller_eip.*.id[count.index]
   resource_id = ucloud_instance.controller.*.id[count.index]
 }
 
@@ -97,100 +100,141 @@ data template_file clone_project_script {
   }
 }
 
-resource null_resource setupScript {
+resource null_resource setupController {
   depends_on = [ucloud_eip_association.association]
-  count = var.controller_count
+  count = local.controller_count
   provisioner remote-exec {
     connection {
       type     = "ssh"
       user     = "root"
       password = var.root_password
-      host     = ucloud_eip.eip[count.index].public_ip
+      host     = ucloud_eip.controller_eip[count.index].public_ip
     }
     inline = [
       data.template_file.mount_disk_script.rendered,
       data.template_file.clone_project_script.rendered,
-      file("./reconfig_ssh_keys.sh"),
+      local.reconfig_ssh_keys_script,
     ]
   }
 }
 
-data template_file provision_consul_backends_script {
-  template = file("./provision-consul-backends.sh")
-  vars = {
-    project_id = var.project_id
-    ucloud_pub_key = var.ucloud_pub_key
-    ucloud_secret = var.ucloud_secret
-    project_root_dir = var.project_root_dir
-    project_dir = var.project_dir
-    region = var.region
-    az = "[${join(",", formatlist("\"%s\"", var.az))}]"
-    root_password = var.consul_root_password
-    tag = var.tag
-    vpc_id = ucloud_vpc.vpc.id
-    subnet_id = ucloud_subnet.subnet.id
-    data_volume_size = var.consul_data_volume_size
-    image_id = var.consul_image_id
-    instance_type = var.consul_instance_type
-    charge_type = var.charge_type
-  }
-}
-
-data template_file destroy_consul_backends_script {
-  template = file("./destroy-consul-backends.sh")
-  vars = {
-    project_dir = var.project_dir
-    project_root_dir = var.project_root_dir
-  }
-}
-
-resource null_resource provision_consul_backend {
-  depends_on = [
-    ucloud_instance.controller,
-    null_resource.setupScript,
-    ucloud_eip_association.association,
-    ucloud_disk_attachment.attachment,
-    ucloud_security_group.sg
-  ]
-  provisioner remote-exec {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = ucloud_eip.eip[0].public_ip
-    }
-    inline = [
-      data.template_file.provision_consul_backends_script.rendered
-    ]
-  }
-  provisioner remote-exec {
-    when = "destroy"
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = ucloud_eip.eip[0].public_ip
-    }
-    inline = [
-      data.template_file.destroy_consul_backends_script.rendered
-    ]
-  }
-}
-
-data "ucloud_lbs" "consul_lb" {
-  depends_on = [null_resource.provision_consul_backend]
-  vpc_id = ucloud_vpc.vpc.id
+module consul_backend {
+  source = "./consul-backend"
+  az = var.az
+  data_volume_size = var.consul_data_volume_size
+  image_id = var.consul_image_id
+  instance_type = var.consul_instance_type
+  project_id = var.project_id
+  region = var.region
+  root_password = var.consul_root_password
   subnet_id = ucloud_subnet.subnet.id
-  name_regex = "consulLb"
+  tag = var.tag
+  ucloud_pub_key = var.ucloud_pub_key
+  ucloud_secret = var.ucloud_secret
+  vpc_id = ucloud_vpc.vpc.id
 }
 
-//module consul_lb_ipv6 {
-//  source = "../ipv6"
-//  api_server_url = var.ipv6_api_url
-//  region_id = var.region_id
-//  resourceId = data.ucloud_lbs.consul_lb.lbs[0].id
-//}
-//
-//output consul_lb_ipv6 {
-//  value = module.consul_lb_ipv6.ipv6
-//}
+locals {
+  setup-consul-script-path = "${path.module}/setup-consul.sh"
+}
+
+data "template_file" "setup-script" {
+  count    = length(var.az)
+  template = file(local.setup-consul-script-path)
+  vars = {
+    region             = var.region
+    node-name          = module.consul_backend.uhost_ids[count.index]
+    consul-server-ip-0 = module.consul_backend.private_ips[0]
+    consul-server-ip-1 = module.consul_backend.private_ips[1]
+    consul-server-ip-2 = module.consul_backend.private_ips[2]
+    consul-vip = module.consul_backend.consul_lb_ip
+  }
+}
+
+data null_data_source consul_finish {
+  inputs = {
+    finishSignal = module.consul_backend.finishSignal
+  }
+}
+
+resource "null_resource" "install_consul_server_via_ipv4" {
+  count = var.provision_from_kun ? 0 : length(module.consul_backend.private_ips)
+  depends_on = [
+    ucloud_eip_association.association,
+    null_resource.setupController,
+    data.null_data_source.consul_finish
+  ]
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = module.consul_backend.private_ips[count.index]
+      bastion_host = ucloud_eip.controller_eip[0].public_ip
+      bastion_user = "root"
+      bastion_password = var.root_password
+    }
+    inline = [
+      data.template_file.setup-script[count.index].rendered,
+      local.reconfig_ssh_keys_script,
+    ]
+  }
+}
+
+module uhost_ipv6s {
+  source = "../ipv6"
+  disable = !var.provision_from_kun
+  api_server_url = var.ipv6_api_url
+  region_id = var.region_id
+  resourceIds = module.consul_backend.uhost_ids
+}
+
+resource "null_resource" "install_consul_server_via_kun" {
+  count = var.provision_from_kun ? length(module.consul_backend.private_ips) : 0
+  depends_on = [
+    ucloud_eip_association.association,
+    null_resource.setupController,
+    data.null_data_source.consul_finish
+  ]
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = module.uhost_ipv6s.ipv6s[count.index]
+    }
+    inline = [
+      data.template_file.setup-script[count.index].rendered,
+      local.reconfig_ssh_keys_script,
+    ]
+  }
+}
+
+resource null_resource setupControllerBackendConfig {
+  count = local.controller_count
+  depends_on = [ucloud_eip_association.association]
+  provisioner remote-exec {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = ucloud_eip.controller_eip[count.index].public_ip
+    }
+    inline = [
+      "mkdir /config",
+      "echo address = \"http://${module.consul_backend.consul_lb_ip}:8500\" > /config/backend.tfvars"
+    ]
+  }
+}
+
+module consul_backend_lb_ipv6 {
+  source = "../ipv6"
+  disable = !var.provision_from_kun
+  api_server_url = var.ipv6_api_url
+  region_id = var.region_id
+  resourceIds = list(module.consul_backend.consul_lb_id)
+}
+
+output backend_ip {
+  value = var.provision_from_kun ? module.consul_backend_lb_ipv6.ipv6s[0] : module.consul_backend.consul_lb_ip
+}
