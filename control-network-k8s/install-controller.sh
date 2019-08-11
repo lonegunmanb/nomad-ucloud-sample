@@ -1,4 +1,5 @@
-yum install -y unzip wget curl git ca-certificates
+yum install -y epel-release
+yum install -y unzip wget curl git ca-certificates jq
 cd /tmp
 
 wget -nv -O terraform.zip http://hashicorpfile.cn-bj.ufileos.com/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
