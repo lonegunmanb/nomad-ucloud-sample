@@ -8,6 +8,7 @@
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
     "tf_plugin_ucloud_version": "1.11.1",
+    "tf_plugin_external_version": "1.2.0",
     "docker_repo": "",
     "image_tag": "",
     "docker_login_server": "",
@@ -42,23 +43,24 @@
         "TF_PLUGIN_CONSUL_VERSION={{user `tf_plugin_consul_version`}}",
         "TF_PLUGIN_NULL_VERSION={{user `tf_plugin_null_version`}}",
         "TF_PLUGIN_TEMPLATE_VERSION={{user `tf_plugin_template_version`}}",
-        "TF_PLUGIN_UCLOUD_VERSION={{user `tf_plugin_ucloud_version`}}"
+        "TF_PLUGIN_UCLOUD_VERSION={{user `tf_plugin_ucloud_version`}}",
+        "TF_PLUGIN_EXTERNAL_VERSION={{user `tf_plugin_external_version`}}"
       ]
     }],
   "post-processors": [
-        [
-          {
-            "type": "docker-tag",
-            "repository": "{{user `docker_repo`}}",
-            "tag": "{{user `image_tag`}}"
-          },
-          {
-            "type": "docker-push",
-            "login_server": "{{user `docker_login_server`}}",
-            "login_username": "{{user `docker_login_username`}}",
-            "login_password": "{{user `docker_login_password`}}",
-            "login": true
-          }
-        ]
-      ]
+    [
+      {
+        "type": "docker-tag",
+        "repository": "{{user `docker_repo`}}",
+        "tag": "{{user `image_tag`}}"
+      },
+      {
+        "type": "docker-push",
+        "login_server": "{{user `docker_login_server`}}",
+        "login_username": "{{user `docker_login_username`}}",
+        "login_password": "{{user `docker_login_password`}}",
+        "login": true
+      }
+    ]
+  ]
 }
