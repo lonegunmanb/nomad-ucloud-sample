@@ -1,25 +1,40 @@
-provider "kubernetes" {
-  host = "https://104.196.242.174"
-
-  client_certificate     = file("~/.kube/client-cert.pem")
-  client_key             = file("~/.kube/client-key.pem")
-  cluster_ca_certificate = file("~/.kube/cluster-ca-cert.pem")
-}
-
-resource kubernetes_pod controller {
+resource "kubernetes_deployment" "controller" {
   metadata {
-    name = "controller"
-    labels {
-      app = "ctrl"
-    }
+    namespace = var.k8s_namespace
+    name = "rkq-controller"
   }
   spec {
-    container {
-      name = "controller"
-      image = var.controllerImage
-      env {
-        name = "TF_VAR_consul_backend"
-        value = ""
+    replicas = 3
+
+    selector {
+      match_labels = {
+        app = var.controller_pod_label
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = var.controller_pod_label
+        }
+      }
+      spec {
+        container {
+          name = "controller"
+          image = var.controller_image
+          command = ["tail"]
+          args = ["-f", "/dev/null"]
+          resources {
+            limits {
+              cpu    = "1"
+              memory = "1024Mi"
+            }
+            requests {
+              cpu    = "1"
+              memory = "1024Mi"
+            }
+          }
+        }
       }
     }
   }
@@ -27,12 +42,12 @@ resource kubernetes_pod controller {
 
 resource kubernetes_service ctrlService {
   metadata {
-    namespace = var.namespace
+    namespace = var.k8s_namespace
     name = "nomad-ctrl-service"
   }
   spec {
-    selector {
-      app = kubernetes_pod.controller.metadata.0.labels.app
+    selector = {
+      app = var.controller_pod_label
     }
     port {
       port = 80
