@@ -17,5 +17,8 @@ data "external" "consul_lb_ipv6" {
 }
 
 output "ipv6s" {
-  value = length(data.external.consul_lb_ipv6.*.result) == 0 ? list(null) : data.external.consul_lb_ipv6.*.result["ip"]
+  value = length(data.external.consul_lb_ipv6.*.result) == 0 ? list(null) : [
+    for map in data.external.consul_lb_ipv6.*.result:
+      map["ip"]
+  ]
 }
