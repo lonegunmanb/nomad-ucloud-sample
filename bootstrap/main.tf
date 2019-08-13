@@ -70,6 +70,7 @@ resource "kubernetes_config_map" "bootstrap-script" {
 //  }
 //}
 resource "kubernetes_pod" "test" {
+  depends_on = [kubernetes_config_map.bootstrap-script]
   metadata {
     name = "test"
     namespace = var.k8s_namespace
