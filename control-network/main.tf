@@ -168,7 +168,7 @@ resource "null_resource" "install_consul_server_via_ipv4" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.root_password
+      password = var.consul_root_password
       host     = module.consul_backend.private_ips[count.index]
       bastion_host = ucloud_eip.controller_eip[0].public_ip
       bastion_user = "root"
@@ -200,7 +200,7 @@ resource "null_resource" "install_consul_server_via_kun" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.root_password
+      password = var.consul_root_password
       host     = module.uhost_ipv6s.ipv6s[count.index]
     }
     inline = [
