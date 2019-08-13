@@ -33,9 +33,9 @@ data "template_file" "bootstrap_script" {
   }
 }
 
-resource "kubernetes_config_map" "bootstrap_script" {
+resource "kubernetes_config_map" "bootstrap-script" {
   metadata {
-    name = "bootstrap_script"
+    name = "bootstrap-script"
   }
   data = {
     "bootstrap.sh" = data.template_file.bootstrap_script.rendered
@@ -80,14 +80,14 @@ resource "kubernetes_pod" "test" {
       image = var.controller_image
       command = ["tail", "-f", "/dev/null"]
       volume_mount {
-        name = "bootstrap_script"
+        name = "bootstrap-script"
         mount_path = "/bootstrap"
       }
     }
     volume {
-      name = "bootstrap_script"
+      name = "bootstrap-script"
       config_map {
-        name = "bootstrap_script"
+        name = "bootstrap-script"
       }
     }
   }
