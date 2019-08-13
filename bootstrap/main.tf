@@ -132,7 +132,7 @@ resource "kubernetes_pod" "test" {
     volume {
       name = "code"
       persistent_volume_claim {
-        claim_name = kubernetes_persistent_volume_claim.code_volume.metadata.name
+        claim_name = kubernetes_persistent_volume_claim.code_volume.metadata[0].name
         read_only = false
       }
     }
