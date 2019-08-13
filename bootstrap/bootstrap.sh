@@ -3,7 +3,7 @@ cd /project
 git clone ${terraform_project_url}
 cd ${project_dir}
 git checkout ${branch}
-cd consul-network
+cd control-network
 cat>terraform.tfvars<<-EOF
 ucloud_pub_key = "${ucloud_pub_key}"
 ucloud_secret = "${ucloud_secret}"
@@ -31,6 +31,7 @@ ipv6_api_url = "${ipv6_api_url}"
 controller_count = 0
 provision_from_kun = true
 EOF
+terraform init -plugin-dir=/plugin
 terraform apply --auto-approve -input=false
 terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../network/backend.tfvars
 terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../backend.tfvars
