@@ -8,6 +8,7 @@ variable terraform_project_url {}
 variable controller_image {}
 variable controller_pod_label {}
 variable k8s_namespace {}
+variable k8s_storage_class_name {}
 variable region {}
 variable region_id {}
 variable ucloud_pub_key {}

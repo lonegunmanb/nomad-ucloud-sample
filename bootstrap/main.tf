@@ -84,6 +84,25 @@ resource "kubernetes_config_map" "bootstrap-script" {
 //    }
 //  }
 //}
+
+
+resource kubernetes_persistent_volume_claim code_volume {
+  metadata {
+    name = "rktmq-bootstrap-code-volume-${var.cluster_id}"
+    namespace = var.k8s_namespace
+  }
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    storage_class_name = var.k8s_storage_class_name
+
+    resources {
+      requests {
+        storage = "1Gi"
+      }
+    }
+  }
+}
+
 resource "kubernetes_pod" "test" {
   depends_on = [kubernetes_config_map.bootstrap-script]
   metadata {
@@ -99,11 +118,22 @@ resource "kubernetes_pod" "test" {
         name = "bootstrap-script"
         mount_path = "/bootstrap"
       }
+      volume_mount {
+        name = "code"
+        mount_path = "/project"
+      }
     }
     volume {
       name = "bootstrap-script"
       config_map {
         name = "bootstrap-script"
+      }
+    }
+    volume {
+      name = "code"
+      persistent_volume_claim {
+        claim_name = kubernetes_persistent_volume_claim.code_volume.metadata.name
+        read_only = false
       }
     }
   }
