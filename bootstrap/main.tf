@@ -36,6 +36,7 @@ data "template_file" "bootstrap_script" {
 resource "kubernetes_config_map" "bootstrap-script" {
   metadata {
     name = "bootstrap-script"
+    namespace = var.k8s_namespace
   }
   data = {
     "bootstrap.sh" = data.template_file.bootstrap_script.rendered
