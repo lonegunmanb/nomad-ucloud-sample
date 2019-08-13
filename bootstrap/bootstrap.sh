@@ -79,4 +79,4 @@ terraform apply --auto-approve -input=false
 cd ..
 terraform init -plugin-dir=/plugin -backend-config=backend.tfvars
 terraform workspace new ${cluster_id}
-terraform apply --auto-approve -input=false
+terraform apply --auto-approve -input=false -var-file=backend.tfvars -var-file=terraform.tfvars.json
