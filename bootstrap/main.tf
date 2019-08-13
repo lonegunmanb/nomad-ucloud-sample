@@ -96,7 +96,7 @@ resource kubernetes_persistent_volume_claim code_volume {
     storage_class_name = var.k8s_storage_class_name
 
     resources {
-      requests {
+      requests = {
         storage = "1Gi"
       }
     }
