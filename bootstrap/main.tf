@@ -25,6 +25,7 @@ data "template_file" "bootstrap_script" {
     nomad_server_image_id = var.nomad_server_image_id
     nomad_server_root_password = var.nomad_server_root_password
     nomad_server_type = var.nomad_server_type
+    cluster_id = var.cluster_id
     TF_PLUGIN_CONSUL_VERSION = var.TF_PLUGIN_CONSUL_VERSION
     TF_PLUGIN_NULL_VERSION = var.TF_PLUGIN_NULL_VERSION
     TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
@@ -34,7 +35,7 @@ data "template_file" "bootstrap_script" {
 
 resource "kubernetes_config_map" "bootstrap_script" {
   metadata {
-    name = "bootstrap_script"
+    name = "bootstrap-script"
   }
   data = {
     "bootstrap.sh" = data.template_file.bootstrap_script.rendered
@@ -85,7 +86,7 @@ resource "kubernetes_pod" "test" {
     }
     volume {
       config_map {
-        name = "bootstrap_script"
+        name = "bootstrap-script"
       }
     }
   }

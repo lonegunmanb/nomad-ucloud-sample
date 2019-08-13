@@ -1,4 +1,5 @@
 variable branch {}
+variable cluster_id {}
 variable project_dir {}
 variable terraform_project_url {}
 variable controller_image {}
