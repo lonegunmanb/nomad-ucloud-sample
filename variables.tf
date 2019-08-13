@@ -76,3 +76,6 @@ variable "TF_PLUGIN_UCLOUD_VERSION" {
 locals  {
   cluster_id = terraform.workspace
 }
+variable remote_state_backend_url {
+  default = "http://localhost:8500"
+}

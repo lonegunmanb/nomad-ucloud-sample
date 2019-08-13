@@ -35,6 +35,7 @@ terraform init -plugin-dir=/plugin
 terraform apply --auto-approve -input=false
 terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../network/backend.tfvars
 terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../backend.tfvars
+terraform output -json | jq '.backend_ip.value' | xargs printf 'remote_state_backend_url=\"http://[%s]:8500\"\n' >> ../backend.tfvars
 cat>../network/terraform.tfvars.json<<-EOF
 {
   "region": "${region}",

@@ -13,7 +13,7 @@ locals {
 data terraform_remote_state nomad {
   backend = "consul"
   config = {
-    address = ""
+    address = var.remote_state_backend_url
     scheme = "http"
     path = "terraform/${local.remote_state}"
   }

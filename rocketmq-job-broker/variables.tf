@@ -12,3 +12,6 @@ variable rocketmq_version {}
 variable allow-multiple-tasks-in-az {}
 variable namesvr_clusterId {}
 variable nomad_cluster_id {}
+variable remote_state_backend_url {
+  default = "http://localhost:8500"
+}
