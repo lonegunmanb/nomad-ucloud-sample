@@ -39,6 +39,13 @@ data "template_file" "bootstrap_script" {
   }
 }
 
+data "template_file" "destroy-script" {
+  template = file("${path.module}/destroy.sh")
+  vars = {
+    project_dir = var.project_dir
+  }
+}
+
 resource "kubernetes_config_map" "bootstrap-script" {
   metadata {
     name = "bootstrap-script"
@@ -46,6 +53,7 @@ resource "kubernetes_config_map" "bootstrap-script" {
   }
   data = {
     "bootstrap.sh" = data.template_file.bootstrap_script.rendered
+    "destroy.sh" = data.template_file.destroy-script.rendered
   }
 }
 
