@@ -80,7 +80,7 @@ resource "kubernetes_pod" "test" {
       image = var.controller_image
       command = ["tail", "-f", "/dev/null"]
       volume_mount {
-        name = "bootstrap"
+        name = "bootstrap-script"
         mount_path = "/bootstrap"
       }
     }

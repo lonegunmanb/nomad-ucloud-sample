@@ -7,7 +7,6 @@ variable clientVpcCidr {}
 variable controllerVpcId {
   default = ""
 }
-variable externalVpcCidr {}
 
 locals {
   cluster_id = terraform.workspace
