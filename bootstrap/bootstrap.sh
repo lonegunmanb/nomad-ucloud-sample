@@ -69,7 +69,10 @@ cat>../terraform.tfvars.json<<-EOF
     "TF_PLUGIN_CONSUL_VERSION": "${TF_PLUGIN_CONSUL_VERSION}",
     "TF_PLUGIN_NULL_VERSION": "${TF_PLUGIN_NULL_VERSION}",
     "TF_PLUGIN_TEMPLATE_VERSION": "${TF_PLUGIN_TEMPLATE_VERSION}",
-    "TF_PLUGIN_UCLOUD_VERSION": "${TF_PLUGIN_UCLOUD_VERSION}"
+    "TF_PLUGIN_UCLOUD_VERSION": "${TF_PLUGIN_UCLOUD_VERSION}",
+    "ipv6_api_url": "${ipv6_api_url}",
+    "region_id": "${region_id}",
+    "provision_from_kun": true
 }
 EOF
 cd ../network

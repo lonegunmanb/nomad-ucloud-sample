@@ -49,6 +49,9 @@ module consul_servers {
   vpc_id           = data.terraform_remote_state.network.outputs.mgrVpcId
   subnet_id        = data.terraform_remote_state.network.outputs.mgrSubnetId
   data_volume_size = 30
+  ipv6_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  provision_from_kun = var.provision_from_kun
 }
 
 module nomad_servers {
@@ -65,6 +68,9 @@ module nomad_servers {
   subnet_id         = data.terraform_remote_state.network.outputs.mgrSubnetId
   consul_server_ips = module.consul_servers.private_ips
   data_volume_size  = 30
+  ipv6_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  provision_from_kun = var.provision_from_kun
 }
 
 module nameServer {
@@ -87,6 +93,9 @@ module nameServer {
   TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
   TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
   TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
+  ipv6_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  provision_from_kun = var.provision_from_kun
 }
 
 module broker {
@@ -109,5 +118,8 @@ module broker {
   TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
   TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
   TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
+  ipv6_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  provision_from_kun = var.provision_from_kun
 }
 

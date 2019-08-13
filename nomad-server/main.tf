@@ -43,6 +43,18 @@ locals {
   reconfig-ssh-keys-script      = file(local.reconfig-ssh-keys-script-path)
 }
 
+module ipv6 {
+  source = "../ipv6"
+  api_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  resourceIds = ucloud_instance.nomad_servers.*.id
+  disable = !var.provision_from_kun
+}
+
+locals {
+  server_ips = var.provision_from_kun ? module.ipv6.ipv6s : ucloud_eip.nomad_servers.*.public_ip
+}
+
 data "template_file" "setup-script" {
   count    = var.instance_count
   template = file(local.setup-script-path)
@@ -60,14 +72,14 @@ data "template_file" "setup-script" {
 resource "null_resource" "setup" {
   count = var.instance_count
   depends_on = [
-    ucloud_eip_association.nomad_ip,
+    ucloud_eip_association.nomad_ip
   ]
   provisioner "remote-exec" {
     connection {
       type     = "ssh"
       user     = "root"
       password = var.root_password
-      host     = ucloud_eip.nomad_servers[count.index].public_ip
+      host     = local.server_ips[count.index]
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,

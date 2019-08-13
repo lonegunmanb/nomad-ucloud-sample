@@ -79,3 +79,13 @@ locals  {
 variable remote_state_backend_url {
   default = "http://localhost:8500"
 }
+
+variable ipv6_server_url {
+  default = ""
+}
+variable region_id {
+  default = ""
+}
+variable provision_from_kun {
+  default = false
+}

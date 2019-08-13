@@ -30,3 +30,9 @@ variable "TF_PLUGIN_TEMPLATE_VERSION" {
 variable "TF_PLUGIN_UCLOUD_VERSION" {
   default = "1.11.1"
 }
+variable provision_from_kun {
+  type = bool
+  default = false
+}
+variable ipv6_server_url {}
+variable region_id {}
