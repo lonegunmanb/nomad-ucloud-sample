@@ -234,7 +234,3 @@ module consul_backend_lb_ipv6 {
   region_id = var.region_id
   resourceIds = list(module.consul_backend.consul_lb_id)
 }
-
-output backend_ip {
-  value = var.provision_from_kun ? module.consul_backend_lb_ipv6.ipv6s[0] : module.consul_backend.consul_lb_ip
-}
