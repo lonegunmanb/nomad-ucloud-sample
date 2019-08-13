@@ -1,7 +1,13 @@
-set -e
 cd /project/${project_dir}
-terraform destroy -force -var-file=backend.tfvars
-cd network/
-terraform destroy -force -var-file=backend.tfvars
-cd ../control-network/
+if [ ! -f "destroyed" ]; then
+  terraform destroy -force -var-file=backend.tfvars
+  touch destroyed
+fi
+cd network
+set -e
+if [ ! -f "destroyed" ]; then
+  terraform destroy -force -var-file=backend.tfvars
+  touch destroyed
+fi
+cd ../control-network
 terraform destroy -force
