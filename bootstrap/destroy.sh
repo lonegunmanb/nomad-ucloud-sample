@@ -1,3 +1,4 @@
+set -e
 cd /project/${project_dir}
 terraform destroy -force -var-file=backend.tfvars
 cd network/
