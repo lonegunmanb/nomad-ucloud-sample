@@ -1,4 +1,7 @@
 variable branch {}
+variable backend_consul_root_password {}
+variable consul_data_volume_size {}
+variable consul_instance_type {}
 variable cluster_id {}
 variable project_dir {}
 variable terraform_project_url {}
@@ -6,15 +9,18 @@ variable controller_image {}
 variable controller_pod_label {}
 variable k8s_namespace {}
 variable region {}
+variable region_id {}
 variable ucloud_pub_key {}
 variable ucloud_secret {}
 variable project_id {}
+variable controller_cidr {}
 variable mgrVpcCidr {}
 variable clientVpcCidr {}
 variable allow_ip {}
 variable az {
   type = list(string)
 }
+variable ipv6_api_url {}
 variable consul_server_image_id {}
 variable consul_server_root_password {}
 variable consul_server_type {}

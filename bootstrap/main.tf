@@ -1,18 +1,24 @@
 data "template_file" "bootstrap_script" {
   template = file("${path.module}/bootstrap.sh")
   vars = {
+    backend_consul_root_password = var.backend_consul_root_password
     terraform_project_url = var.terraform_project_url
     project_dir = var.project_dir
     branch = var.branch
     controller_image = var.controller_image
     controller_pod_label = var.controller_pod_label
     k8s_namespace = var.k8s_namespace
+    consul_data_volume_size = var.consul_data_volume_size
+    consul_instance_type = var.consul_instance_type
     region = var.region
+    region_id = var.region_id
     ucloud_pub_key = var.ucloud_pub_key
     ucloud_secret = var.ucloud_secret
     project_id = var.project_id
+    controller_cidr = var.controller_cidr
     mgrVpcCidr = var.mgrVpcCidr
     clientVpcCidr = var.clientVpcCidr
+    ipv6_api_url = var.ipv6_api_url
     allow_ip = var.allow_ip
     az = join(", ", formatlist("\"%s\"", var.az))
     consul_server_image_id = var.consul_server_image_id

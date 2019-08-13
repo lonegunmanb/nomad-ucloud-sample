@@ -3,11 +3,33 @@ cd /project
 git clone ${terraform_project_url}
 cd ${project_dir}
 git checkout ${branch}
-cd bootstrap
+cd consul-network
 cat>terraform.tfvars<<-EOF
-controller_image = "${controller_image}"
-controller_pod_label = "${controller_pod_label}"
-k8s_namespace = "${k8s_namespace}"
+ucloud_pub_key = "${ucloud_pub_key}"
+ucloud_secret = "${ucloud_secret}"
+region = "${region}"
+region_id = "${region_id}"
+az = [${az}]
+project_id = "${project_id}"
+cidr = "${controller_cidr}"
+vpcName = "controllerVpc"
+subnetName = "controllerSubnet"
+consul_image_id = "${consul_server_image_id}"
+controller_image_id = ""
+controler_instance_type = ""
+allow_ip = "${allow_ip}"
+root_password = ""
+
+terraform_project_url = ""
+git_branch = ""
+project_root_dir = ""
+project_dir = ""
+consul_root_password = "${backend_consul_root_password}"
+consul_data_volume_size = ${consul_data_volume_size}
+consul_instance_type = "${consul_instance_type}"
+ipv6_api_url = "${ipv6_api_url}"
+controller_count = 0
+provision_from_kun = true
 EOF
 terraform apply --auto-approve -input=false
 terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../network/backend.tfvars
