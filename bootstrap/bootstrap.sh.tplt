@@ -108,4 +108,5 @@ if [ ! -f "inited" ]; then
   terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
   touch inited
 fi
+echo "Finished"
 tail -f /dev/null
