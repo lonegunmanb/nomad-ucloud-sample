@@ -92,6 +92,15 @@ resource "kubernetes_pod" "bootstraper" {
         name = "code"
         mount_path = "/project"
       }
+      //DO NOT remove security_context or the pod will be recreated on re-apply
+      security_context {
+        allow_privilege_escalation = false
+        privileged = false
+        read_only_root_filesystem = false
+        run_as_group = 0
+        run_as_non_root = false
+        run_as_user = 0
+      }
     }
     volume {
       name = "bootstrap-script"
@@ -105,6 +114,16 @@ resource "kubernetes_pod" "bootstraper" {
         claim_name = kubernetes_persistent_volume_claim.code_volume.metadata[0].name
         read_only = false
       }
+    }
+    //DO NOT remove security_context or the pod will be recreated on re-apply
+    security_context {
+      fs_group = 2000
+      run_as_group = 0
+      run_as_non_root = false
+      run_as_user = 0
+      supplemental_groups = [
+        2000,
+      ]
     }
   }
 }
