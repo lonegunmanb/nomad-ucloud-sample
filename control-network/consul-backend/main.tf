@@ -6,7 +6,7 @@ provider "ucloud" {
 }
 
 resource ucloud_lb consul_lb {
-  name = "consulLb"
+  name = "consulLb-${var.tag}"
   internal = true
   tag = var.tag
   vpc_id = var.vpc_id

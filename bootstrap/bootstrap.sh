@@ -18,7 +18,7 @@ controller_image_id = ""
 controler_instance_type = ""
 allow_ip = "${allow_ip}"
 root_password = ""
-
+tag = "${cluster_id}"
 terraform_project_url = ""
 git_branch = ""
 project_root_dir = ""
@@ -87,3 +87,4 @@ rm -f destroyed
 terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars
 terraform workspace new ${cluster_id}
 terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
+tail -f /dev/null

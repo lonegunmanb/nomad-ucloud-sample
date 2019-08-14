@@ -6,7 +6,6 @@ data "template_file" "bootstrap_script" {
     project_dir = var.project_dir
     branch = var.branch
     controller_image = var.controller_image
-    controller_pod_label = var.controller_pod_label
     k8s_namespace = var.k8s_namespace
     consul_data_volume_size = var.consul_data_volume_size
     consul_instance_type = var.consul_instance_type
@@ -48,7 +47,7 @@ data "template_file" "destroy-script" {
 
 resource "kubernetes_config_map" "bootstrap-script" {
   metadata {
-    name = "bootstrap-script"
+    name = "bootstrap-script-${var.cluster_id}"
     namespace = var.k8s_namespace
   }
   data = {
@@ -56,35 +55,6 @@ resource "kubernetes_config_map" "bootstrap-script" {
     "destroy.sh" = data.template_file.destroy-script.rendered
   }
 }
-
-//resource "kubernetes_job" "bootstrap_job" {
-//  metadata {
-//    namespace = var.k8s_namespace
-//    name = "bootstrap"
-//  }
-//  spec {
-//    template {
-//      metadata {}
-//      spec {
-//        container {
-//          name = "bootstrap"
-//          image = var.controller_image
-//          command = ["sh", "/bootstrap/bootstrap.sh"]
-//          volume_mount {
-//            name = "bootstrap"
-//            mount_path = "/bootstrap"
-//          }
-//        }
-//        volume {
-//          config_map {
-//            name = "bootstrap_script"
-//          }
-//        }
-//      }
-//    }
-//  }
-//}
-
 
 resource kubernetes_persistent_volume_claim code_volume {
   metadata {
@@ -103,17 +73,17 @@ resource kubernetes_persistent_volume_claim code_volume {
   }
 }
 
-resource "kubernetes_pod" "test" {
+resource "kubernetes_pod" "bootstraper" {
   depends_on = [kubernetes_config_map.bootstrap-script]
   metadata {
-    name = "test"
+    name = "bootstraper"
     namespace = var.k8s_namespace
   }
   spec {
     container {
       name = "bootstrap"
       image = var.controller_image
-      command = ["tail", "-f", "/dev/null"]
+      command = ["sh", "/bootstrap/bootstrap.sh"]
       volume_mount {
         name = "bootstrap-script"
         mount_path = "/bootstrap"
@@ -126,7 +96,7 @@ resource "kubernetes_pod" "test" {
     volume {
       name = "bootstrap-script"
       config_map {
-        name = "bootstrap-script"
+        name = kubernetes_config_map.bootstrap-script.metadata[0]["name"]
       }
     }
     volume {
@@ -139,63 +109,109 @@ resource "kubernetes_pod" "test" {
   }
 }
 
-//resource "kubernetes_deployment" "controller" {
-//  metadata {
-//    namespace = var.k8s_namespace
-//    name = "rkq-controller"
-//  }
-//  spec {
-//    replicas = 3
-//
-//    selector {
-//      match_labels = {
-//        app = var.controller_pod_label
-//      }
-//    }
-//
-//    template {
-//      metadata {
-//        labels = {
-//          app = var.controller_pod_label
-//        }
-//      }
-//      spec {
-//        container {
-//          name = "controller"
-//          image = var.controller_image
-//          command = [
-//            "tail"]
-//          args = [
-//            "-f",
-//            "/dev/null"]
-//          resources {
-//            limits {
-//              cpu = "1"
-//              memory = "1024Mi"
-//            }
-//            requests {
-//              cpu = "1"
-//              memory = "1024Mi"
-//            }
-//          }
-//        }
-//      }
-//    }
-//  }
-//}
-//
-//resource kubernetes_service ctrlService {
-//  metadata {
-//    namespace = var.k8s_namespace
-//    name = "nomad-ctrl-service"
-//  }
-//  spec {
-//    selector = {
-//      app = var.controller_pod_label
-//    }
-//    port {
-//      port = 80
-//      target_port = 80
-//    }
-//  }
-//}
+provider "ucloud" {
+  public_key  = var.ucloud_pub_key
+  private_key = var.ucloud_secret
+  project_id  = var.project_id
+  region      = var.region
+}
+
+data "ucloud_lbs" "consulLb" {
+  name_regex = "consulLb-${var.cluster_id}"
+}
+
+locals {
+  lbId = data.ucloud_lbs.consulLb.lbs[0].id
+}
+
+module "consulLbIpv6" {
+  source = "../ipv6"
+  api_server_url = var.ipv6_api_url
+  region_id = var.region_id
+  resourceIds = [local.lbId]
+}
+
+resource "kubernetes_config_map" "backend-script" {
+  metadata {
+    name = "backend-script-${var.cluster_id}"
+    namespace = var.k8s_namespace
+  }
+  data = {
+    "backend.tfvars" = "address = \"http://[${module.consulLbIpv6.ipv6s[0]}]:8500\""
+  }
+}
+
+locals {
+  controller_pod_label = "rktmq-${var.cluster_id}"
+}
+
+resource "kubernetes_deployment" "controller" {
+  metadata {
+    namespace = var.k8s_namespace
+    name = "rkq-controller-${var.cluster_id}"
+  }
+  spec {
+    replicas = 3
+
+    selector {
+      match_labels = {
+        app = local.controller_pod_label
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = local.controller_pod_label
+        }
+      }
+      spec {
+        container {
+          name = "controller"
+          image = var.controller_image
+          command = [
+            "tail"]
+          args = [
+            "-f",
+            "/dev/null"]
+          resources {
+            limits {
+              cpu = "1"
+              memory = "1024Mi"
+            }
+            requests {
+              cpu = "1"
+              memory = "1024Mi"
+            }
+          }
+          volume_mount {
+            name = "backend-script"
+            mount_path = "/backend"
+          }
+        }
+        volume {
+          name = "backend-script"
+          config_map {
+            name = kubernetes_config_map.backend-script.metadata[0]["name"]
+          }
+        }
+      }
+    }
+  }
+}
+
+resource kubernetes_service ctrlService {
+  metadata {
+    namespace = var.k8s_namespace
+    name = "nomad-ctrl-service-${var.cluster_id}"
+  }
+  spec {
+    selector = {
+      app = local.controller_pod_label
+    }
+    port {
+      port = 80
+      target_port = 80
+    }
+  }
+}
