@@ -35,9 +35,9 @@ terraform apply --auto-approve -input=false
 #give consul some time to be stablized
 sleep 10
 mkdir /backend
-terraform output -json | jq '.backend_ip.value' | xargs -I {} export TF_VAR_remote_state_backend_url=http://[{}]:8500
-echo $TF_VAR_remote_state_backend_url | xargs -I {} export TF_VAR_remote_state_backend_url={} >> ~/.bashrc
-terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > /backend/backend.tfvars
+export TF_VAR_remote_state_backend_url=http://[$(terraform output -json | jq -r '.backend_ip.value')]:8500
+echo export TF_VAR_remote_state_backend_url=$TF_VAR_remote_state_backend_url >> ~/.bashrc
+echo address=\"$TF_VAR_remote_state_backend_url\" > /backend/backend.tfvars
 cat>../network/terraform.tfvars.json<<-EOF
 {
   "region": "${region}",
