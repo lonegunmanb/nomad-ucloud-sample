@@ -32,7 +32,7 @@ if [ ! -f "terraform.tfvars" ]; then
   ipv6_api_url = "${ipv6_api_url}"
   controller_count = 0
   provision_from_kun = true
-  EOF
+EOF
 fi
 if [ ! -f "inited" ]; then
   terraform init -plugin-dir=/plugin
@@ -61,7 +61,7 @@ if [ ! -f "../network/terraform.tfvars.json" ]; then
     "mgrVpcCidr": "${mgrVpcCidr}",
     "clientVpcCidr": "${clientVpcCidr}"
   }
-  EOF
+EOF
 fi
 if [ ! -f "../terraform.tfvars.json" ]; then
   cat>../terraform.tfvars.json<<-EOF
@@ -92,7 +92,7 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "region_id": "${region_id}",
       "provision_from_kun": true
   }
-  EOF
+EOF
 fi
 cd ../network
 rm -f destroyed
