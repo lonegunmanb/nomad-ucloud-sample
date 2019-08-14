@@ -34,9 +34,10 @@ terraform init -plugin-dir=/plugin
 terraform apply --auto-approve -input=false
 #give consul some time to be stablized
 sleep 10
-terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../network/backend.tfvars
-terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > ../backend.tfvars
-terraform output -json | jq '.backend_ip.value' | xargs printf 'remote_state_backend_url=\"http://[%s]:8500\"\n' >> ../backend.tfvars
+mkdir /backend
+terraform output -json | jq '.backend_ip.value' | xargs -I {} export TF_VAR_remote_state_backend_url=http://[{}]:8500
+echo $TF_VAR_remote_state_backend_url | xargs -I {} export TF_VAR_remote_state_backend_url={} >> ~/.bashrc
+terraform output -json | jq '.backend_ip.value' | xargs printf 'address=\"http://[%s]:8500\"\n' > /backend/backend.tfvars
 cat>../network/terraform.tfvars.json<<-EOF
 {
   "region": "${region}",
@@ -78,11 +79,11 @@ cat>../terraform.tfvars.json<<-EOF
 EOF
 cd ../network
 rm -f destroyed
-terraform init -plugin-dir=/plugin -backend-config=backend.tfvars
+terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars
 terraform workspace new ${cluster_id}
 terraform apply --auto-approve -input=false
 cd ..
 rm -f destroyed
-terraform init -plugin-dir=/plugin -backend-config=backend.tfvars
+terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars
 terraform workspace new ${cluster_id}
-terraform apply --auto-approve -input=false -var-file=backend.tfvars -var-file=terraform.tfvars.json
+terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
