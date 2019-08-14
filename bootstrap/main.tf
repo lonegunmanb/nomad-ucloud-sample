@@ -96,7 +96,7 @@ resource "kubernetes_pod" "bootstraper" {
     volume {
       name = "bootstrap-script"
       config_map {
-        name = kubernetes_config_map.bootstrap-script.metadata[0]["name"]
+        name = kubernetes_config_map.bootstrap-script.metadata[0].name
       }
     }
     volume {
@@ -117,6 +117,7 @@ provider "ucloud" {
 }
 
 data "ucloud_lbs" "consulLb" {
+  depends_on = [kubernetes_pod.bootstraper]
   name_regex = "consulLb-${var.cluster_id}"
 }
 
@@ -192,7 +193,7 @@ resource "kubernetes_deployment" "controller" {
         volume {
           name = "backend-script"
           config_map {
-            name = kubernetes_config_map.backend-script.metadata[0]["name"]
+            name = kubernetes_config_map.backend-script.metadata[0].name
           }
         }
       }
