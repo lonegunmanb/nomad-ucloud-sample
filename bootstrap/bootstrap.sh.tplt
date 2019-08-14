@@ -38,6 +38,7 @@ mkdir /backend
 export TF_VAR_remote_state_backend_url=http://[$(terraform output -json | jq -r '.backend_ip.value')]:8500
 echo export TF_VAR_remote_state_backend_url=$TF_VAR_remote_state_backend_url >> ~/.bashrc
 echo address=\"$TF_VAR_remote_state_backend_url\" > /backend/backend.tfvars
+echo remote_state_backend_url=\"$TF_VAR_remote_state_backend_url\" >> /backend/backend.tfvars
 cat>../network/terraform.tfvars.json<<-EOF
 {
   "region": "${region}",

@@ -1,5 +1,5 @@
 data "template_file" "bootstrap_script" {
-  template = file("${path.module}/bootstrap.sh")
+  template = file("${path.module}/bootstrap.sh.tplt")
   vars = {
     backend_consul_root_password = var.backend_consul_root_password
     terraform_project_url = var.terraform_project_url
@@ -39,7 +39,7 @@ data "template_file" "bootstrap_script" {
 }
 
 data "template_file" "destroy-script" {
-  template = file("${path.module}/destroy.sh")
+  template = file("${path.module}/destroy.sh.tplt")
   vars = {
     project_dir = var.project_dir
   }
@@ -73,10 +73,14 @@ resource kubernetes_persistent_volume_claim code_volume {
   }
 }
 
+locals  {
+  bootstraper_pod_name = "bootstraper"
+  bootstrap_script_dir = "/bootstrap"
+}
 resource "kubernetes_pod" "bootstraper" {
   depends_on = [kubernetes_config_map.bootstrap-script]
   metadata {
-    name = "bootstraper"
+    name = local.bootstraper_pod_name
     namespace = var.k8s_namespace
   }
   spec {
@@ -86,7 +90,7 @@ resource "kubernetes_pod" "bootstraper" {
       command = ["sh", "/bootstrap/bootstrap.sh"]
       volume_mount {
         name = "bootstrap-script"
-        mount_path = "/bootstrap"
+        mount_path = local.bootstrap_script_dir
       }
       volume_mount {
         name = "code"
@@ -125,6 +129,10 @@ resource "kubernetes_pod" "bootstraper" {
         2000,
       ]
     }
+  }
+  provisioner "local-exec" {
+    when = "destroy"
+    command = "kubectl -n ${var.k8s_namespace} exec ${local.bootstraper_pod_name} sh ${local.bootstrap_script_dir}/destroy.sh"
   }
 }
 
