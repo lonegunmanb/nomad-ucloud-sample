@@ -17,7 +17,7 @@ data "template_file" "broker-job" {
     broker-config     = "http://nomad-jobfile.cn-bj.ufileos.com/broker.conf.tpl"
     brokersvc-name    = local.brokersvc-name
     node-class        = "broker"
-    task-limit-per-az = var.allow-multiple-tasks-in-az ? length(local.az) : 1
+    task-limit-per-az = var.allow_multiple_tasks_in_az ? length(local.az) : 1
   }
 }
 

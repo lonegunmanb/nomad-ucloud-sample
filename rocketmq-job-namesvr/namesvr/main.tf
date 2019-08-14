@@ -8,7 +8,7 @@ variable az {
 variable region {}
 variable cluster-id {}
 variable nomad-server-ip {}
-variable allow-multiple-tasks-in-az {}
+variable allow_multiple_tasks_in_az {}
 
 provider nomad {
   address = "http://${var.nomad-server-ip}:4646"
@@ -31,7 +31,7 @@ data "template_file" "namesvr-job" {
     count             = length(var.az)
     min-az-count      = length(distinct(var.az))
     node-class        = "nameServer"
-    task-limit-per-az = var.allow-multiple-tasks-in-az ? length(var.az) : 1
+    task-limit-per-az = var.allow_multiple_tasks_in_az ? length(var.az) : 1
   }
 }
 

@@ -74,7 +74,7 @@ resource kubernetes_persistent_volume_claim code_volume {
 }
 
 locals  {
-  bootstraper_pod_name = "bootstraper"
+  bootstraper_pod_name = "bootstraper-${var.cluster_id}"
   bootstrap_script_dir = "/bootstrap"
 }
 resource "kubernetes_pod" "bootstraper" {
@@ -150,6 +150,7 @@ data "ucloud_lbs" "consulLb" {
 
 locals {
   lbId = data.ucloud_lbs.consulLb.lbs[0].id
+  allow_multiple_tasks_in_az = length(var.az) == length(distinct(var.az)) ? false : true
 }
 
 module "consulLbIpv6" {
@@ -205,6 +206,14 @@ resource "kubernetes_deployment" "controller" {
           env {
             name = "TF_VAR_remote_state_backend_url"
             value = "http://[${module.consulLbIpv6.ipv6s[0]}]:8500"
+          }
+          env {
+            name = "TF_VAR_nomad_cluster_id"
+            value = var.cluster_id
+          }
+          env {
+            name = "TF_VAR_allow_multiple_tasks_in_az"
+            value = local.allow_multiple_tasks_in_az
           }
           resources {
             limits {

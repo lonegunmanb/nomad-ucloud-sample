@@ -14,7 +14,7 @@ module "namesvr" {
   cluster-id                 = local.namesvr_clusterId
   nomad-server-ip            = data.terraform_remote_state.nomad.outputs.nomad_servers_ips[0]
   region                     = data.terraform_remote_state.nomad.outputs.region
-  allow-multiple-tasks-in-az = false
+  allow_multiple_tasks_in_az = var.allow_multiple_tasks_in_az
 }
 
 module "console" {

@@ -1,6 +1,7 @@
-terraform=$TERRAFORM
-if [$terraform -eq ""]
+if [[ -z "${TERRAFORM}" ]]; then
   terraform="terraform"
+else
+  terraform="${TERRAFORM}"
 fi
 while true; do
   $terraform apply --auto-approve -input=false

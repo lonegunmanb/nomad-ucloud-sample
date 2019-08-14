@@ -9,7 +9,7 @@ locals {
 }
 variable rocketmq_docker_image {}
 variable rocketmq_version {}
-variable allow-multiple-tasks-in-az {}
+variable allow_multiple_tasks_in_az {}
 variable namesvr_clusterId {}
 variable nomad_cluster_id {}
 variable remote_state_backend_url {
