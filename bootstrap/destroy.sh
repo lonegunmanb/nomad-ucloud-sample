@@ -1,7 +1,7 @@
 cd /project/${project_dir}
 while true; do
   if [ ! -f "destroyed" ]; then
-    terraform destroy -force -var-file=backend.tfvars
+    terraform destroy -force -var-file=/backend/backend.tfvars
     if [ $? -eq 0 ]; then
         break
     fi
@@ -14,7 +14,7 @@ touch destroyed
 cd network
 while true; do
   if [ ! -f "destroyed" ]; then
-    terraform destroy -force -var-file=backend.tfvars
+    terraform destroy -force -var-file=/backend/backend.tfvars
     if [ $? -eq 0 ]; then
         break
     fi
