@@ -89,10 +89,6 @@ module nameServer {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
-  TF_PLUGIN_CONSUL_VERSION  = var.TF_PLUGIN_CONSUL_VERSION
-  TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
-  TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
-  TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun
@@ -114,10 +110,6 @@ module broker {
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
   consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
-  TF_PLUGIN_CONSUL_VERSION  = var.TF_PLUGIN_CONSUL_VERSION
-  TF_PLUGIN_NULL_VERSION    = var.TF_PLUGIN_NULL_VERSION
-  TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
-  TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun

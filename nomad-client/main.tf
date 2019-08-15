@@ -54,16 +54,6 @@ locals {
   server_ips = var.provision_from_kun ? module.ipv6.ipv6s : ucloud_eip.nomad_clients.*.public_ip
 }
 
-data "template_file" "build-terraform-plugin-cache-script" {
-  template = file("${path.module}/../scripts/build-terraform-plugin-cache.sh")
-  vars = {
-    TF_PLUGIN_CONSUL_VERSION = var.TF_PLUGIN_CONSUL_VERSION
-    TF_PLUGIN_NULL_VERSION = var.TF_PLUGIN_NULL_VERSION
-    TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
-    TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
-  }
-}
-
 data "template_file" "setup-script" {
   count    = var.instance_count
   template = file(local.setup-script-path)
@@ -93,7 +83,6 @@ resource "null_resource" "setup" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      data.template_file.build-terraform-plugin-cache-script.rendered,
       local.reconfig-ssh-keys-script,
     ]
   }
