@@ -74,7 +74,7 @@ resource kubernetes_persistent_volume_claim code_volume {
 }
 
 locals  {
-  bootstraper_pod_name = "bootstraper-${var.cluster_id}"
+  bootstraper_pod_name = "bootstrapper-${var.cluster_id}"
   bootstrap_script_dir = "/bootstrap"
 }
 resource "kubernetes_pod" "bootstraper" {

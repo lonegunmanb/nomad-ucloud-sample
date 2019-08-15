@@ -34,12 +34,12 @@
     {
       "type": "shell",
       "scripts": [
-        "scripts/config-yum.sh",
-        "scripts/consul-service.sh",
-        "scripts/nomad-service.sh",
-        "scripts/install-docker.sh",
-        "scripts/nomad-client.sh",
-        "scripts/build-terraform-plugin-cache.sh"
+        "../scripts/config-yum.sh",
+        "../scripts/consul-service.sh",
+        "../scripts/nomad-service.sh",
+        "../scripts/install-docker.sh",
+        "../scripts/nomad-client.sh",
+        "../scripts/build-terraform-plugin-cache.sh"
       ],
       "environment_vars": [
         "CONSUL_VERSION={{user `consul_version`}}",

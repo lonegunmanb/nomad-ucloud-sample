@@ -1,9 +1,5 @@
 yum install -y unzip wget telnet git
 cd /tmp
-TERRAFORM_VERSION = $TERRAFORM_VERSION
-CONSUL_VERSION = $CONSUL_VERSION
-NOMAD_VERSION = $NOMAD_VERSION
-GO_VERSION = $GO_VERSION
 
 wget -nv -O terraform.zip http://hashicorpfile.cn-bj.ufileos.com/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 unzip terraform
