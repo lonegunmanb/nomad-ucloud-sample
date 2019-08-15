@@ -1,9 +1,6 @@
 {
   "variables": {
     "terraform_version": "0.12.6",
-    "consul_version": "1.5.1",
-    "nomad_version": "0.9.3",
-    "go_version": "1.12.7",
     "tf_plugin_consul_version": "2.5.0",
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
@@ -18,11 +15,9 @@
 
   "builders": [{
     "type": "docker",
-    "image": "centos:7",
+    "image": "alpine:3.10.1",
     "commit": true,
     "changes": [
-      "ENV GOPATH /root/go",
-      "ENV PATH $PATH:/usr/local/go/bin:~/go/bin",
       "CMD [\"\"]",
       "ENTRYPOINT [\"\"]"
     ]
@@ -31,15 +26,12 @@
     {
       "type": "shell",
       "scripts": [
-        "../scripts/config-yum.sh",
-        "../scripts/install-controller.sh",
+        "../scripts/config-apk.sh",
+        "../scripts/install-bootstrapper.sh",
         "../scripts/build-terraform-plugin-cache.sh"
       ],
       "environment_vars": [
         "TERRAFORM_VERSION={{user `terraform_version`}}",
-        "CONSUL_VERSION={{user `consul_version`}}",
-        "NOMAD_VERSION={{user `nomad_version`}}",
-        "GO_VERSION={{user `go_version`}}",
         "TF_PLUGIN_CONSUL_VERSION={{user `tf_plugin_consul_version`}}",
         "TF_PLUGIN_NULL_VERSION={{user `tf_plugin_null_version`}}",
         "TF_PLUGIN_TEMPLATE_VERSION={{user `tf_plugin_template_version`}}",
