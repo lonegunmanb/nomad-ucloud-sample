@@ -1,7 +1,9 @@
-cd /project/${project_dir}
+cd /project/${project_dir}/control-network
+export TF_VAR_remote_state_backend_url=http://[$(terraform output -json | jq -r '.backend_ip.value')]:8500
+cd ..
 while true; do
   if [ ! -f "destroyed" ]; then
-    terraform destroy -force -var-file=/backend/backend.tfvars
+    terraform destroy -force
     if [ $? -eq 0 ]; then
         break
     fi
@@ -14,7 +16,7 @@ touch destroyed
 cd network
 while true; do
   if [ ! -f "destroyed" ]; then
-    terraform destroy -force -var-file=/backend/backend.tfvars
+    terraform destroy -force
     if [ $? -eq 0 ]; then
         break
     fi
