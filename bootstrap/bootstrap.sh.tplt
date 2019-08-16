@@ -81,10 +81,6 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "region": "${region}",
       "ucloud_pub_key": "${ucloud_pub_key}",
       "ucloud_secret": "${ucloud_secret}",
-      "TF_PLUGIN_CONSUL_VERSION": "${TF_PLUGIN_CONSUL_VERSION}",
-      "TF_PLUGIN_NULL_VERSION": "${TF_PLUGIN_NULL_VERSION}",
-      "TF_PLUGIN_TEMPLATE_VERSION": "${TF_PLUGIN_TEMPLATE_VERSION}",
-      "TF_PLUGIN_UCLOUD_VERSION": "${TF_PLUGIN_UCLOUD_VERSION}",
       "ipv6_server_url": "${ipv6_api_url}",
       "region_id": "${region_id}",
       "provision_from_kun": true

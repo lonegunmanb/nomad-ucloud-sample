@@ -31,10 +31,6 @@ data "template_file" "bootstrap_script" {
     nomad_server_root_password = var.nomad_server_root_password
     nomad_server_type = var.nomad_server_type
     cluster_id = var.cluster_id
-    TF_PLUGIN_CONSUL_VERSION = var.TF_PLUGIN_CONSUL_VERSION
-    TF_PLUGIN_NULL_VERSION = var.TF_PLUGIN_NULL_VERSION
-    TF_PLUGIN_TEMPLATE_VERSION = var.TF_PLUGIN_TEMPLATE_VERSION
-    TF_PLUGIN_UCLOUD_VERSION = var.TF_PLUGIN_UCLOUD_VERSION
   }
 }
 
