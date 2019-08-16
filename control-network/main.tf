@@ -215,6 +215,7 @@ resource "null_resource" "install_consul_server_via_kun" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
+      data.template_file.add-loopback.rendered,
       local.reconfig_ssh_keys_script,
     ]
   }
