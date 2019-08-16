@@ -1,10 +1,5 @@
-module "isNomadIpv6" {
-  source = "../isipv6"
-  ip = data.terraform_remote_state.nomad.outputs.nomad_server_ip
-}
-
 locals {
-  nomad_server_ip = module.isNomadIpv6.isIpv6 ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
+  nomad_server_ip = var.provision_from_kun ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
 }
 
 provider "nomad" {

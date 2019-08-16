@@ -15,3 +15,4 @@ variable nomad_cluster_id {}
 variable remote_state_backend_url {
   default = "http://localhost:8500"
 }
+variable provision_from_kun {}

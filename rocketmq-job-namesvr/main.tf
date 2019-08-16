@@ -1,14 +1,9 @@
-module "isNomadIpv6" {
-  source = "../isipv6"
-  ip = data.terraform_remote_state.nomad.outputs.nomad_server_ip
-}
-
 locals {
   namesvr_clusterId = terraform.workspace
   az             = data.terraform_remote_state.nomad.outputs.az
   namesvr-name   = "namesvc-service-${local.namesvr_clusterId}"
   region         = data.terraform_remote_state.nomad.outputs.region
-  nomadServerAddress    = module.isNomadIpv6.isIpv6 ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
+  nomadServerAddress    = var.provision_from_kun ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
 }
 
 module "namesvr" {

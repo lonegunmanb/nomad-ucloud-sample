@@ -16,3 +16,4 @@ variable remote_state_backend_url {
 }
 
 variable allow_multiple_tasks_in_az {}
+variable provision_from_kun {}
