@@ -23,7 +23,7 @@ module "console" {
   namesvc_name = local.namesvr-name
   region = local.region
   clusterId = local.namesvr_clusterId
-  nomad_ip = data.terraform_remote_state.nomad.outputs.nomad_server_ip
+  nomad_ip = local.nomadServerAddress
 }
 
 module "loadBalanceWatcher" {
