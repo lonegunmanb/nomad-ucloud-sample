@@ -113,7 +113,6 @@ resource null_resource setupController {
     }
     inline = [
       data.template_file.mount_disk_script.rendered,
-      data.template_file.clone_project_script.rendered,
       local.reconfig_ssh_keys_script,
     ]
   }
@@ -138,6 +137,7 @@ module consul_backend {
 
 locals {
   setup-consul-script-path = "${path.module}/setup-consul.sh"
+  add-loopback-script-path = "${path.module}/../scripts/add-loopback.sh.tplt"
 }
 
 data "template_file" "setup-script" {
@@ -150,6 +150,13 @@ data "template_file" "setup-script" {
     consul-server-ip-1 = module.consul_backend.private_ips[1]
     consul-server-ip-2 = module.consul_backend.private_ips[2]
     consul-vip = module.consul_backend.consul_lb_ip
+  }
+}
+
+data "template_file" "add-loopback" {
+  template = file(local.add-loopback-script-path)
+  vars = {
+    vip = module.consul_backend.consul_lb_ip
   }
 }
 
@@ -178,6 +185,7 @@ resource "null_resource" "install_consul_server_via_ipv4" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
+      data.template_file.add-loopback.rendered,
       local.reconfig_ssh_keys_script,
     ]
   }

@@ -11,11 +11,3 @@ sed -i 's/CONSUL_SERVER2_IP/${consul-server-ip-1}/g' /etc/consul.d/consul.hcl
 sed -i 's/CONSUL_SERVER3_IP/${consul-server-ip-2}/g' /etc/consul.d/consul.hcl
 systemctl enable consul
 systemctl start consul
-
-touch /etc/sysconfig/network-scripts/ifcfg-lo:1
-cat > /etc/sysconfig/network-scripts/ifcfg-lo:1 <<EOF
-DEVICE=lo:1
-IPADDR=${consul-vip}
-NETMASK=255.255.255.255
-EOF
-ifup lo:1
