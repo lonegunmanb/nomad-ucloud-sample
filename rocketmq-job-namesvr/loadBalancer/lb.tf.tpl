@@ -2,6 +2,7 @@ variable ucloud_pub_key {}
 variable ucloud_secret {}
 variable project_id {}
 variable region {}
+variable ucloud_api_base_url {}
 
 terraform {
   backend "consul" {
@@ -16,6 +17,7 @@ provider "ucloud" {
   private_key = var.ucloud_secret
   project_id = var.project_id
   region = var.region
+  base_url = var.ucloud_api_base_url
 }
 
 {{range service "nameServer${cluster-id}"}}

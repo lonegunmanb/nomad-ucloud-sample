@@ -76,3 +76,5 @@ variable region_id {
 variable provision_from_kun {
   default = false
 }
+variable "ucloud_api_base_url" {
+}

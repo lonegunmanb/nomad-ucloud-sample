@@ -3,6 +3,7 @@ provider "ucloud" {
   private_key = var.ucloud_secret
   project_id = var.projectId
   region = var.region
+  base_url = var.ucloud_api_base_url
 }
 
 resource ucloud_lb rocketMQLoadBalancer {
@@ -57,6 +58,7 @@ data "template_file" "tf-vars-content" {
     ucloudPubKey = var.ucloud_pubkey
     ucloudPriKey = var.ucloud_secret
     projectId    = var.projectId
+    ucloud_api_base_url = var.ucloud_api_base_url
   }
 }
 

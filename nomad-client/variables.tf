@@ -1,4 +1,8 @@
 variable region {}
+variable ucloud_pub_key {}
+variable ucloud_secret {}
+variable project_id {}
+variable ucloud_api_base_url {}
 variable az {
   type = list(string)
 }

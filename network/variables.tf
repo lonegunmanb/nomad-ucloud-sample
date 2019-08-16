@@ -7,6 +7,8 @@ variable clientVpcCidr {}
 variable controllerVpcId {
   default = ""
 }
+variable "ucloud_api_base_url" {
+}
 
 locals {
   cluster_id = terraform.workspace

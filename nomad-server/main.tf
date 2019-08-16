@@ -1,3 +1,11 @@
+provider "ucloud" {
+  region = var.region
+  public_key = var.ucloud_pub_key
+  private_key = var.ucloud_secret
+  project_id = var.project_id
+  base_url = var.ucloud_api_base_url
+}
+
 resource ucloud_isolation_group isolation_group {
   count = length(var.az)
   name = "nomad-server-${var.cluster_id}-${count.index}"

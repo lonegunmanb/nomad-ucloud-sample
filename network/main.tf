@@ -8,6 +8,7 @@ module mgrVpc {
   ucloud_secret = var.ucloud_secret
   vpcName = local.mgrVpcName
   subnetName = local.mgrSubnetName
+  ucloud_api_base_url = var.ucloud_api_base_url
 }
 
 module clientVpc {
@@ -20,6 +21,7 @@ module clientVpc {
   ucloud_secret = var.ucloud_secret
   vpcName = local.clientVpcName
   subnetName = local.clientSubnetName
+  ucloud_api_base_url = var.ucloud_api_base_url
 }
 
 provider "ucloud" {
@@ -27,6 +29,7 @@ provider "ucloud" {
   private_key = var.ucloud_secret
   project_id  = var.project_id
   region      = var.region
+  base_url    = var.ucloud_api_base_url
 }
 
 resource ucloud_vpc_peering_connection peering {

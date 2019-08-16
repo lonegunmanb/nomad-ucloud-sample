@@ -3,6 +3,7 @@ provider "ucloud" {
   private_key = var.ucloud_secret
   project_id  = var.project_id
   region      = var.region
+  base_url    = var.ucloud_api_base_url
 }
 
 resource ucloud_security_group consul_server_sg {
@@ -52,6 +53,10 @@ module consul_servers {
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun
+  project_id = var.project_id
+  ucloud_api_base_url = var.ucloud_api_base_url
+  ucloud_pub_key = var.ucloud_pub_key
+  ucloud_secret = var.ucloud_secret
 }
 
 module nomad_servers {
@@ -71,6 +76,10 @@ module nomad_servers {
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun
+  project_id = var.project_id
+  ucloud_api_base_url = var.ucloud_api_base_url
+  ucloud_pub_key = var.ucloud_pub_key
+  ucloud_secret = var.ucloud_secret
 }
 
 module nameServer {
@@ -92,6 +101,10 @@ module nameServer {
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun
+  project_id = var.project_id
+  ucloud_api_base_url = var.ucloud_api_base_url
+  ucloud_pub_key = var.ucloud_pub_key
+  ucloud_secret = var.ucloud_secret
 }
 
 module broker {
@@ -113,5 +126,9 @@ module broker {
   ipv6_server_url = var.ipv6_server_url
   region_id = var.region_id
   provision_from_kun = var.provision_from_kun
+  project_id = var.project_id
+  ucloud_api_base_url = var.ucloud_api_base_url
+  ucloud_pub_key = var.ucloud_pub_key
+  ucloud_secret = var.ucloud_secret
 }
 

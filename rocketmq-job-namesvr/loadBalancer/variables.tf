@@ -9,6 +9,7 @@ variable subnetId {}
 variable projectId {}
 variable ucloud_pubkey {}
 variable ucloud_secret {}
+variable ucloud_api_base_url {}
 locals {
   job-hcl = "${path.module}/job.hcl"
   tf-tpl  = "${path.module}/lb.tf.tpl"

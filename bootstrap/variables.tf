@@ -13,6 +13,7 @@ variable region_id {}
 variable ucloud_pub_key {}
 variable ucloud_secret {}
 variable project_id {}
+variable ucloud_api_base_url {}
 variable controller_cidr {}
 variable mgrVpcCidr {}
 variable clientVpcCidr {}

@@ -8,3 +8,4 @@ variable cidr {
 }
 variable vpcName {}
 variable subnetName {}
+variable ucloud_api_base_url {}

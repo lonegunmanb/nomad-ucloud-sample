@@ -105,6 +105,10 @@ resource "kubernetes_pod" "bootstraper" {
         run_as_non_root = false
         run_as_user = 0
       }
+      env {
+        name = "TF_VAR_ucloud_api_base_url"
+        value = var.ucloud_api_base_url
+      }
     }
     volume {
       name = "bootstrap-script"
@@ -214,6 +218,10 @@ resource "kubernetes_deployment" "controller" {
           env {
             name = "TF_VAR_allow_multiple_tasks_in_az"
             value = local.allow_multiple_tasks_in_az
+          }
+          env {
+            name = "TF_VAR_ucloud_api_base_url"
+            value = var.ucloud_api_base_url
           }
           resources {
             limits {

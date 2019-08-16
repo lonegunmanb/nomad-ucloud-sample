@@ -4,6 +4,7 @@ variable region {}
 variable region_id {}
 variable ucloud_secret {}
 variable project_id {}
+variable ucloud_api_base_url {}
 variable cidr {
   type = "string"
 }

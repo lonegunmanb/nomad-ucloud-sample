@@ -38,5 +38,6 @@ module "loadBalanceWatcher" {
   subnetId        = data.terraform_remote_state.nomad.outputs.clientSubnetId
   ucloud_pubkey   = var.ucloud_pubkey
   ucloud_secret   = var.ucloud_secret
+  ucloud_api_base_url = var.ucloud_api_base_url
 }
 
