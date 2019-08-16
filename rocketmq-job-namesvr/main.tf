@@ -3,7 +3,7 @@ locals {
   az             = data.terraform_remote_state.nomad.outputs.az
   namesvr-name   = "namesvc-service-${local.namesvr_clusterId}"
   region         = data.terraform_remote_state.nomad.outputs.region
-  nomadServerAddress    = var.provision_from_kun ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
+  nomadServerAddress    = length(data.terraform_remote_state.nomad.outputs.nomad_server_ip) > 15 ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
 }
 
 module "namesvr" {

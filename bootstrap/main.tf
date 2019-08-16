@@ -105,10 +105,6 @@ resource "kubernetes_pod" "bootstraper" {
         name = "TF_VAR_ucloud_api_base_url"
         value = var.ucloud_api_base_url
       }
-      env {
-        name = "TF_VAR_provision_from_kun"
-        value = "true"
-      }
     }
     volume {
       name = "bootstrap-script"
