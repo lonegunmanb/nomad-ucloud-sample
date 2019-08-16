@@ -30,8 +30,24 @@ output "consul_servers_private_ips" {
   value = module.consul_servers.private_ips
 }
 
+output "consul_lb_ip" {
+  value = module.consul_servers.lb_ip
+}
+
 output "nomad_servers_ips" {
   value = module.nomad_servers.public_ips
+}
+
+module nomad_lb_ipv6 {
+  source = "./ipv6"
+  disable = !var.provision_from_kun
+  api_server_url = var.ipv6_server_url
+  region_id = var.region_id
+  resourceIds = [module.nomad_servers.lb_id]
+}
+
+output "nomad_server_ip" {
+  value = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s[0] : module.nomad_servers.public_ips[0]
 }
 
 output "nomad_broker_public_ips" {

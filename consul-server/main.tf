@@ -47,8 +47,7 @@ resource "ucloud_eip_association" "consul_ip" {
 
 locals {
   setup-script-path             = "${path.module}/setup.sh"
-  reconfig-ssh-keys-script-path = "${path.module}/reconfig_ssh_keys.sh"
-  reconfig-ssh-keys-script      = file(local.reconfig-ssh-keys-script-path)
+  reconfig-ssh-keys-script      = file("${path.module}/reconfig_ssh_keys.sh")
 }
 
 module ipv6 {
@@ -75,6 +74,16 @@ data "template_file" "setup-script" {
   }
 }
 
+module "consulLb" {
+  source = "../internal_lb"
+  tag = var.cluster_id
+  instance_ids = ucloud_instance.consul_server.*.id
+  name = "consulServer-${var.cluster_id}"
+  ports = [8500]
+  subnet_id = var.subnet_id
+  vpc_id = var.vpc_id
+}
+
 resource "null_resource" "install_consul_server" {
   count = local.instance_count
   depends_on = [
@@ -89,6 +98,7 @@ resource "null_resource" "install_consul_server" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
+      module.consulLb.setup_loopback_script,
       local.reconfig-ssh-keys-script,
     ]
   }

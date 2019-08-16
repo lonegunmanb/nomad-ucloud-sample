@@ -6,21 +6,6 @@ provider "ucloud" {
   base_url = var.ucloud_api_base_url
 }
 
-resource ucloud_lb consul_lb {
-  name = "consulLb-${var.tag}"
-  internal = true
-  tag = var.tag
-  vpc_id = var.vpc_id
-  subnet_id = var.subnet_id
-}
-
-resource ucloud_lb_listener consul_listener {
-  load_balancer_id = ucloud_lb.consul_lb.id
-  protocol = "tcp"
-  name = "consul"
-  port = 8500
-}
-
 resource ucloud_isolation_group isolation_group {
   count = length(var.az)
   name = "consul-backend-${var.tag}-${count.index}"
@@ -57,12 +42,4 @@ resource "ucloud_disk_attachment" "consul_server_data" {
   availability_zone = var.az[count.index % length(var.az)]
   disk_id           = ucloud_disk.consul_data[count.index].id
   instance_id       = ucloud_instance.consul_server[count.index].id
-}
-
-resource ucloud_lb_attachment consul {
-  count = local.instance_count
-  listener_id = ucloud_lb_listener.consul_listener.id
-  load_balancer_id = ucloud_lb.consul_lb.id
-  resource_id = ucloud_instance.consul_server[count.index].id
-  port = 8500
 }

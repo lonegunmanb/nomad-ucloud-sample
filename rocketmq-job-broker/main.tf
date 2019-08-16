@@ -1,5 +1,14 @@
+module "isNomadIpv6" {
+  source = "../isipv6"
+  ip = data.terraform_remote_state.nomad.outputs.nomad_server_ip
+}
+
+locals {
+  nomad_server_ip = module.isNomadIpv6.isIpv6 ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
+}
+
 provider "nomad" {
-  address = "http://${data.terraform_remote_state.nomad.outputs.nomad_servers_ips[0]}:4646"
+  address = "http://${local.nomad_server_ip}:4646"
   region  = local.region
 }
 

@@ -6,3 +6,7 @@ output "private_ips" {
   value = ucloud_instance.consul_server.*.private_ip
 }
 
+output "lb_ip" {
+  value = module.consulLb.lb_ip
+}
+

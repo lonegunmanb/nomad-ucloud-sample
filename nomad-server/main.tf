@@ -77,6 +77,16 @@ data "template_file" "setup-script" {
   }
 }
 
+module "nomad_server_lb" {
+  source = "../internal_lb"
+  instance_ids = ucloud_instance.nomad_servers.*.id
+  name = "nomadServerLb-${var.cluster_id}"
+  ports = [4646]
+  subnet_id = var.subnet_id
+  tag = var.cluster_id
+  vpc_id = var.vpc_id
+}
+
 resource "null_resource" "setup" {
   count = var.instance_count
   depends_on = [
@@ -91,6 +101,7 @@ resource "null_resource" "setup" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
+      module.nomad_server_lb.setup_loopback_script,
       local.reconfig-ssh-keys-script,
     ]
   }

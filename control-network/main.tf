@@ -137,7 +137,6 @@ module consul_backend {
 
 locals {
   setup-consul-script-path = "${path.module}/setup-consul.sh"
-  add-loopback-script-path = "${path.module}/../scripts/add-loopback.sh.tplt"
 }
 
 data "template_file" "setup-script" {
@@ -149,14 +148,6 @@ data "template_file" "setup-script" {
     consul-server-ip-0 = module.consul_backend.private_ips[0]
     consul-server-ip-1 = module.consul_backend.private_ips[1]
     consul-server-ip-2 = module.consul_backend.private_ips[2]
-    consul-vip = module.consul_backend.consul_lb_ip
-  }
-}
-
-data "template_file" "add-loopback" {
-  template = file(local.add-loopback-script-path)
-  vars = {
-    vip = module.consul_backend.consul_lb_ip
   }
 }
 
@@ -164,6 +155,16 @@ data null_data_source consul_finish {
   inputs = {
     finishSignal = module.consul_backend.finishSignal
   }
+}
+
+module "backend_lb" {
+  source = "../internal_lb"
+  instance_ids = module.consul_backend.uhost_ids
+  name = "consulLb-${var.tag}"
+  ports = [8500]
+  subnet_id = ucloud_subnet.subnet.id
+  tag = var.tag
+  vpc_id = ucloud_vpc.vpc.id
 }
 
 resource "null_resource" "install_consul_server_via_ipv4" {
@@ -185,7 +186,7 @@ resource "null_resource" "install_consul_server_via_ipv4" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      data.template_file.add-loopback.rendered,
+      module.backend_lb.setup_loopback_script,
       local.reconfig_ssh_keys_script,
     ]
   }
@@ -215,7 +216,7 @@ resource "null_resource" "install_consul_server_via_kun" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      data.template_file.add-loopback.rendered,
+      module.backend_lb.setup_loopback_script,
       local.reconfig_ssh_keys_script,
     ]
   }
@@ -233,7 +234,7 @@ resource null_resource setupControllerBackendConfig {
     }
     inline = [
       "mkdir /config",
-      "echo address = \"http://${module.consul_backend.consul_lb_ip}:8500\" > /config/backend.tfvars"
+      "echo address = \"http://${module.backend_lb.lb_ip}:8500\" > /config/backend.tfvars"
     ]
   }
 }
@@ -243,5 +244,5 @@ module consul_backend_lb_ipv6 {
   disable = !var.provision_from_kun
   api_server_url = var.ipv6_api_url
   region_id = var.region_id
-  resourceIds = list(module.consul_backend.consul_lb_id)
+  resourceIds = list(module.backend_lb.lb_id)
 }
