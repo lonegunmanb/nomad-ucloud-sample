@@ -2,6 +2,7 @@
   "variables": {
     "terraform_version": "0.12.6",
     "tf_plugin_consul_version": "2.5.0",
+    "tf_plugin_nomad_version": "1.4.1",
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
     "tf_plugin_ucloud_version": "1.11.1",
@@ -33,6 +34,7 @@
       "environment_vars": [
         "TERRAFORM_VERSION={{user `terraform_version`}}",
         "TF_PLUGIN_CONSUL_VERSION={{user `tf_plugin_consul_version`}}",
+        "TF_PLUGIN_NOMAD_VERSION={{user `tf_plugin_nomad_version`}}",
         "TF_PLUGIN_NULL_VERSION={{user `tf_plugin_null_version`}}",
         "TF_PLUGIN_TEMPLATE_VERSION={{user `tf_plugin_template_version`}}",
         "TF_PLUGIN_UCLOUD_VERSION={{user `tf_plugin_ucloud_version`}}",
