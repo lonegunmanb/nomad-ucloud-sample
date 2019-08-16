@@ -31,7 +31,7 @@ resource "ucloud_instance" "consul_server" {
 }
 
 resource "ucloud_eip" "consul_servers" {
-  count         = local.instance_count
+  count         = var.provision_from_kun ? 0 : local.instance_count
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"
@@ -40,7 +40,7 @@ resource "ucloud_eip" "consul_servers" {
 }
 
 resource "ucloud_eip_association" "consul_ip" {
-  count       = local.instance_count
+  count       = var.provision_from_kun ? 0 : local.instance_count
   eip_id      = ucloud_eip.consul_servers[count.index].id
   resource_id = ucloud_instance.consul_server[count.index].id
 }

@@ -31,7 +31,7 @@ resource "ucloud_instance" "nomad_servers" {
 }
 
 resource "ucloud_eip" "nomad_servers" {
-  count         = var.instance_count
+  count         = var.provision_from_kun ? 0 : var.instance_count
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"
@@ -40,7 +40,7 @@ resource "ucloud_eip" "nomad_servers" {
 }
 
 resource "ucloud_eip_association" "nomad_ip" {
-  count       = var.instance_count
+  count       = var.provision_from_kun ? 0 : var.instance_count
   eip_id      = ucloud_eip.nomad_servers[count.index].id
   resource_id = ucloud_instance.nomad_servers[count.index].id
 }
