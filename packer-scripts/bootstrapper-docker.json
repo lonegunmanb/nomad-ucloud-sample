@@ -1,6 +1,8 @@
 {
   "variables": {
     "terraform_version": "0.12.6",
+    "nomad_version": "0.9.4",
+    "consul_version": "1.5.3",
     "tf_plugin_consul_version": "2.5.0",
     "tf_plugin_nomad_version": "1.4.1",
     "tf_plugin_null_version": "2.1.2",
@@ -16,7 +18,7 @@
 
   "builders": [{
     "type": "docker",
-    "image": "alpine:3.10.1",
+    "image": "centos:7",
     "commit": true,
     "changes": [
       "CMD [\"\"]",
@@ -27,12 +29,14 @@
     {
       "type": "shell",
       "scripts": [
-        "../scripts/config-apk.sh",
+        "../scripts/config-yum.sh",
         "../scripts/install-bootstrapper.sh",
         "../scripts/build-terraform-plugin-cache.sh"
       ],
       "environment_vars": [
         "TERRAFORM_VERSION={{user `terraform_version`}}",
+        "NOMAD_VERSION={{user `nomad_version`}}",
+        "CONSUL_VERSION={{user `consul_version`}}",
         "TF_PLUGIN_CONSUL_VERSION={{user `tf_plugin_consul_version`}}",
         "TF_PLUGIN_NOMAD_VERSION={{user `tf_plugin_nomad_version`}}",
         "TF_PLUGIN_NULL_VERSION={{user `tf_plugin_null_version`}}",
