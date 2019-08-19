@@ -18,7 +18,6 @@ data "template_file" "broker-job" {
     count             = length(local.az)
     broker-image      = "${var.rocketmq_docker_image}:${var.rocketmq_version}"
     rockermq-version  = var.rocketmq_version
-    broker-config     = "http://nomad-jobfile.cn-bj.ufileos.com/broker.conf.tpl"
     brokersvc-name    = local.brokersvc-name
     node-class        = "broker"
     task-limit-per-az = var.allow_multiple_tasks_in_az ? length(local.az) : 1
