@@ -63,9 +63,7 @@ variable "nomad_client_image_id" {
 locals  {
   cluster_id = terraform.workspace
 }
-variable remote_state_backend_url {
-  default = "http://localhost:8500"
-}
+variable remote_state_backend_url {}
 
 variable ipv6_server_url {
   default = ""
