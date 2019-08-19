@@ -66,7 +66,7 @@ job "${job-name}" {
         data = <<EOF
         brokerClusterName = {{ env "NOMAD_META_clusterId" }}
         brokerName=broker-{{env "NOMAD_META_clusterId"}}
-        brokerIP1={{ env "NOMAD_IP_broker" }}
+        brokerIP1={{env "meta.eip"}}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
         storePathRootDir=/tmp/rmqstore/node00
