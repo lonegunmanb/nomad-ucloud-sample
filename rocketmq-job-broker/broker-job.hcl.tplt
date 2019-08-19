@@ -78,7 +78,7 @@ job "${job-name}" {
         dLegerSelfId=n{{ env "NOMAD_ALLOC_INDEX" }}
         sendMessageThreadPoolNums=16
         clientCloseSocketIfTimeout=true
-        EOF
+EOF
         destination = "local/conf/broker.conf"
         change_mode = "noop"
       }
