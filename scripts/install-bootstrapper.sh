@@ -1,4 +1,5 @@
-yum install -y curl wget git python2 jq unzip
+yum install -y epel-release.noarch
+yum install -y curl wget git python2 jq.x86_64 unzip
 cd /tmp
 
 wget  -nv -O nomad.zip http://hashicorpfile.cn-bj.ufileos.com/nomad_${NOMAD_VERSION}_linux_amd64.zip
