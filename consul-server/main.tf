@@ -128,6 +128,7 @@ provider "consul" {
 }
 
 resource "consul_acl_policy" "agent" {
+  depends_on = [null_resource.install_consul_server]
   name  = "agent"
   datacenters = [var.region]
   rules = <<-RULE
@@ -150,6 +151,7 @@ RULE
 }
 
 resource "consul_acl_token" "agent" {
+  depends_on = [null_resource.install_consul_server]
   description = "agent_toke"
   policies = [consul_acl_policy.agent.name]
   local = true
