@@ -10,3 +10,14 @@ output "lb_ip" {
   value = module.consulLb.lb_ip
 }
 
+output rootAccessorId {
+  value = local.rootAccessorId
+}
+
+output "rootSecretId" {
+  value = local.rootSecretId
+}
+
+output "agent_token" {
+  value = data.external.agent_secret.result["secretId"]
+}

@@ -80,6 +80,7 @@ module nomad_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key = var.ucloud_pub_key
   ucloud_secret = var.ucloud_secret
+  consul_token = module.consul_servers.agent_token
 }
 
 module nameServer {
@@ -105,6 +106,7 @@ module nameServer {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key = var.ucloud_pub_key
   ucloud_secret = var.ucloud_secret
+  consul_token = module.consul_servers.agent_token
 }
 
 module broker {
@@ -130,5 +132,5 @@ module broker {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key = var.ucloud_pub_key
   ucloud_secret = var.ucloud_secret
+  consul_token = module.consul_servers.agent_token
 }
-

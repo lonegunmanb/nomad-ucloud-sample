@@ -10,6 +10,12 @@ retry_join = ["CONSUL_SERVER1_IP", "CONSUL_SERVER2_IP", "CONSUL_SERVER3_IP"]
 performance {
   raft_multiplier = 1
 }
+acl = {
+    enabled = true,
+    tokens = {
+      default = "CONSUL_TOKEN"
+    }
+}
 EOF
 
 echo "write nomad.d/server.hcl"
@@ -21,6 +27,10 @@ name = "NODENAME"
 server {
   enabled          = true
   bootstrap_expect = EXPECTEDSVRS
+}
+consul {
+  address = "127.0.0.1:8500"
+  token   = "CONSUL_TOKEN"
 }
 EOF
 

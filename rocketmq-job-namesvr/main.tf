@@ -40,5 +40,6 @@ module "loadBalanceWatcher" {
   ucloud_pubkey   = var.ucloud_pubkey
   ucloud_secret   = var.ucloud_secret
   ucloud_api_base_url = var.ucloud_api_base_url
+  consul_token    = data.terraform_remote_state.nomad.outputs.consul_agent_token
 }
 
