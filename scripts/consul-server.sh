@@ -14,12 +14,6 @@ ui = true
 connect {
   enabled = true
 }
-acl = {
-    enabled = true,
-    default_policy = "deny",
-    enable_token_persistence = true
-    enable_key_list_policy = true
-}
 EOF
 cat>/etc/consul.d/consul.json<<-EOF
 {

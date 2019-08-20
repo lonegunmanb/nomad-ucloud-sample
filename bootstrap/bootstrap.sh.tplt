@@ -16,7 +16,7 @@ if [ ! -f "terraform.tfvars" ]; then
   cidr = "${controller_cidr}"
   vpcName = "controllerVpc"
   subnetName = "controllerSubnet"
-  consul_image_id = "${consul_server_image_id}"
+  consul_image_id = "${consul_backend_image_id}"
   controller_image_id = ""
   controler_instance_type = ""
   allow_ip = "${allow_ip}"

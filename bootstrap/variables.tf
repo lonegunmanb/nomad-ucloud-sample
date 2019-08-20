@@ -25,6 +25,9 @@ variable ipv6_api_url {}
 variable consul_server_image_id {}
 variable consul_server_root_password {}
 variable consul_server_type {}
+variable consul_backend_image_id {}
+variable consul_backend_root_password {}
+variable consul_backend_server_type {}
 variable nomad_client_broker_type {}
 variable nomad_client_image_id {}
 variable nomad_client_namesvr_type {}
