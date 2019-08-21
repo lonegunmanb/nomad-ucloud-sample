@@ -192,6 +192,7 @@ resource "kubernetes_config_map" "backend-script" {
   }
   data = {
     "backend.tfvars" = "address = \"http://[${module.consulLbIpv6.ipv6s[0]}]:8500\""
+    "remote.tfvars"  = "remote_state_backend_url = \"http://[${module.consulLbIpv6.ipv6s[0]}]:8500\""
   }
 }
 
