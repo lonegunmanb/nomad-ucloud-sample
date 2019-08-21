@@ -5,6 +5,7 @@ variable consul_instance_type {}
 variable cluster_id {}
 variable project_dir {}
 variable terraform_project_url {}
+variable bootstrapper_image {}
 variable controller_image {}
 variable k8s_namespace {}
 variable k8s_storage_class_name {}

@@ -85,7 +85,7 @@ resource "kubernetes_pod" "bootstraper" {
   spec {
     container {
       name = "bootstrap"
-      image = var.controller_image
+      image = var.bootstrapper_image
       command = ["sh", "/bootstrap/bootstrap.sh"]
       volume_mount {
         name = "bootstrap-script"
