@@ -26,9 +26,9 @@ if [ ! -f "terraform.tfvars" ]; then
   git_branch = ""
   project_root_dir = ""
   project_dir = ""
-  consul_root_password = "${backend_consul_root_password}"
-  consul_data_volume_size = ${consul_data_volume_size}
-  consul_instance_type = "${consul_instance_type}"
+  consul_backend_root_password = "${consul_backend_root_password}"
+  consul_backend_data_volume_size = ${consul_backend_data_volume_size}
+  consul_backend_instance_type = "${consul_backend_instance_type}"
   ipv6_api_url = "${ipv6_api_url}"
   controller_count = 0
   provision_from_kun = true
@@ -86,7 +86,23 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "provision_from_kun": true,
       "broker_count": ${broker_count},
       "name_server_count": ${name_server_count},
-      "nomad_server_count": ${nomad_server_count}
+      "nomad_server_count": ${nomad_server_count},
+      "name_server_local_disk_type": "${name_server_local_disk_type}",
+      "name_server_udisk_type": "${name_server_udisk_type}",
+      "name_server_data_disk_size": ${name_server_data_disk_size},
+      "broker_local_disk_type": "${broker_local_disk_type}",
+      "broker_udisk_type": "${broker_udisk_type}",
+      "broker_data_disk_size": ${broker_data_disk_size},
+      "name_server_use_udisk": ${name_server_use_udisk},
+      "broker_use_udisk": ${broker_use_udisk},
+      "nomad_server_use_udisk": ${nomad_server_use_udisk},
+      "nomad_server_local_disk_type": "${nomad_server_local_disk_type}",
+      "nomad_server_udisk_type": "${nomad_server_udisk_type}",
+      "nomad_server_data_disk_size": ${nomad_server_data_disk_size},
+      "consul_server_data_disk_size": ${consul_server_data_disk_size},
+      "consul_server_local_disk_type": "${consul_server_local_disk_type}",
+      "consul_server_udisk_type": "${consul_server_udisk_type}",
+      "consul_server_use_udisk": ${consul_server_use_udisk}
   }
 EOF
 fi

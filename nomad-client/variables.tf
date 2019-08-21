@@ -20,6 +20,15 @@ variable consul_server_private_ips {
 variable consul_server_public_ips {
   type = list(string)
 }
+variable use_udisk {
+  type = bool
+}
+variable local_disk_type {
+  default = "local_normal" //loacl_ssd cloud_normal cloud_ssd
+}
+variable udisk_type {
+  default = "data_disk" //ssd_data_disk
+}
 variable data_volume_size {}
 variable class {}
 variable provision_from_kun {

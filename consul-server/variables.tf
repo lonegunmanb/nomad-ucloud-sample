@@ -13,7 +13,6 @@ variable root_password {}
 variable sg_id {}
 variable vpc_id {}
 variable subnet_id {}
-variable data_volume_size {}
 variable image_id {}
 variable cluster_id {}
 variable instance_type {}
@@ -23,3 +22,9 @@ variable provision_from_kun {
 }
 variable ipv6_server_url {}
 variable region_id {}
+variable use_udisk {
+  type = bool
+}
+variable local_disk_type {}
+variable udisk_type {}
+variable data_volume_size {}

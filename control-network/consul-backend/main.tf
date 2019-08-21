@@ -22,7 +22,8 @@ resource "ucloud_instance" "consul_server" {
   charge_type       = var.charge_type
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
-  isolation_group = ucloud_isolation_group.isolation_group.*.id[count.index % length(var.az)]
+  data_disk_size    = 0
+  isolation_group   = ucloud_isolation_group.isolation_group.*.id[count.index % length(var.az)]
   provisioner "local-exec" {
     command = "sleep 10"
   }
@@ -31,7 +32,7 @@ resource "ucloud_instance" "consul_server" {
 resource "ucloud_disk" "consul_data" {
   count             = local.instance_count
   availability_zone = var.az[count.index % length(var.az)]
-  name              = "consul-data-${var.tag}-${count.index}"
+  name              = "consul-backend-data-${var.tag}-${count.index}"
   disk_size         = var.data_volume_size
   tag               = var.tag
   charge_type = var.charge_type

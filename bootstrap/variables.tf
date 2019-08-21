@@ -1,7 +1,7 @@
 variable branch {}
-variable backend_consul_root_password {}
-variable consul_data_volume_size {}
-variable consul_instance_type {}
+variable consul_backend_root_password {}
+variable consul_backend_data_volume_size {}
+variable consul_backend_instance_type {}
 variable cluster_id {}
 variable project_dir {}
 variable terraform_project_url {}
@@ -33,12 +33,44 @@ variable nomad_client_root_password {}
 variable nomad_server_image_id {}
 variable nomad_server_root_password {}
 variable nomad_server_type {}
-variable "broker_count" {
+variable broker_count {
   type = number
 }
-variable "name_server_count" {
+variable name_server_count {
   type = number
 }
-variable "nomad_server_count" {
+variable nomad_server_count {
   type = number
+}
+variable name_server_local_disk_type {}
+variable name_server_udisk_type {}
+variable name_server_data_disk_size {
+  type = number
+}
+variable broker_local_disk_type {}
+variable broker_udisk_type {}
+variable broker_data_disk_size {
+  type = number
+}
+variable name_server_use_udisk {
+  type = bool
+}
+variable broker_use_udisk {
+  type = bool
+}
+variable nomad_server_use_udisk {
+  type = bool
+}
+variable nomad_server_local_disk_type {}
+variable nomad_server_udisk_type {}
+variable nomad_server_data_disk_size {
+  type = number
+}
+variable consul_server_data_disk_size {
+  type = number
+}
+variable consul_server_local_disk_type {}
+variable consul_server_udisk_type {}
+variable consul_server_use_udisk {
+  type = bool
 }

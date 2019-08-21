@@ -17,10 +17,17 @@ variable instance_type {}
 variable consul_server_ips {
   type = list(string)
 }
-variable data_volume_size {}
 variable provision_from_kun {
   type = bool
   default = false
 }
 variable ipv6_server_url {}
 variable region_id {}
+variable use_udisk {}
+variable local_disk_type {
+  default = "local_normal" //loacl_ssd cloud_normal cloud_ssd
+}
+variable udisk_type {
+  default = "data_disk" //ssd_data_disk
+}
+variable data_volume_size {}
