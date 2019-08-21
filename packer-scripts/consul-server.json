@@ -22,7 +22,7 @@
     "source_image_id":"{{user `image_id`}}",
     "ssh_username":"{{user `ssh_user`}}",
     "ssh_password": "{{user `ssh_password`}}",
-    "image_name": "consul-backend-{{user `consul_version`}}"
+    "image_name": "consul-server-{{user `consul_version`}}"
   }],
   "provisioners": [
     {

@@ -20,9 +20,6 @@ data "template_file" "bootstrap_script" {
     ipv6_api_url = var.ipv6_api_url
     allow_ip = var.allow_ip
     az = join(", ", formatlist("\"%s\"", var.az))
-    consul_backend_image_id = var.consul_backend_image_id
-    consul_backend_root_password = var.consul_backend_root_password
-    consul_backend_server_type = var.consul_backend_server_type
     consul_server_image_id = var.consul_server_image_id
     consul_server_root_password = var.consul_server_root_password
     consul_server_type = var.consul_server_type
