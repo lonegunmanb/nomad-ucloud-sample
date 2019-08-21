@@ -21,7 +21,7 @@
     "image": "centos:7",
     "commit": true,
     "changes": [
-      "CMD [\"\"]",
+      "CMD [\"tail\", \"-f\", \"/dev/null\"]",
       "ENTRYPOINT [\"\"]"
     ]
   }],

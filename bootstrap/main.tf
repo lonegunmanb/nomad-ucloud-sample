@@ -224,11 +224,7 @@ resource "kubernetes_deployment" "controller" {
         container {
           name    = "controller"
           image   = var.controller_image
-          command = [
-            "tail"]
-          args    = [
-            "-f",
-            "/dev/null"]
+
           env {
             name  = "TF_VAR_remote_state_backend_url"
             value = "http://[${module.consulLbIpv6.ipv6s[0]}]:8500"
