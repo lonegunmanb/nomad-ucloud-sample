@@ -32,6 +32,8 @@ data "template_file" "bootstrap_script" {
     nomad_server_type = var.nomad_server_type
     cluster_id = var.cluster_id
     broker_count = var.broker_count
+    name_server_count = var.name_server_count
+    nomad_server_count = var.nomad_server_count
   }
 }
 
