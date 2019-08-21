@@ -121,12 +121,12 @@ resource null_resource setupController {
 module consul_backend {
   source = "./consul-backend"
   az = var.az
-  data_volume_size = var.consul_data_volume_size
+  data_volume_size = var.consul_backend_data_volume_size
   image_id = var.consul_image_id
-  instance_type = var.consul_instance_type
+  instance_type = var.consul_backend_instance_type
   project_id = var.project_id
   region = var.region
-  root_password = var.consul_root_password
+  root_password = var.consul_backend_root_password
   subnet_id = ucloud_subnet.subnet.id
   tag = var.tag
   ucloud_pub_key = var.ucloud_pub_key
@@ -178,7 +178,7 @@ resource "null_resource" "install_consul_server_via_ipv4" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.consul_root_password
+      password = var.consul_backend_root_password
       host     = module.consul_backend.private_ips[count.index]
       bastion_host = ucloud_eip.controller_eip[0].public_ip
       bastion_user = "root"
@@ -211,7 +211,7 @@ resource "null_resource" "install_consul_server_via_kun" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.consul_root_password
+      password = var.consul_backend_root_password
       host     = module.uhost_ipv6s.ipv6s[count.index]
     }
     inline = [

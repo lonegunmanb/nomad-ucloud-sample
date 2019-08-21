@@ -28,9 +28,9 @@ variable terraform_project_url {}
 variable git_branch {}
 variable project_root_dir {}
 variable project_dir {}
-variable consul_root_password {}
-variable consul_data_volume_size {}
-variable consul_instance_type {}
+variable consul_backend_root_password {}
+variable consul_backend_data_volume_size {}
+variable consul_backend_instance_type {}
 
 variable charge_type {
   default = "dynamic"
