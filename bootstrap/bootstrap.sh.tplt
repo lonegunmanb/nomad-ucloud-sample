@@ -45,7 +45,7 @@ if [ ! -d "/backend" ]; then
   mkdir /backend
   export TF_VAR_remote_state_backend_url=http://[$(terraform output -json | jq -r '.backend_ip.value')]:8500
   echo address=\"$TF_VAR_remote_state_backend_url\" > /backend/backend.tfvars
-  echo remote_state_backend_url=\"$TF_VAR_remote_state_backend_url\" >> /backend/backend.tfvars
+  echo remote_state_backend_url=\"$TF_VAR_remote_state_backend_url\" > /backend/remote.tfvars
 fi
 
 if [ ! -f "../network/terraform.tfvars.json" ]; then
@@ -90,7 +90,7 @@ fi
 cd ../network
 rm -f destroyed
 if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars
+  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
   terraform workspace new ${cluster_id}
   terraform workspace select ${cluster_id}
   terraform apply --auto-approve -input=false
@@ -99,7 +99,7 @@ fi
 cd ..
 rm -f destroyed
 if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars
+  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
   terraform workspace new ${cluster_id}
   terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
   touch inited
