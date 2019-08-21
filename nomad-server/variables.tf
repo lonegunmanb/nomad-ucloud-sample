@@ -17,7 +17,6 @@ variable instance_type {}
 variable consul_server_ips {
   type = list(string)
 }
-variable consul_token {}
 variable data_volume_size {}
 variable provision_from_kun {
   type = bool

@@ -13,9 +13,6 @@ job "${jobName}" {
       ]
       network_mode = "host"
     }
-    env {
-      CONSUL_HTTP_TOKEN = "${consul_token}"
-    }
     meta {
       clusterId = "${cluster-id}"
     }

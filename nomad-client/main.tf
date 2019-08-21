@@ -81,7 +81,6 @@ EOF
     consul-server-ip-0 = var.consul_server_private_ips[0]
     consul-server-ip-1 = var.consul_server_private_ips[1]
     consul-server-ip-2 = var.consul_server_private_ips[2]
-    consul-token       = var.consul_token
   }
 }
 

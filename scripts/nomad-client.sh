@@ -11,12 +11,6 @@ performance {
   raft_multiplier = 1
 }
 bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
-acl = {
-    enabled = true,
-    tokens = {
-      default = "CONSUL_TOKEN"
-    }
-}
 EOF
 
 echo "write nomad.d/client.hcl"
@@ -31,10 +25,7 @@ client {
   node_class = "CLASS"
   META
 }
-consul {
-  address = "127.0.0.1:8500"
-  token   = "CONSUL_TOKEN"
-}
+
 EOF
 sync
 echo "done"

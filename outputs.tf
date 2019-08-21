@@ -82,14 +82,3 @@ output "brokersvr_ids" {
   value = module.broker.ids
 }
 
-output "consul_rootAccessorId" {
-  value = module.consul_servers.rootAccessorId
-}
-
-output "consul_rootSecretId" {
-  value = module.consul_servers.rootSecretId
-}
-
-output "consul_agent_token" {
-  value = module.consul_servers.agent_token
-}

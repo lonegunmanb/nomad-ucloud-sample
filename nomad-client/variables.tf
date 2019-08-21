@@ -20,7 +20,6 @@ variable consul_server_private_ips {
 variable consul_server_public_ips {
   type = list(string)
 }
-variable consul_token {}
 variable data_volume_size {}
 variable class {}
 variable provision_from_kun {

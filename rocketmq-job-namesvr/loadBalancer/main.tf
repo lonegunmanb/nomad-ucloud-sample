@@ -71,7 +71,6 @@ data "template_file" "job" {
     tfvars          = data.template_file.tf-vars-content.rendered
     tf              = data.template_file.tf-content.rendered
     jobName         = var.jobName
-    consul_token    = var.consul_token
   }
 }
 
