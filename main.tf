@@ -65,7 +65,7 @@ module nomad_servers {
   az                = var.az
   cluster_id        = local.cluster_id
   image_id          = var.nomad_server_image_id
-  instance_count    = 3
+  instance_count    = var.nomad_server_count
   instance_type     = var.nomad_server_type
   root_password     = var.nomad_server_root_password
   sg_id             = ucloud_security_group.consul_server_sg.id
@@ -89,7 +89,7 @@ module nameServer {
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
-  instance_count            = 3
+  instance_count            = var.name_server_count
   instance_type             = var.nomad_client_namesvr_type
   region                    = var.region
   root_password             = var.nomad_client_root_password
@@ -114,7 +114,7 @@ module broker {
   consul_server_private_ips = module.consul_servers.private_ips
   data_volume_size          = 30
   image_id                  = var.nomad_client_image_id
-  instance_count            = 3
+  instance_count            = var.broker_count
   instance_type             = var.nomad_client_broker_type
   region                    = var.region
   root_password             = var.nomad_client_root_password

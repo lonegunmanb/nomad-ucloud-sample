@@ -33,3 +33,12 @@ variable nomad_client_root_password {}
 variable nomad_server_image_id {}
 variable nomad_server_root_password {}
 variable nomad_server_type {}
+variable "broker_count" {
+  type = number
+}
+variable "name_server_count" {
+  type = number
+}
+variable "nomad_server_count" {
+  type = number
+}

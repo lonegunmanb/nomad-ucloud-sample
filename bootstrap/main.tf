@@ -31,6 +31,7 @@ data "template_file" "bootstrap_script" {
     nomad_server_root_password = var.nomad_server_root_password
     nomad_server_type = var.nomad_server_type
     cluster_id = var.cluster_id
+    broker_count = var.broker_count
   }
 }
 

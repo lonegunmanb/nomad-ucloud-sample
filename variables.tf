@@ -76,3 +76,12 @@ variable provision_from_kun {
 }
 variable "ucloud_api_base_url" {
 }
+variable "broker_count" {
+  type = number
+}
+variable "name_server_count" {
+  type = number
+}
+variable "nomad_server_count" {
+  type = number
+}

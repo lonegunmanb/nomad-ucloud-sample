@@ -83,7 +83,10 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "ucloud_secret": "${ucloud_secret}",
       "ipv6_server_url": "${ipv6_api_url}",
       "region_id": "${region_id}",
-      "provision_from_kun": true
+      "provision_from_kun": true,
+      "broker_count": ${broker_count},
+      "name_server_count": ${name_server_count},
+      "nomad_server_count": ${nomad_server_count}
   }
 EOF
 fi
