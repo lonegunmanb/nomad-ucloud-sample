@@ -37,6 +37,7 @@ job "${job-name}" {
         ]
         volumes = [
           "local/conf:/opt/rocketmq-${rockermq-version}/conf/dledger",
+          "local/data:/data",
         ]
         network_mode = "host"
       }
@@ -78,6 +79,8 @@ job "${job-name}" {
         dLegerSelfId=n{{ env "NOMAD_ALLOC_INDEX" }}
         sendMessageThreadPoolNums=16
         clientCloseSocketIfTimeout=true
+        storePathCommitLog=/data/commit_log
+        storePathConsumerQueue=/data/consumer_queue
 EOF
         destination = "local/conf/broker.conf"
         change_mode = "noop"

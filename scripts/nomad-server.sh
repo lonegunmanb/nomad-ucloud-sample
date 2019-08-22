@@ -16,11 +16,14 @@ echo "write nomad.d/server.hcl"
 cat>/etc/nomad.d/server.hcl<<-EOF
 region = "REGION"
 datacenter = "DATACENTER"
-data_dir = "/data/nomad/data"
+data_dir = "/data/nomadAgent"
 name = "NODENAME"
 server {
+  data_dir = "/data/nomadServer"
   enabled          = true
   bootstrap_expect = EXPECTEDSVRS
+  job_gc_threshold = "1h"
+  deployment_gc_threshold = "10m"
 }
 EOF
 

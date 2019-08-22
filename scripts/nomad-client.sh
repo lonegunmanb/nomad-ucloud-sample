@@ -23,6 +23,11 @@ name = "NODENAME"
 client {
   enabled = true
   node_class = "CLASS"
+  alloc_dir = "/data"
+  reserved {
+    cpu = 100
+    memory = 1024
+  }
   META
 }
 
