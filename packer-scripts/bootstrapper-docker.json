@@ -21,8 +21,8 @@
     "image": "centos:7",
     "commit": true,
     "changes": [
-      "CMD [\"tail\", \"-f\", \"/dev/null\"]",
-      "ENTRYPOINT [\"\"]"
+      "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
+      "CMD [\"sleep infinity\"]"
     ]
   }],
   "provisioners": [
