@@ -245,6 +245,14 @@ resource "kubernetes_deployment" "controller" {
             name  = "TF_VAR_provision_from_kun"
             value = "true"
           }
+          env {
+            name = "TF_VAR_ucloud_pubkey"
+            value = var.ucloud_pub_key
+          }
+          env {
+            name = "TV_VAR_ucloud_secret"
+            value = var.ucloud_secret
+          }
           resources {
             limits {
               cpu    = "1"
