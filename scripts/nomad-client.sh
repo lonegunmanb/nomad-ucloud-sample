@@ -18,7 +18,7 @@ mkdir --parents /opt/consul/data
 cat>/etc/nomad.d/client.hcl<<-EOF
 region = "REGION"
 datacenter = "DATACENTER"
-data_dir = "/opt/consul/data"
+data_dir = "/opt/nomad/data"
 name = "NODENAME"
 client {
   enabled = true
