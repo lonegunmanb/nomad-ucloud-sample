@@ -39,7 +39,7 @@ module "consul_access_ipv6" {
   disable = !var.provision_from_kun
   api_server_url = var.ipv6_server_url
   region_id = var.region_id
-  resourceIds = [module.consul_servers.lb_ip]
+  resourceIds = [module.consul_servers.lb_id]
 }
 
 output "consul_access_ip" {
