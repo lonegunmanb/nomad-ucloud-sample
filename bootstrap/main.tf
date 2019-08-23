@@ -289,8 +289,8 @@ resource kubernetes_service ctrlService {
       app = local.controller_pod_label
     }
     port {
-      port        = 80
-      target_port = 80
+      port        = var.controller_svc_port
+      target_port = var.controller_pod_port
     }
   }
 }

@@ -81,3 +81,9 @@ variable controller_request_cpu {}
 variable controller_limit_cpu {}
 variable controller_request_memory {}
 variable controller_limit_memory {}
+variable controller_svc_port {
+  type = number
+}
+variable controller_pod_port {
+  type = number
+}
