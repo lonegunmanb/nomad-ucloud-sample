@@ -14,7 +14,7 @@ resource ucloud_lb rocketMQLoadBalancer {
   subnet_id = var.subnetId
 }
 
-resource ucloud_eip rocketMQLoadBalancer {
+resource ucloud_eip nameSvrLoadBalancer {
   bandwidth            = 200
   charge_mode          = "traffic"
   name                 = "rocketmq-namesvr-lb-${var.clusterId}"
@@ -24,7 +24,7 @@ resource ucloud_eip rocketMQLoadBalancer {
 
 resource ucloud_eip_association rocketMQLoadBalancer {
   resource_id   = ucloud_lb.rocketMQLoadBalancer.id
-  eip_id        = ucloud_eip.rocketMQLoadBalancer.id
+  eip_id        = ucloud_eip.nameSvrLoadBalancer.id
 }
 
 resource ucloud_lb_listener nameServerListener {
