@@ -110,7 +110,13 @@ EOF
         cd /tf
         cat main.tf
         terraform init -plugin-dir=/plugin
-        terraform apply --auto-approve -lock=false
+        while true; do
+          terraform apply --auto-approve -lock=false
+          if [ $? -eq 0 ]; then
+            break
+          fi
+        done
+
         tail -f /dev/null
         EOF
         destination = "local/tf/tf.sh"
