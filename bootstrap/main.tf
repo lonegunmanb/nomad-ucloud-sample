@@ -1,3 +1,13 @@
+resource "kubernetes_secret" "ucloud_key" {
+  metadata {
+    name      = "ucloud-key"
+    namespace = var.k8s_namespace
+  }
+  data = {
+    ucloud-pub-key = var.ucloud_pub_key
+    ucloud-secret  = var.ucloud_secret
+  }
+}
 data "template_file" "bootstrap_script" {
   template = file("${path.module}/bootstrap.sh.tplt")
   vars     = {
@@ -128,6 +138,24 @@ resource "kubernetes_pod" "bootstraper" {
         name  = "TF_VAR_ucloud_api_base_url"
         value = var.ucloud_api_base_url
       }
+      env {
+        name = "TF_VAR_ucloud_pub_key"
+        value_from {
+          secret_key_ref {
+            name = kubernetes_secret.ucloud_key.metadata[0].name
+            key  = "ucloud-pub-key"
+          }
+        }
+      }
+      env {
+        name  = "TV_VAR_ucloud_secret"
+        value_from {
+          secret_key_ref {
+            name = kubernetes_secret.ucloud_key.metadata[0].name
+            key = "ucloud-secret"
+          }
+        }
+      }
     }
     volume {
       name = "bootstrap-script"
@@ -222,8 +250,8 @@ resource "kubernetes_deployment" "controller" {
       }
       spec {
         container {
-          name    = "controller"
-          image   = var.controller_image
+          name  = "controller"
+          image = var.controller_image
 
           env {
             name  = "TF_VAR_remote_state_backend_url"
@@ -247,11 +275,21 @@ resource "kubernetes_deployment" "controller" {
           }
           env {
             name = "TF_VAR_ucloud_pubkey"
-            value = var.ucloud_pub_key
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.ucloud_key.metadata[0].name
+                key  = "ucloud-pub-key"
+              }
+            }
           }
           env {
-            name = "TV_VAR_ucloud_secret"
-            value = var.ucloud_secret
+            name  = "TV_VAR_ucloud_secret"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.ucloud_key.metadata[0].name
+                key = "ucloud-secret"
+              }
+            }
           }
           resources {
             limits {

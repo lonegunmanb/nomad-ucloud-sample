@@ -7,8 +7,6 @@ git checkout ${branch}
 cd control-network
 if [ ! -f "terraform.tfvars" ]; then
   cat>terraform.tfvars<<-EOF
-  ucloud_pub_key = "${ucloud_pub_key}"
-  ucloud_secret = "${ucloud_secret}"
   region = "${region}"
   region_id = "${region_id}"
   az = [${az}]
@@ -52,8 +50,6 @@ if [ ! -f "../network/terraform.tfvars.json" ]; then
   cat>../network/terraform.tfvars.json<<-EOF
   {
     "region": "${region}",
-    "ucloud_pub_key": "${ucloud_pub_key}",
-    "ucloud_secret": "${ucloud_secret}",
     "project_id": "${project_id}",
     "mgrVpcCidr": "${mgrVpcCidr}",
     "clientVpcCidr": "${clientVpcCidr}"
@@ -79,8 +75,6 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "nomad_server_type": "${nomad_server_type}",
       "project_id": "${project_id}",
       "region": "${region}",
-      "ucloud_pub_key": "${ucloud_pub_key}",
-      "ucloud_secret": "${ucloud_secret}",
       "ipv6_server_url": "${ipv6_api_url}",
       "region_id": "${region_id}",
       "provision_from_kun": true,
