@@ -7,7 +7,7 @@ provider "ucloud" {
 }
 
 resource ucloud_isolation_group isolation_group {
-  name  = "consul-server-${var.cluster_id}"
+  name = "consul-server-${var.cluster_id}"
 }
 
 resource "ucloud_instance" "consul_server" {
@@ -48,6 +48,7 @@ resource "ucloud_disk_attachment" "attachment" {
 
 resource "ucloud_eip" "consul_servers" {
   count         = var.provision_from_kun ? 0 : local.instance_count
+  name          = "consul-server-${var.cluster_id}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"

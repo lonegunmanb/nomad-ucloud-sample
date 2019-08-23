@@ -68,12 +68,12 @@ resource ucloud_disk_attachment attachment {
 }
 
 resource ucloud_eip controller_eip {
-  count = local.controller_count
+  count         = local.controller_count
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
   bandwidth     = 200
-  name = "controller"
+  name          = "controller-${var.tag}"
   tag           = var.tag
 }
 

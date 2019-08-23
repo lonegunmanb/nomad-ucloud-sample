@@ -17,5 +17,8 @@ unzip consul.zip
 install consul /usr/local/bin/consul
 consul --version
 
+wget -nv -O ucloud-cli.tgz https://github.com/ucloud/ucloud-cli/releases/download/${UCLOUD_CLI_VERSION}/ucloud-cli-linux-${UCLOUD_CLI_VERSION}-amd64.tgz
+tar zxf ucloud-cli.tgz -C /usr/local/bin/
+
 rm -rf /tmp/*
 sync

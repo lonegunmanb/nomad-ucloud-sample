@@ -17,9 +17,6 @@ variable instance_type {}
 variable consul_server_private_ips {
   type = list(string)
 }
-variable consul_server_public_ips {
-  type = list(string)
-}
 variable use_udisk {
   type = bool
 }

@@ -43,6 +43,7 @@ resource "ucloud_disk_attachment" "disk_attachment" {
 
 resource "ucloud_eip" "nomad_clients" {
   count         = var.instance_count
+  name          = "nomad-client-${var.cluster_id}-${var.class}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"

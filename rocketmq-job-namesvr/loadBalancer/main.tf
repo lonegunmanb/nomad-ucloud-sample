@@ -17,7 +17,7 @@ resource ucloud_lb rocketMQLoadBalancer {
 resource ucloud_eip rocketMQLoadBalancer {
   bandwidth            = 200
   charge_mode          = "traffic"
-  name                 = "rocketmq-${var.clusterId}"
+  name                 = "rocketmq-namesvr-lb-${var.clusterId}"
   tag                  = var.clusterId
   internet_type        = "bgp"
 }
@@ -39,6 +39,18 @@ resource ucloud_lb_listener consoleListener {
   protocol         = "tcp"
   listen_type      = "request_proxy"
   port             = 8080
+}
+
+provider "consul" {
+  address = var.consul_access_url
+  datacenter = var.region
+}
+
+resource "consul_keys" "lb_state" {
+  key {
+    path = "namesvr-lb/${var.clusterId}/lbState"
+    delete = true
+  }
 }
 
 data "template_file" "tf-content" {
@@ -83,7 +95,8 @@ resource "nomad_job" "terraform_docker" {
   depends_on = [
     ucloud_eip_association.rocketMQLoadBalancer,
     ucloud_lb_listener.consoleListener,
-    ucloud_lb_listener.nameServerListener
+    ucloud_lb_listener.nameServerListener,
+    consul_keys.lb_state
   ]
   jobspec = data.template_file.job.rendered
 }

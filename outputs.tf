@@ -34,6 +34,10 @@ output "consul_lb_ip" {
   value = module.consul_servers.lb_ip
 }
 
+output "consul_access_ip" {
+  value = var.provision_from_kun ? module.consul_servers.lb_ip : module.consul_servers.public_ips[0]
+}
+
 output "nomad_servers_ips" {
   value = module.nomad_servers.public_ips
 }

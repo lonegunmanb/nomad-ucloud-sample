@@ -13,9 +13,6 @@ job "${jobName}" {
       ]
       network_mode = "host"
     }
-    meta {
-      clusterId = "${cluster-id}"
-    }
     template {
       data = <<EOF
         set -e

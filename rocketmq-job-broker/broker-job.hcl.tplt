@@ -10,7 +10,7 @@ job "${job-name}" {
     value = "${task-limit-per-az}"
   }
   group "broker" {
-    count = ${count}
+    count = 3
     spread {
       attribute = "$${meta.az}"
     }
@@ -20,6 +20,12 @@ job "${job-name}" {
       min_healthy_time = "1m"
       healthy_deadline = "5m"
       progress_deadline = "10m"
+    }
+    migrate {
+      max_parallel = 1
+      health_check = "checks"
+      min_healthy_time = "1m"
+      healthy_deadline = "5m"
     }
     ephemeral_disk {
       migrate = true
@@ -67,7 +73,8 @@ job "${job-name}" {
         data = <<EOF
         brokerClusterName = {{ env "NOMAD_META_clusterId" }}
         brokerName=broker-{{env "NOMAD_META_clusterId"}}
-        brokerIP1={{env "meta.eip"}}
+        {{$allocId := env "NOMAD_ALLOC_INDEX"}}
+        brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
         storePathRootDir=/tmp/rmqstore/node00
@@ -83,6 +90,74 @@ job "${job-name}" {
         storePathConsumerQueue=/data/consumer_queue
 EOF
         destination = "local/conf/broker.conf"
+        change_mode = "noop"
+      }
+    }
+    task "terraform" {
+      driver = "docker"
+      config {
+        image = "${terraform-image}"
+        command = "sh"
+        args = ["/tf/tf.sh"]
+        volumes = [
+          "local/tf:/tf",
+          "/plugin:/plugin"
+        ]
+        network_mode = "host"
+      }
+      template {
+        data = <<EOF
+        cd /tf
+        cat main.tf
+        terraform init -plugin-dir=/plugin
+        terraform apply --auto-approve -lock=false
+        tail -f /dev/null
+        EOF
+        destination = "local/tf/tf.sh"
+        change_mode = "noop"
+      }
+      template {
+        data = <<EOF
+        TF_VAR_ucloud_pub_key=${ucloud_pub_key}
+        TF_VAR_ucloud_secret=${ucloud_secret}
+        TF_VAR_project_id=${project_id}
+        TF_VAR_region=${region}
+        TF_VAR_ucloud_api_base_url=${ucloud_api_base_url}
+        EOF
+        destination = "local/tf/broker.terraform.tfvars"
+        env = true
+      }
+      template {
+        data = <<EOF
+            variable ucloud_pub_key {}
+            variable ucloud_secret {}
+            variable project_id {}
+            variable region {}
+            variable ucloud_api_base_url {}
+
+            terraform {
+              backend "consul" {
+                address = "{{with service "consul"}}{{with index . 0}}{{.Address}}:8500{{end}}{{end}}"
+                scheme = "http"
+                path = "brokerEip/${cluster-id}/eip_association/{{ env "NOMAD_ALLOC_INDEX" }}"
+              }
+            }
+
+            provider "ucloud" {
+              public_key = var.ucloud_pub_key
+              private_key = var.ucloud_secret
+              project_id = var.project_id
+              region = var.region
+              base_url = var.ucloud_api_base_url
+            }
+
+            resource "ucloud_eip_association" "association-{{ env "NOMAD_ALLOC_INDEX" }}" {
+              {{$allocId := env "NOMAD_ALLOC_INDEX"}}
+              eip_id      = "{{key (printf "brokerEip/${cluster-id}/eipId/%s" $allocId)}}"
+              resource_id = "{{env "node.unique.name"}}"
+            }
+            EOF
+        destination = "local/tf/main.tf"
         change_mode = "noop"
       }
     }

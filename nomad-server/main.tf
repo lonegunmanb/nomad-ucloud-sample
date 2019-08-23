@@ -43,6 +43,7 @@ resource "ucloud_disk_attachment" "attachment" {
 
 resource "ucloud_eip" "nomad_servers" {
   count         = var.provision_from_kun ? 0 : var.instance_count
+  name          = "nomad-server-${var.cluster_id}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = "dynamic"

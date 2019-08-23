@@ -12,7 +12,7 @@ resource ucloud_security_group consul_server_sg {
     port_range = "22"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = "accept"
+    policy     = var.provision_from_kun ? "drop" : "accept"
   }
 
   //consul ui port
@@ -20,7 +20,7 @@ resource ucloud_security_group consul_server_sg {
     port_range = "8500"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = "accept"
+    policy     = var.provision_from_kun ? "drop" : "accept"
   }
 
   //nomad ui port
@@ -28,7 +28,7 @@ resource ucloud_security_group consul_server_sg {
     port_range = "4646"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = "accept"
+    policy     = var.provision_from_kun ? "drop" : "accept"
   }
   rules {
     port_range = "20000-32000"
@@ -105,7 +105,6 @@ module nameServer {
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
-  consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "nameServer"
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id
@@ -133,7 +132,6 @@ module broker {
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
-  consul_server_public_ips  = module.consul_servers.public_ips
   class                     = "broker"
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id

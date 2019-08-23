@@ -8,7 +8,7 @@ terraform {
   backend "consul" {
     address = "{{with service "consul"}}{{with index . 0}}{{.Address}}:8500{{end}}{{end}}"
     scheme = "http"
-    path = "lb-${cluster-id}/lbState"
+    path = "namesvr-lb/${cluster-id}/lbState"
   }
 }
 
