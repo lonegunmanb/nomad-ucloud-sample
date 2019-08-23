@@ -6,11 +6,6 @@ provider "ucloud" {
   base_url    = var.ucloud_api_base_url
 }
 
-resource ucloud_isolation_group isolation_group {
-  count = length(var.az)
-  name  = "nomad-client-${var.cluster_id}-${count.index}"
-}
-
 resource "ucloud_instance" "nomad_clients" {
   count             = var.instance_count
   name              = "nomad-client-${var.class}-${count.index}"
@@ -26,7 +21,6 @@ resource "ucloud_instance" "nomad_clients" {
   boot_disk_type    = var.local_disk_type
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
-  isolation_group   = ucloud_isolation_group.isolation_group.*.id[count.index % length(var.az)]
   provisioner "local-exec" {
     command = "sleep 10"
   }

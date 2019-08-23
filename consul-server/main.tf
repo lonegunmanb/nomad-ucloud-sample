@@ -7,8 +7,7 @@ provider "ucloud" {
 }
 
 resource ucloud_isolation_group isolation_group {
-  count = local.instance_count
-  name  = "consul-server-${var.cluster_id}-${count.index}"
+  name  = "consul-server-${var.cluster_id}"
 }
 
 resource "ucloud_instance" "consul_server" {
@@ -26,7 +25,7 @@ resource "ucloud_instance" "consul_server" {
   boot_disk_type    = var.local_disk_type
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
-  isolation_group   = ucloud_isolation_group.isolation_group.*.id[count.index]
+  isolation_group   = ucloud_isolation_group.isolation_group.id
   provisioner "local-exec" {
     command = "sleep 10"
   }
