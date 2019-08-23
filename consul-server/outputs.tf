@@ -9,3 +9,7 @@ output "private_ips" {
 output "lb_ip" {
   value = module.consulLb.lb_ip
 }
+
+output "lb_id" {
+  value = module.consulLb.lb_id
+}
