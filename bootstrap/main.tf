@@ -206,7 +206,7 @@ resource "kubernetes_deployment" "controller" {
     name      = "rkq-controller-${var.cluster_id}"
   }
   spec {
-    replicas = 3
+    replicas = var.controller_count
 
     selector {
       match_labels = {
@@ -255,12 +255,12 @@ resource "kubernetes_deployment" "controller" {
           }
           resources {
             limits {
-              cpu    = "1"
-              memory = "1024Mi"
+              cpu    = var.controller_limit_cpu
+              memory = var.controller_limit_memory
             }
             requests {
-              cpu    = "1"
-              memory = "1024Mi"
+              cpu    = var.controller_request_cpu
+              memory = var.controller_request_memory
             }
           }
           volume_mount {

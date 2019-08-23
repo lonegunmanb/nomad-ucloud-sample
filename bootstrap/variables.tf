@@ -74,3 +74,10 @@ variable consul_server_udisk_type {}
 variable consul_server_use_udisk {
   type = bool
 }
+variable controller_count {
+  type = number
+}
+variable controller_request_cpu {}
+variable controller_limit_cpu {}
+variable controller_request_memory {}
+variable controller_limit_memory {}
