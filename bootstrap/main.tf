@@ -1,6 +1,6 @@
 resource "kubernetes_secret" "ucloud_key" {
   metadata {
-    name      = "ucloud-key"
+    name      = "ucloud-key-${var.cluster_id}"
     namespace = var.k8s_namespace
   }
   data = {
@@ -148,7 +148,7 @@ resource "kubernetes_pod" "bootstraper" {
         }
       }
       env {
-        name  = "TV_VAR_ucloud_secret"
+        name  = "TF_VAR_ucloud_secret"
         value_from {
           secret_key_ref {
             name = kubernetes_secret.ucloud_key.metadata[0].name
@@ -283,7 +283,7 @@ resource "kubernetes_deployment" "controller" {
             }
           }
           env {
-            name  = "TV_VAR_ucloud_secret"
+            name  = "TF_VAR_ucloud_secret"
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.ucloud_key.metadata[0].name
