@@ -43,7 +43,7 @@ module "consul_access_ipv6" {
 }
 
 output "consul_access_ip" {
-  value = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s[0] : module.consul_servers.public_ips[0]
+  value = var.provision_from_kun ? module.consul_access_ipv6.ipv6s[0] : module.consul_servers.public_ips[0]
 }
 
 output "nomad_servers_ips" {
