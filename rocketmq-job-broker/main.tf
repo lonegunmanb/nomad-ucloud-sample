@@ -25,7 +25,7 @@ resource "null_resource" "eip_destroy_helper" {
   depends_on = [ucloud_eip.broker_eip]
   provisioner "local-exec" {
     when = "destroy"
-    command = "ucloud config --profile=default --region=${local.region} --base-url=${var.ucloud_api_base_url} --public-key=${var.ucloud_pubkey} --private-key=${var.ucloud_secret} && ucloud eip unbind --eip-id=${ucloud_eip.broker_eip.*.id[count.index]} --region=${local.region} --project-id=${local.projectId} --public-key=${var.ucloud_pubkey} --private-key=${var.ucloud_secret}"
+    command = "ucloud config --profile=default --active=true --region=${local.region} --base-url=${var.ucloud_api_base_url} --public-key=${var.ucloud_pubkey} --private-key=${var.ucloud_secret} && ucloud eip unbind --eip-id=${ucloud_eip.broker_eip.*.id[count.index]} --region=${local.region} --project-id=${local.projectId} --public-key=${var.ucloud_pubkey} --private-key=${var.ucloud_secret}"
   }
 }
 
