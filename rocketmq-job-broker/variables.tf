@@ -22,6 +22,12 @@ variable ucloud_pubkey {}
 variable ucloud_secret {}
 variable ucloud_api_base_url {}
 variable terraform-image {}
-variable broker_bandwidth {
+variable broker_size {
   type = number
+  default = 1
+}
+locals {
+  base_bandwidth = 50
+  base_cpu       = 2000
+  base_memory    = 4096
 }

@@ -1,5 +1,6 @@
 job "${job-name}" {
   datacenters = ["${region}"]
+  region = "${region}"
   constraint {
     attribute = "$${node.class}"
     value = "${node-class}"
@@ -19,13 +20,12 @@ job "${job-name}" {
       health_check = "checks"
       min_healthy_time = "1m"
       healthy_deadline = "5m"
-      progress_deadline = "10m"
+      progress_deadline = "24h"
     }
     migrate {
       max_parallel = 1
       health_check = "checks"
       min_healthy_time = "1m"
-      healthy_deadline = "5m"
     }
     ephemeral_disk {
       migrate = true
@@ -48,8 +48,8 @@ job "${job-name}" {
         network_mode = "host"
       }
       resources {
-        cpu = 1000
-        memory = 4096
+        cpu = ${cpu}
+        memory = ${memory}
         network {
           port "broker" {}
           port "dledger" {}
@@ -104,6 +104,10 @@ EOF
           "/plugin:/plugin"
         ]
         network_mode = "host"
+      }
+      resources {
+        cpu = 500
+        memory = 100
       }
       template {
         data = <<EOF
@@ -234,5 +238,11 @@ EOF
         }
       }
     }
+  }
+  reschedule {
+    delay          = "30s"
+    delay_function = "exponential"
+    max_delay      = "120s"
+    unlimited      = true
   }
 }
