@@ -42,8 +42,13 @@ module "consul_access_ipv6" {
   resourceIds = [module.consul_servers.lb_id]
 }
 
+locals {
+  nomad_server_ips = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.public_ips
+  consul_server_ips = var.provision_from_kun ? module.consul_access_ipv6.ipv6s : module.consul_servers.public_ips
+}
+
 output "consul_access_ip" {
-  value = var.provision_from_kun ? module.consul_access_ipv6.ipv6s[0] : module.consul_servers.public_ips[0]
+  value = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
 }
 
 output "nomad_servers_ips" {
@@ -59,7 +64,7 @@ module nomad_lb_ipv6 {
 }
 
 output "nomad_server_ip" {
-  value = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s[0] : module.nomad_servers.public_ips[0]
+  value = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
 }
 
 output "nomad_broker_public_ips" {
