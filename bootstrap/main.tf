@@ -3,8 +3,9 @@ resource kubernetes_secret "controller_image_repo_secret" {
     name      = "controller-image-repo-secret-${var.cluster_id}"
     namespace = var.k8s_namespace
   }
+  type = "kubernetes.io/dockerconfigjson"
   data = {
-    docker-server = var.controller_image_repo
+    docker-server   = var.controller_image_repo
     docker-username = var.controller_image_username
     docker-password = var.controller_image_password
   }
