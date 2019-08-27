@@ -242,6 +242,7 @@ locals {
 }
 
 resource "kubernetes_deployment" "controller" {
+  depends_on = [null_resource.controller_image_repo_secret]
   metadata {
     namespace = var.k8s_namespace
     name      = "rkq-controller-${var.cluster_id}"
