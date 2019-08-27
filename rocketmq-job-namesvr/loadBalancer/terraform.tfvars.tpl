@@ -1,5 +1,0 @@
-ucloud_pub_key = "${ucloudPubKey}"
-ucloud_secret = "${ucloudPriKey}"
-project_id = "${projectId}"
-region = "${region}"
-ucloud_api_base_url = "${ucloud_api_base_url}"

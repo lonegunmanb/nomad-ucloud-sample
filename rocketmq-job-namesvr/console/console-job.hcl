@@ -22,16 +22,6 @@ job "console-${cluster-id}" {
           port "tcp" {}
         }
       }
-      service {
-        name = "console${cluster-id}"
-        port = "tcp"
-        check {
-          type     = "tcp"
-          port     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
-      }
     }
     task "namesvc${cluster-id}" {
       driver = "exec"
@@ -54,6 +44,67 @@ job "console-${cluster-id}" {
           port "namesvr2" {}
         }
       }
+    }
+    task "lb-backend-terraform" {
+      driver = "docker"
+      config {
+        image = "${terraform-image}"
+        command = "sh"
+        args = ["/tf/tf.sh"]
+        volumes = [
+          "local/tf:/tf",
+          "/plugin:/plugin"
+        ]
+      }
+      resources {
+        cpu = 100
+        memory = 50
+      }
+      template {
+        data = <<EOF
+        set -e
+        cd /tf
+        cat main.tf
+        terraform init -plugin-dir=/plugin
+        terraform apply --auto-approve -lock=false
+        tail -f /dev/null
+        EOF
+        destination = "local/tf/tf.sh"
+        change_mode = "noop"
+      }
+      template {
+        data = <<EOF
+            terraform {
+            backend "consul" {
+                address = "{{with service "consul"}}{{with index . 0}}{{.Address}}:8500{{end}}{{end}}"
+                scheme = "http"
+                path = "namesvr-lb/${cluster-id}/console"
+              }
+            }
+
+            provider "ucloud" {
+              public_key = "${ucloudPubKey}"
+              private_key = "${ucloudPriKey}"
+              project_id = "${projectId}"
+              region = "${region}"
+              base_url = "${ucloud_api_base_url}"
+            }
+
+            resource "ucloud_lb_attachment" "console" {
+                load_balancer_id = "${load_balancer_id}"
+                listener_id      = "${consoleListenerId}"
+                resource_id      = "{{env "node.unique.name"}}"
+                port             = {{env "NOMAD_PORT_console_tcp"}}
+            }
+            EOF
+        destination = "local/tf/main.tf"
+        change_mode = "noop"
+      }
+      //    template {
+      //      data = "TF_LOG=trace"
+      //      destination = "local/tf/env"
+      //      env = true
+      //    }
     }
   }
 }

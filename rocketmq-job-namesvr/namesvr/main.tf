@@ -9,6 +9,13 @@ variable region {}
 variable cluster-id {}
 variable nomad-server-ip {}
 variable allow_multiple_tasks_in_az {}
+variable ucloud_api_base_url {}
+variable projectId {}
+variable ucloud_pubkey {}
+variable ucloud_secret {}
+variable load_balancer_id {}
+variable nameServerListenerId {}
+variable terraform-image {}
 
 provider nomad {
   address = "http://${var.nomad-server-ip}:4646"
@@ -32,6 +39,13 @@ data "template_file" "namesvr-job" {
     min-az-count      = length(distinct(var.az))
     node-class        = "nameServer"
     task-limit-per-az = var.allow_multiple_tasks_in_az ? length(var.az) : 1
+    ucloud_api_base_url        = var.ucloud_api_base_url
+    projectId                  = var.projectId
+    ucloudPubKey = var.ucloud_pubkey
+    ucloudPriKey = var.ucloud_secret
+    load_balancer_id = var.load_balancer_id
+    nameServerListenerId = var.nameServerListenerId
+    terraform-image = var.terraform-image
   }
 }
 

@@ -1,3 +1,3 @@
 output "nameSvrLbIp" {
-  value = module.loadBalanceWatcher.nameSvrLbIp
+  value = ucloud_eip.nameSvrLoadBalancer.public_ip
 }
