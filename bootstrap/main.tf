@@ -1,3 +1,18 @@
+resource kubernetes_secret "controller_image_repo_secret" {
+  metadata {
+    name      = "controller-image-repo-secret-${var.cluster_id}"
+    namespace = var.k8s_namespace
+  }
+  data = {
+    //--docker-server=hub.ucloudadmin.com \
+    //--docker-username=uaek \
+    //--docker-password=YOUR_PASSWORD \
+    docker-server = var.controller_image_repo
+    docker-username = var.controller_image_username
+    docker-password = var.controller_image_password
+  }
+}
+
 resource "kubernetes_secret" "ucloud_key" {
   metadata {
     name      = "ucloud-key-${var.cluster_id}"
@@ -311,6 +326,9 @@ resource "kubernetes_deployment" "controller" {
           config_map {
             name = kubernetes_config_map.backend-script.metadata[0].name
           }
+        }
+        image_pull_secrets {
+          name = kubernetes_secret.controller_image_repo_secret.metadata[0].name
         }
       }
     }
