@@ -1,5 +1,6 @@
 job "${job-name}" {
   datacenters = ["${region}"]
+  region = "${region}"
   constraint {
     attribute = "$${node.class}"
     value = "${node-class}"

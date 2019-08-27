@@ -1,5 +1,6 @@
 job "console-${cluster-id}" {
   datacenters = ["${region}"]
+  region = "${region}"
   group "console" {
     task "console" {
       driver = "docker"
