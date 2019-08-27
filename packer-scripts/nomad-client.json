@@ -14,7 +14,7 @@
     "tf_plugin_nomad_version": "1.4.1",
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
-    "tf_plugin_ucloud_version": "1.11.1",
+    "tf_plugin_ucloud_version": "1.12.1",
     "tf_plugin_external_version": "1.2.0"
   },
 
