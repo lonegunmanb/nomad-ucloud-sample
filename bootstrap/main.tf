@@ -4,9 +4,6 @@ resource kubernetes_secret "controller_image_repo_secret" {
     namespace = var.k8s_namespace
   }
   data = {
-    //--docker-server=hub.ucloudadmin.com \
-    //--docker-username=uaek \
-    //--docker-password=YOUR_PASSWORD \
     docker-server = var.controller_image_repo
     docker-username = var.controller_image_username
     docker-password = var.controller_image_password
