@@ -1,13 +1,13 @@
-resource kubernetes_secret "controller_image_repo_secret" {
-  metadata {
-    name      = "controller-image-repo-secret-${var.cluster_id}"
-    namespace = var.k8s_namespace
+locals {
+  controller_image_repo_secret_name = "controller-image-repo-secret-${var.cluster_id}"
+}
+resource "null_resource" "controller_image_repo_secret" {
+  provisioner "local-exec" {
+    command = "kubectl create secret docker-registry ${local.controller_image_repo_secret_name} --docker-server=${var.controller_image_repo} --docker-username=${var.controller_image_username} --docker-password=${var.controller_image_password} -n ${var.k8s_namespace}"
   }
-  type = "kubernetes.io/dockerconfigjson"
-  data = {
-    docker-server   = var.controller_image_repo
-    docker-username = var.controller_image_username
-    docker-password = var.controller_image_password
+  provisioner "local-exec" {
+    when = "destroy"
+    command = "kubectl delete secret -n ${var.k8s_namespace} ${local.controller_image_repo_secret_name}"
   }
 }
 
@@ -326,7 +326,7 @@ resource "kubernetes_deployment" "controller" {
           }
         }
         image_pull_secrets {
-          name = kubernetes_secret.controller_image_repo_secret.metadata[0].name
+          name = local.controller_image_repo_secret_name
         }
       }
     }
