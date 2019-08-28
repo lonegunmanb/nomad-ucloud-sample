@@ -34,7 +34,10 @@ job "${job-name}" {
     }
     task "broker" {
       driver = "docker"
+      //to use volume on host, we use root user inside container
+      user = "0"
       config {
+        privileged = true
         image = "${broker-image}"
         command = "./mqbroker"
         args = [
@@ -77,8 +80,8 @@ job "${job-name}" {
         brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
-        storePathRootDir=/tmp/rmqstore/node00
-        storePathCommitLog=/tmp/rmqstore/node00/commitlog
+        storePathRootDir=/data
+        storePathCommitLog=/data/commitlog
         enableDLegerCommitLog=true
         dLegerGroup={{ env "NOMAD_META_clusterId" }}
         dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := (env "NOMAD_ALLOC_INDEX")|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
@@ -86,8 +89,7 @@ job "${job-name}" {
         dLegerSelfId=n{{ env "NOMAD_ALLOC_INDEX" }}
         sendMessageThreadPoolNums=16
         clientCloseSocketIfTimeout=true
-        storePathCommitLog=/data/commit_log
-        storePathConsumerQueue=/data/consumer_queue
+        flushDiskType=ASYNC_FLUSH
 EOF
         destination = "local/conf/broker.conf"
         change_mode = "noop"
@@ -95,7 +97,7 @@ EOF
       template {
         //due to rocketmq set MAX_POSSIBLE_HEAP to MAX_POSSIBLE_RAM / 4, we set half memory to heap, half to direct memory
                 //memory im MB * 1024 * 1024 / 2 = memory * 524288
-        data = "MAX_POSSIBLE_HEAP=\"{{ multiply ${memory} 524288}}\""
+        data = "MAX_POSSIBLE_HEAP=\"{{ multiply ${memory} 938860}}\""
         destination = "local/conf/heapLimit.cfg"
         env = true
       }
@@ -108,12 +110,12 @@ EOF
         args = ["/tf/tf.sh"]
         volumes = [
           "local/tf:/tf",
-          "/plugin:/plugin"
+          "/plugin:/plugin",
         ]
         network_mode = "host"
       }
       resources {
-        cpu = 500
+        cpu = 100
         memory = 100
       }
       template {
@@ -194,8 +196,9 @@ EOF
           "-register",
         ]
       }
-
       resources {
+        cpu = 500
+        memory = 100
         network {
           port "tcp" {}
         }
@@ -235,6 +238,8 @@ EOF
         ]
       }
       resources {
+        cpu = 1000
+        memory = 100
         network {
           port "namesvrTcp0" {}
           port "namesvrTcp1" {}

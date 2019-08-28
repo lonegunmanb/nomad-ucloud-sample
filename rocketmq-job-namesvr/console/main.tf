@@ -9,6 +9,9 @@ variable ucloud_api_base_url {}
 variable terraform-image {}
 variable load_balancer_id {}
 variable consoleListenerId {}
+variable openWebConsole {
+  type = bool
+}
 
 locals {
   console-job-hcl = "${path.module}/console-job.hcl"
@@ -37,6 +40,7 @@ data "template_file" "console-job" {
 }
 
 resource "nomad_job" "console" {
+  count = var.openWebConsole ? 1 : 0
   jobspec = data.template_file.console-job.rendered
 }
 

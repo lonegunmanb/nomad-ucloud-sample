@@ -69,6 +69,8 @@ job "${job-name}" {
       }
 
       resources {
+        cpu = 500
+        memory = 100
         network {
           port "tcp" {}
         }

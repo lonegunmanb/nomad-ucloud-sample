@@ -104,4 +104,5 @@ module "console" {
   terraform-image     = var.terraform-image
   load_balancer_id    = ucloud_lb.rocketMQLoadBalancer.id
   consoleListenerId   = ucloud_lb_listener.consoleListener.id
+  openWebConsole      = true
 }

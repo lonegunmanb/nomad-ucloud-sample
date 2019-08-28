@@ -1,4 +1,4 @@
-mkfs.ext4 /dev/vdb
+mkfs.xfs /dev/vdb
 mount /dev/vdb /data
 echo 'mount /dev/vdb /data'>>/etc/rc.d/rc.local
 sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.service

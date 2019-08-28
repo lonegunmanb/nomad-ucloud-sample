@@ -28,6 +28,9 @@ client {
     cpu = 100
     memory = 1024
   }
+  options {
+      "docker.privileged.enabled" = "true"
+  }
   META
 }
 
