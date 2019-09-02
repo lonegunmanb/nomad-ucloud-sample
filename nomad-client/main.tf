@@ -18,7 +18,7 @@ resource "ucloud_instance" "nomad_clients" {
   security_group    = var.sg_id
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
-  boot_disk_type    = var.local_disk_type
+  boot_disk_type    = var.use_udisk ? (var.udisk_type == "rssd_data_disk" ? "cloud_ssd" : var.udisk_type) : var.local_disk_type
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
   provisioner "local-exec" {
