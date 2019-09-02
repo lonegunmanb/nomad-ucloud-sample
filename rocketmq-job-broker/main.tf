@@ -1,5 +1,6 @@
 locals {
   nomad_server_ip = length(data.terraform_remote_state.nomad.outputs.nomad_server_ip) > 15 ? "[${data.terraform_remote_state.nomad.outputs.nomad_server_ip}]":data.terraform_remote_state.nomad.outputs.nomad_server_ip
+  consul_lb_ip    = data.terraform_remote_state.nomad.outputs.consul_lb_ip
 }
 
 provider "ucloud" {
@@ -88,6 +89,7 @@ data "template_file" "broker-job" {
     project_id          = local.projectId
     region              = local.region
     ucloud_api_base_url = var.ucloud_api_base_url
+    consul-lb-ip        = local.consul_lb_ip
   }
 }
 

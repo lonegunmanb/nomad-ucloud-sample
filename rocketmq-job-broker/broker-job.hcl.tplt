@@ -32,6 +32,40 @@ job "${job-name}" {
       size = "500"
       sticky = true
     }
+    task "fabio" {
+      driver = "docker"
+      config {
+        image        = "uhub.service.ucloud.cn/lonegunmanb/fabio"
+        port_map = {
+          d0 = 40000
+          d1 = 40001
+          d2 = 40002
+          ui = 9998
+        }
+        volumes = [
+          "local/fabio.properties:/etc/fabio/fabio.properties"
+        ]
+      }
+      template {
+        data = <<EOF
+          registry.consul.tagprefix = urlprefix-${cluster-id}-
+          registry.consul.register.enabled = false
+          proxy.addr = :40000;proto=tcp,:40001;proto=tcp,:40002;proto=tcp
+          registry.consul.addr = ${consul-lb-ip}:8500
+EOF
+        destination = "local/fabio.properties"
+      }
+      resources {
+        cpu    = 10200
+        memory = 256
+        network {
+          port "d0" {}
+          port "d1" {}
+          port "d2" {}
+          port "ui" {}
+        }
+      }
+    }
     task "broker" {
       driver = "docker"
       //to use volume on host, we use root user inside container
@@ -59,6 +93,19 @@ job "${job-name}" {
         }
       }
       service {
+        name = "broker-dledger-$${NOMAD_ALLOC_INDEX}"
+        port = "dledger"
+        tags = [
+          "urlprefix-${cluster-id}-:4000$${NOMAD_ALLOC_INDEX} proto=tcp"
+        ]
+        check {
+          type     = "tcp"
+          port     = "dledger"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
+      service {
         port = "broker"
         check {
           type = "tcp"
@@ -78,13 +125,14 @@ job "${job-name}" {
         brokerName=broker-{{env "NOMAD_META_clusterId"}}
         {{$allocId := env "NOMAD_ALLOC_INDEX"}}
         brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
+        #brokerIP1={{env "NOMAD_IP_broker"}}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
         storePathRootDir=/data
         storePathCommitLog=/data/commitlog
         enableDLegerCommitLog=true
         dLegerGroup={{ env "NOMAD_META_clusterId" }}
-        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := (env "NOMAD_ALLOC_INDEX")|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
+        dLegerPeers={{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}{{$index := (env "NOMAD_ALLOC_INDEX")|parseInt}}{{if ne $i 0}};{{end}}n{{$i}}-{{if ne $i $index}}{{env (printf "NOMAD_ADDR_fabio_d%d" $i)}}{{else}}{{env "NOMAD_ADDR_dledger"}}{{end}}{{end}}
         ## must be unique
         dLegerSelfId=n{{ env "NOMAD_ALLOC_INDEX" }}
         sendMessageThreadPoolNums=16
