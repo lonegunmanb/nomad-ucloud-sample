@@ -114,6 +114,7 @@ module nameServer {
   ucloud_api_base_url       = var.ucloud_api_base_url
   ucloud_pub_key            = var.ucloud_pub_key
   ucloud_secret             = var.ucloud_secret
+  consul_access_url         = local.consul_access_url
 }
 
 module broker {
@@ -141,5 +142,5 @@ module broker {
   ucloud_api_base_url       = var.ucloud_api_base_url
   ucloud_pub_key            = var.ucloud_pub_key
   ucloud_secret             = var.ucloud_secret
+  consul_access_url         = local.consul_access_url
 }
-

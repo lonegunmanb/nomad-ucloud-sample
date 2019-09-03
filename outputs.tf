@@ -30,10 +30,6 @@ output "consul_servers_private_ips" {
   value = module.consul_servers.private_ips
 }
 
-output "consul_lb_ip" {
-  value = module.consul_servers.lb_ip
-}
-
 module "consul_access_ipv6" {
   source = "./ipv6"
   disable = !var.provision_from_kun
@@ -43,12 +39,14 @@ module "consul_access_ipv6" {
 }
 
 locals {
-  nomad_server_ips = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.public_ips
+  nomad_server_ips  = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.public_ips
   consul_server_ips = var.provision_from_kun ? module.consul_access_ipv6.ipv6s : module.consul_servers.public_ips
+  consul_access_ip  = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
+  consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
 }
 
 output "consul_access_ip" {
-  value = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
+  value = local.consul_access_ip
 }
 
 output "nomad_servers_ips" {

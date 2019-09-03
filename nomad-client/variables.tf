@@ -34,3 +34,4 @@ variable provision_from_kun {
 }
 variable ipv6_server_url {}
 variable region_id {}
+variable "consul_access_url" {}
