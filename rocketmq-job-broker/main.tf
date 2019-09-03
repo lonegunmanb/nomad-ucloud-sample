@@ -88,6 +88,7 @@ data "template_file" "broker-job" {
     project_id          = local.projectId
     region              = local.region
     ucloud_api_base_url = var.ucloud_api_base_url
+    internal            = var.internal_use ? "yes" : ""
   }
 }
 

@@ -71,13 +71,19 @@ job "${job-name}" {
         clusterId = "${cluster-id}"
         namesrvCount = "3"
         brokerCount = "3"
+        internal = "${internal}"
       }
       template {
         data = <<EOF
         brokerClusterName = {{ env "NOMAD_META_clusterId" }}
         brokerName=broker-{{env "NOMAD_META_clusterId"}}
-        {{$allocId := env "NOMAD_ALLOC_INDEX"}}
-        brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
+        {{$internal := env "NOMAD_META_internal"}}
+        {{if ne $internal ""}}
+          brokerIP1={{env "meta.hostIp"}}
+        {{else}}
+          {{$allocId := env "NOMAD_ALLOC_INDEX"}}
+          brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
+        {{end}}
         listenPort={{ env "NOMAD_PORT_broker" }}
         namesrvAddr={{range $i := loop ((env "NOMAD_META_namesrvCount")|parseInt)}}{{if ne $i 0}};{{end}}localhost:{{env (printf "NOMAD_PORT_outboundProxy_namesvrTcp%d" $i)}}{{end}}
         storePathRootDir=/data

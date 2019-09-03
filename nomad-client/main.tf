@@ -88,29 +88,13 @@ data "template_file" "setup-script" {
                         meta {
                           az = \"${var.az[count.index % length(var.az)]}\"
                           eip = \"${ucloud_eip.nomad_clients.*.public_ip[count.index]}\"
-                          ipv6 = \"${var.provision_from_kun ? module.ipv6.ipv6s[count.index] : ""}\"
+                          hostIp = \"${var.provision_from_kun ? module.ipv6.ipv6s[count.index] : ucloud_instance.nomad_clients.*.private_ip[count.index]}\"
                         }
 EOF
     , "\n", "\\n")
     consul-server-ip-0 = var.consul_server_private_ips[0]
     consul-server-ip-1 = var.consul_server_private_ips[1]
     consul-server-ip-2 = var.consul_server_private_ips[2]
-  }
-}
-
-locals {
-  register_prepare_count = var.provision_from_kun ? var.instance_count : 0
-//  register_prepare_count = var.instance_count
-}
-
-data template_file register_ipv6_script {
-  depends_on = [ucloud_instance.nomad_clients]
-  count = local.register_prepare_count
-  template = file("${path.module}/register_ipv6.sh")
-  vars = {
-    server_id = ucloud_instance.nomad_clients.*.id[count.index]
-    ipv6      = module.ipv6.ipv6s[count.index]
-//    ipv6 = ucloud_instance.nomad_clients.*.private_ip[count.index]
   }
 }
 
@@ -133,35 +117,5 @@ resource "null_resource" "setup" {
       data.template_file.setup-script[count.index].rendered,
       local.reconfig-ssh-keys-script,
     ]
-  }
-}
-//register ipv6 to consul so when create resource consul_keys, the consul servers are ready
-resource "null_resource" "register_ipv6" {
-  depends_on = [null_resource.setup]
-  count = local.register_prepare_count
-  provisioner "remote-exec" {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = local.server_ips[count.index]
-    }
-    inline = [
-      data.template_file.register_ipv6_script.*.rendered[count.index]
-    ]
-  }
-}
-
-provider "consul" {
-  address = var.consul_access_url
-}
-//re-create keys so on destroy, terraform will delete key
-resource "consul_keys" "ipv6_key" {
-  depends_on = [null_resource.register_ipv6]
-  count = local.register_prepare_count
-  key {
-    path = "ipv6/${ucloud_instance.nomad_clients.*.id[count.index]}"
-    value = ucloud_instance.nomad_clients.*.private_ip[count.index]
-    delete = true
   }
 }

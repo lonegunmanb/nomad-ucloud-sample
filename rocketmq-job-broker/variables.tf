@@ -26,8 +26,12 @@ variable broker_size {
   type = number
   default = 1
 }
+variable internal_use {
+  type = bool
+  default = false
+}
 locals {
   base_bandwidth = 50
-  base_cpu       = 2000
+  base_cpu       = 1500
   base_memory    = 4096
 }
