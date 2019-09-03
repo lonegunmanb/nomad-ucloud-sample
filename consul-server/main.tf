@@ -97,8 +97,7 @@ module "consulLb" {
   tag          = var.cluster_id
   instance_ids = ucloud_instance.consul_server.*.id
   name         = "consulServer-${var.cluster_id}"
-  ports        = [
-    8500]
+  ports        = [8500]
   subnet_id    = var.subnet_id
   vpc_id       = var.vpc_id
 }

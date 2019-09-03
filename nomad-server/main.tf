@@ -94,8 +94,7 @@ module "nomad_server_lb" {
   source       = "../internal_lb"
   instance_ids = ucloud_instance.nomad_servers.*.id
   name         = "nomadServerLb-${var.cluster_id}"
-  ports        = [
-    4646]
+  ports        = [4646]
   subnet_id    = var.subnet_id
   tag          = var.cluster_id
   vpc_id       = var.vpc_id
