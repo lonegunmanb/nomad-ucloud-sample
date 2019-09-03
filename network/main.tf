@@ -33,18 +33,21 @@ provider "ucloud" {
 }
 
 resource ucloud_vpc_peering_connection peering {
+  depends_on = [module.clientVpc.subnetId, module.mgrVpc.subnetId]
   peer_vpc_id = module.mgrVpc.vpc_id
   vpc_id = module.clientVpc.vpc_id
 }
 
 resource ucloud_vpc_peering_connection controller_peering0 {
   count = var.controllerVpcId == "" ? 0 : 1
+  depends_on = [module.mgrVpc.subnetId]
   peer_vpc_id = module.mgrVpc.vpc_id
   vpc_id = var.controllerVpcId
 }
 
 resource ucloud_vpc_peering_connection controller_peering1 {
   count = var.controllerVpcId == "" ? 0 : 1
+  depends_on = [module.clientVpc.subnetId]
   peer_vpc_id = module.clientVpc.vpc_id
   vpc_id = var.controllerVpcId
 }
