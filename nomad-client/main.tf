@@ -75,9 +75,10 @@ locals {
 }
 
 data "template_file" "setup-script" {
-  count    = var.instance_count
-  template = file(local.setup-script-path)
-  vars     = {
+  depends_on = [ucloud_instance.nomad_clients]
+  count      = var.instance_count
+  template   = file(local.setup-script-path)
+  vars       = {
     region             = var.region
     az                 = var.az[count.index % length(var.az)]
     node-name          = ucloud_instance.nomad_clients[count.index].id

@@ -80,9 +80,10 @@ locals {
 }
 
 data "template_file" "setup-script" {
-  count    = local.instance_count
-  template = file(local.setup-script-path)
-  vars     = {
+  depends_on = [ucloud_instance.consul_server]
+  count      = local.instance_count
+  template   = file(local.setup-script-path)
+  vars       = {
     region             = var.region
     node-name          = ucloud_instance.consul_server[count.index].id
     consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
