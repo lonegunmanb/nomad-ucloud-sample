@@ -23,11 +23,14 @@ locals {
 }
 
 resource "ucloud_lb_attachment" "attachment" {
-  count = length(local.attachments)
+  count = var.attachment_count == 0 ? length(local.attachments) : var.attachment_count
   load_balancer_id = ucloud_lb.lb.id
   resource_id = local.attachments[count.index][0]
-  listener_id = local.listener_map[local.attachments[count.index][1]]
   port = local.attachments[count.index][1]
+  listener_id = local.listener_map[local.attachments[count.index][1]]
+  lifecycle {
+    ignore_changes = [listener_id, resource_id]
+  }
 }
 
 data "template_file" "add-loopback-script" {

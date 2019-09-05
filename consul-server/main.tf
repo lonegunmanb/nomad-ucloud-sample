@@ -58,8 +58,8 @@ resource "ucloud_eip" "consul_servers" {
 
 resource "ucloud_eip_association" "consul_ip" {
   count       = var.provision_from_kun ? 0 : local.instance_count
-  eip_id      = ucloud_eip.consul_servers[count.index].id
-  resource_id = ucloud_instance.consul_server[count.index].id
+  eip_id      = ucloud_eip.consul_servers.*.id[count.index]
+  resource_id = ucloud_instance.consul_server.*.id[count.index]
 }
 
 locals {
@@ -120,5 +120,12 @@ resource "null_resource" "install_consul_server" {
       module.consulLb.setup_loopback_script,
       local.reconfig-ssh-keys-script,
     ]
+  }
+}
+
+data "null_data_source" "finish_signal" {
+  depends_on = [null_resource.install_consul_server]
+  inputs = {
+    signal = "finish"
   }
 }

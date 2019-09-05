@@ -52,9 +52,10 @@ resource "ucloud_eip" "nomad_clients" {
 }
 
 resource "ucloud_eip_association" "nomad_ip" {
+  depends_on = [ucloud_instance.nomad_clients, ucloud_eip.nomad_clients]
   count       = var.instance_count
-  eip_id      = ucloud_eip.nomad_clients[count.index].id
-  resource_id = ucloud_instance.nomad_clients[count.index].id
+  eip_id      = ucloud_eip.nomad_clients.*.id[count.index]
+  resource_id = ucloud_instance.nomad_clients.*.id[count.index]
 }
 
 locals {
@@ -117,5 +118,12 @@ resource "null_resource" "setup" {
       data.template_file.setup-script[count.index].rendered,
       local.reconfig-ssh-keys-script,
     ]
+  }
+}
+
+data "null_data_source" "finish_signal" {
+  depends_on = [null_resource.setup, ucloud_instance.nomad_clients]
+  inputs = {
+    signal = "finish"
   }
 }

@@ -14,3 +14,7 @@ variable "listenerName" {
 variable "device" {
   default = "lo:1"
 }
+variable "attachment_count" {
+  type = number
+  default = 0
+}

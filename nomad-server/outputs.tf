@@ -9,3 +9,11 @@ output "lb_id" {
 output "lb_ip" {
   value = module.nomad_server_lb.lb_ip
 }
+
+output "ssh_ip" {
+  value = local.server_ips
+}
+
+output "finish_signal" {
+  value = data.null_data_source.finish_signal
+}

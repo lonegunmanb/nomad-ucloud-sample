@@ -53,8 +53,8 @@ resource "ucloud_eip" "nomad_servers" {
 
 resource "ucloud_eip_association" "nomad_ip" {
   count       = var.provision_from_kun ? 0 : var.instance_count
-  eip_id      = ucloud_eip.nomad_servers[count.index].id
-  resource_id = ucloud_instance.nomad_servers[count.index].id
+  eip_id      = ucloud_eip.nomad_servers.*.id[count.index]
+  resource_id = ucloud_instance.nomad_servers.*.id[count.index]
 }
 
 locals {
@@ -121,3 +121,9 @@ resource "null_resource" "setup" {
   }
 }
 
+data "null_data_source" "finish_signal" {
+  depends_on = [null_resource.setup]
+  inputs = {
+    signal = "finish"
+  }
+}

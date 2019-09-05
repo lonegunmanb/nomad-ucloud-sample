@@ -13,3 +13,11 @@ output "lb_ip" {
 output "lb_id" {
   value = module.consulLb.lb_id
 }
+
+output "ssh_ip" {
+  value = local.server_ips
+}
+
+output "finish_signal" {
+  value = data.null_data_source.finish_signal
+}
