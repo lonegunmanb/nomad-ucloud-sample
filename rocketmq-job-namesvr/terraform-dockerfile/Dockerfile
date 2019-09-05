@@ -1,6 +1,6 @@
 FROM alpine
 
-ARG VERSION=0.12.5
+ARG VERSION=0.12.8
 
 RUN echo "https://mirrors.cloud.tencent.com/alpine/latest-stable/main/" > /etc/apk/repositories \
  && apk add wget unzip ca-certificates \
