@@ -89,7 +89,7 @@ data "template_file" "setup-script" {
                         meta {
                           az = \"${var.az[count.index % length(var.az)]}\"
                           eip = \"${ucloud_eip.nomad_clients.*.public_ip[count.index]}\"
-                          hostIp = \"${var.provision_from_kun ? module.ipv6.ipv6s[count.index] : ucloud_instance.nomad_clients.*.private_ip[count.index]}\"
+                          hostIp = \"${ucloud_instance.nomad_clients.*.private_ip[count.index]}\"
                         }
 EOF
     , "\n", "\\n")

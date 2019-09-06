@@ -26,6 +26,7 @@ locals {
   job-hcl = "${path.module}/namesvr-job.hcl"
 }
 
+variable "golang-image" {}
 data "template_file" "namesvr-job" {
   template = file(local.job-hcl)
   vars = {
@@ -46,6 +47,7 @@ data "template_file" "namesvr-job" {
     load_balancer_id = var.load_balancer_id
     nameServerListenerId = var.nameServerListenerId
     terraform-image = var.terraform-image
+    golang-image = var.golang-image
   }
 }
 

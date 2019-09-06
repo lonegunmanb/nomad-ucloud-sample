@@ -7,6 +7,9 @@ variable rocketmq_version {
 variable terraform-image {
   default = "uhub.service.ucloud.cn/lonegunmanb/terraform:0.11.14"
 }
+variable "golang-image" {
+  default = "uhub.service.ucloud.cn/lonegunmanb/golang:alpine"
+}
 variable ucloud_pubkey {}
 variable ucloud_secret {}
 variable ucloud_api_base_url {}

@@ -10,6 +10,43 @@ job "${job-name}" {
     operator = "distinct_property"
     value = "${task-limit-per-az}"
   }
+  task "namesvr-index" {
+    driver = "docker"
+    config {
+      image    = "${golang-image}"
+      port_map = {
+        tcp = 8080
+      }
+      command  = "go"
+      args     = ["run", "/go/src/server/main.go"]
+      volumes = ["local/go:/go/src/server"]
+    }
+    resources {
+      cpu    = 100
+      memory = 100
+      network {
+        port "tcp" {}
+      }
+    }
+    template {
+      data = <<EOF
+        package main
+        import (
+            "fmt"
+            "log"
+            "net/http"
+        )
+        func myHandler(w http.ResponseWriter, r *http.Request) {
+            fmt.Fprintf(w, "{{range $i, $svc := service "nameServer${cluster-id}"}}{{if ne $i 0}};{{end}}{{ $svc.Address }}:{{ $svc.Port }}{{end}}")
+        }
+        func main(){
+            http.HandleFunc("/", myHandler)
+            log.Fatal(http.ListenAndServe(":8080", nil))
+        }
+        EOF
+      destination = "local/go/main.go"
+    }
+  }
   group "namesvr" {
     count = ${count}
     spread {

@@ -89,6 +89,7 @@ module "namesvr" {
   projectId                  = data.terraform_remote_state.nomad.outputs.projectId
   load_balancer_id           = ucloud_lb.rocketMQLoadBalancer.id
   nameServerListenerId       = ucloud_lb_listener.nameServerListener.id
+  golang-image               = var.golang-image
 }
 
 module "console" {
