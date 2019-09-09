@@ -35,16 +35,17 @@ resource ucloud_security_group sg {
 }
 
 resource ucloud_instance controller {
-  count = local.controller_count
+  count             = local.controller_count
   name              = "controller"
   tag               = var.tag
   availability_zone = var.az[0]
-  image_id = var.controller_image_id
-  instance_type = var.controler_instance_type
-  vpc_id = ucloud_vpc.vpc.id
-  subnet_id = ucloud_subnet.subnet.id
+  image_id          = var.controller_image_id
+  instance_type     = var.controler_instance_type
+  vpc_id            = ucloud_vpc.vpc.id
+  subnet_id         = ucloud_subnet.subnet.id
   root_password     = var.root_password
   charge_type       = var.charge_type
+  duration          = var.duration
   security_group    = ucloud_security_group.sg.*.id[count.index]
   provisioner local-exec {
     command = "sleep 10"
@@ -52,12 +53,13 @@ resource ucloud_instance controller {
 }
 
 resource ucloud_disk dataDisk {
-  count = local.controller_count
+  count             = local.controller_count
   availability_zone = var.az[0]
-  disk_size = 100
-  name = "controllerDisk-${count.index}"
-  tag = var.tag
-  charge_type = var.charge_type
+  disk_size         = 100
+  name              = "controllerDisk-${count.index}"
+  tag               = var.tag
+  charge_type       = var.charge_type
+  duration          = var.duration
 }
 
 resource ucloud_disk_attachment attachment {
@@ -72,6 +74,7 @@ resource ucloud_eip controller_eip {
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
+  duration      = var.duration
   bandwidth     = 200
   name          = "controller-${var.tag}"
   tag           = var.tag

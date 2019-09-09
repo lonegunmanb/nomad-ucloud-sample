@@ -21,17 +21,26 @@ variable use_udisk {
   type = bool
 }
 variable local_disk_type {
-  default = "local_normal" //loacl_ssd cloud_normal cloud_ssd
+  default = "local_normal"
+  //loacl_ssd cloud_normal cloud_ssd
 }
 variable udisk_type {
-  default = "data_disk" //ssd_data_disk
+  default = "data_disk"
+  //ssd_data_disk
 }
 variable data_volume_size {}
 variable class {}
 variable provision_from_kun {
-  type = bool
+  type    = bool
   default = false
 }
 variable ipv6_server_url {}
 variable region_id {}
-variable "consul_access_url" {}
+variable consul_access_url {}
+variable charge_type {
+  default = "dynamic"
+}
+variable duration {
+  default = 1
+  type    = number
+}

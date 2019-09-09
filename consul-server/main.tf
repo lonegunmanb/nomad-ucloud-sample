@@ -18,7 +18,8 @@ resource "ucloud_instance" "consul_server" {
   image_id          = var.image_id
   instance_type     = var.instance_type
   root_password     = var.root_password
-  charge_type       = "dynamic"
+  charge_type       = var.charge_type
+  duration          = var.duration
   security_group    = var.sg_id
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
@@ -37,6 +38,8 @@ resource "ucloud_disk" "data_disk" {
   availability_zone = var.az[count.index % length(var.az)]
   disk_size         = var.use_udisk ? var.data_volume_size : 0
   disk_type         = var.udisk_type
+  charge_type       = var.charge_type
+  duration          = var.duration
 }
 
 resource "ucloud_disk_attachment" "attachment" {
@@ -51,7 +54,8 @@ resource "ucloud_eip" "consul_servers" {
   name          = "consul-server-${var.cluster_id}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
-  charge_type   = "dynamic"
+  charge_type   = var.charge_type
+  duration      = var.duration
   bandwidth     = 200
   tag           = var.cluster_id
 }

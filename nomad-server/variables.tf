@@ -31,3 +31,10 @@ variable udisk_type {
   default = "data_disk" //ssd_data_disk
 }
 variable data_volume_size {}
+variable "duration" {
+  type = number
+  default = 1
+}
+variable charge_type {
+  default = "dynamic"
+}

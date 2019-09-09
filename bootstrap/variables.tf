@@ -92,3 +92,10 @@ variable controller_image_username {}
 variable controller_image_password {}
 variable fabio_image_id {}
 variable fabio_port {}
+variable charge_type {
+  default = "dynamic"
+}
+variable duration {
+  type = number
+  default = 1
+}

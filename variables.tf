@@ -119,3 +119,10 @@ variable consul_server_use_udisk {
 variable fabio_port {
   type = number
 }
+variable "charge_type" {
+  default = "dynamic"
+}
+variable "duration" {
+  type = number
+  default = 1
+}

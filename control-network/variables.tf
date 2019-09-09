@@ -35,6 +35,10 @@ variable consul_backend_instance_type {}
 variable charge_type {
   default = "dynamic"
 }
+variable duration {
+  type = number
+  default = 1
+}
 
 variable "controller_count" {}
 variable "ipv6_api_url" {}

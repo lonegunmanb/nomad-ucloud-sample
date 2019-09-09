@@ -19,3 +19,7 @@ variable instance_type {}
 variable charge_type {
   default = "dynamic"
 }
+variable duration {
+  type = number
+  default = 1
+}

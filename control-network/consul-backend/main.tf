@@ -19,6 +19,7 @@ resource "ucloud_instance" "consul_server" {
   instance_type     = var.instance_type
   root_password     = var.root_password
   charge_type       = var.charge_type
+  duration          = var.duration
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
   data_disk_size    = 0
@@ -34,7 +35,8 @@ resource "ucloud_disk" "consul_data" {
   name              = "consul-backend-data-${var.tag}-${count.index}"
   disk_size         = var.data_volume_size
   tag               = var.tag
-  charge_type = var.charge_type
+  charge_type       = var.charge_type
+  duration          = var.duration
 }
 
 resource "ucloud_disk_attachment" "consul_server_data" {

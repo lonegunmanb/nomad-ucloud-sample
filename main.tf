@@ -61,6 +61,8 @@ module consul_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
+  charge_type         = var.charge_type
+  duration            = var.duration
 }
 
 module nomad_servers {
@@ -87,6 +89,8 @@ module nomad_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
+  charge_type         = var.charge_type
+  duration            = var.duration
 }
 
 locals {
@@ -119,6 +123,8 @@ module nameServer {
   ucloud_pub_key            = var.ucloud_pub_key
   ucloud_secret             = var.ucloud_secret
   consul_access_url         = local.consul_access_url
+  charge_type               = var.charge_type
+  duration                  = var.duration
 }
 
 module broker {
@@ -147,6 +153,8 @@ module broker {
   ucloud_pub_key            = var.ucloud_pub_key
   ucloud_secret             = var.ucloud_secret
   consul_access_url         = local.consul_access_url
+  charge_type               = var.charge_type
+  duration                  = var.duration
 }
 
 module "nameServerid" {

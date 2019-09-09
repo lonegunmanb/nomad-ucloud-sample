@@ -17,7 +17,7 @@ variable image_id {}
 variable cluster_id {}
 variable instance_type {}
 variable provision_from_kun {
-  type = bool
+  type    = bool
   default = false
 }
 variable ipv6_server_url {}
@@ -28,3 +28,10 @@ variable use_udisk {
 variable local_disk_type {}
 variable udisk_type {}
 variable data_volume_size {}
+variable charge_type {
+  default = "dynamic"
+}
+variable duration {
+  type    = number
+  default = 1
+}
