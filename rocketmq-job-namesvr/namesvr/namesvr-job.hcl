@@ -28,6 +28,17 @@ job "${job-name}" {
         port "tcp" {}
       }
     }
+    service {
+      name = "nameSvrIndex-${cluster-id}"
+      port = "tcp"
+      tags = ["urlprefix-/${cluster-id}"]
+      check {
+        type = "tcp"
+        port = "tcp"
+        interval = "10s"
+        timeout = "2s"
+      }
+    }
     template {
       data = <<EOF
         package main

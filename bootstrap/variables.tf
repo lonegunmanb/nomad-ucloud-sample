@@ -90,3 +90,5 @@ variable controller_pod_port {
 variable controller_image_repo {}
 variable controller_image_username {}
 variable controller_image_password {}
+variable fabio_image_id {}
+variable fabio_port {}

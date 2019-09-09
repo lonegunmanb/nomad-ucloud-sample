@@ -100,6 +100,13 @@ if [ ! -f "../terraform.tfvars.json" ]; then
   }
 EOF
 fi
+if [ ! -f "../fabio/terraform.tfvars" ]; then
+  cat>../terraform.tfvars<<-EOF
+  fabio_image = "${fabio_image_id}"
+  lb_port = ${fabio_port}
+  nomad_cluster_id = "${cluster_id}"
+EOF
+fi
 cd ../network
 rm -f destroyed
 if [ ! -f "inited" ]; then
@@ -117,5 +124,15 @@ if [ ! -f "inited" ]; then
   terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
   touch inited
 fi
+
+cd fabio
+rm -f destroyed
+if [ ! -f "inited" ]; then
+  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+  terraform workspace new ${cluster_id}
+  terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
+  touch inited
+fi
+
 echo "Finished"
 tail -f /dev/null

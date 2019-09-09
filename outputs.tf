@@ -40,6 +40,7 @@ module "consul_access_ipv6" {
 
 locals {
   nomad_server_ips  = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.public_ips
+  nomad_server_access_ip = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
   consul_server_ips = var.provision_from_kun ? module.consul_access_ipv6.ipv6s : module.consul_servers.public_ips
   consul_access_ip  = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
   consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
@@ -47,6 +48,10 @@ locals {
 
 output "consul_access_ip" {
   value = local.consul_access_ip
+}
+
+output "consul_lb_ip" {
+  value = module.consul_servers.lb_ip
 }
 
 output "nomad_servers_ips" {
@@ -63,6 +68,10 @@ module nomad_lb_ipv6 {
 
 output "nomad_server_ip" {
   value = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
+}
+
+output "nomad_server_access_url" {
+  value = length(local.nomad_server_access_ip) > 15 ? "http://[${local.nomad_server_access_ip}]:4646" : "http://${local.nomad_server_access_ip}:4646"
 }
 
 output "nomad_broker_public_ips" {

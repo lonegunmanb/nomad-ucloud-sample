@@ -1,0 +1,36 @@
+job "fabio" {
+  datacenters = ["${region}"]
+  type = "system"
+  constraint {
+    attribute = "$${node.class}"
+    value = "${node-class}"
+  }
+  group "fabio" {
+    task "fabio" {
+      driver = "docker"
+      config {
+        image = "${fabio-image}"
+        network_mode = "host"
+        volumes = [
+          "local/fabio.properties:/etc/fabio/fabio.properties"
+        ]
+      }
+      template {
+        data = <<EOF
+          registry.consul.register.enabled = false
+          proxy.addr = :${lb-port}
+EOF
+        destination = "local/fabio.properties"
+      }
+      resources {
+        cpu    = 200
+        memory = 128
+        network {
+          port "lb" {
+            static = ${lb-port}
+          }
+        }
+      }
+    }
+  }
+}

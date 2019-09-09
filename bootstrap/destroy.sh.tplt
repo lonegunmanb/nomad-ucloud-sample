@@ -26,6 +26,19 @@ while true; do
 done
 touch destroyed
 
+cd ../fabio
+while true; do
+  if [ ! -f "destroyed" ]; then
+    terraform destroy -force
+    if [ $? -eq 0 ]; then
+        break
+    fi
+  else
+    break
+  fi
+done
+touch destroyed
+
 cd ../control-network
 while true; do
   terraform destroy -force

@@ -21,6 +21,7 @@ resource "kubernetes_secret" "ucloud_key" {
     ucloud-secret  = var.ucloud_secret
   }
 }
+
 data "template_file" "bootstrap_script" {
   template = file("${path.module}/bootstrap.sh.tplt")
   vars     = {
@@ -73,6 +74,8 @@ data "template_file" "bootstrap_script" {
     consul_server_udisk_type        = var.consul_server_udisk_type
     consul_server_local_disk_type   = var.consul_server_local_disk_type
     consul_server_data_disk_size    = var.consul_server_data_disk_size
+    fabio_image_id                  = var.fabio_image_id
+    fabio_port                      = var.fabio_port
   }
 }
 

@@ -116,3 +116,9 @@ variable consul_server_udisk_type {}
 variable consul_server_use_udisk {
   type = bool
 }
+variable fabio_image {
+
+}
+variable fabio_port {
+  type = number
+}

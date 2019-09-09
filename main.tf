@@ -159,7 +159,7 @@ module "nameServerInternalLb" {
   instance_ids = module.nameServerid.output
   attachment_count = var.name_server_count
   name         = "nameServerInternalLb-${local.cluster_id}"
-  ports        = [8080]
+  ports        = [var.fabio_port]
   vpc_id       = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id    = data.terraform_remote_state.network.outputs.clientSubnetId
   tag          = local.cluster_id
