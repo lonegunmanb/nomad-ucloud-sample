@@ -122,20 +122,22 @@ resource null_resource setupController {
 }
 
 module consul_backend {
-  source = "./consul-backend"
-  az = var.az
-  data_volume_size = var.consul_backend_data_volume_size
-  image_id = var.consul_image_id
-  instance_type = var.consul_backend_instance_type
-  project_id = var.project_id
-  region = var.region
-  root_password = var.consul_backend_root_password
-  subnet_id = ucloud_subnet.subnet.id
-  tag = var.tag
-  ucloud_pub_key = var.ucloud_pub_key
-  ucloud_secret = var.ucloud_secret
-  vpc_id = ucloud_vpc.vpc.id
+  source              = "./consul-backend"
+  az                  = var.az
+  data_volume_size    = var.consul_backend_data_volume_size
+  image_id            = var.consul_image_id
+  instance_type       = var.consul_backend_instance_type
+  project_id          = var.project_id
+  region              = var.region
+  root_password       = var.consul_backend_root_password
+  subnet_id           = ucloud_subnet.subnet.id
+  tag                 = var.tag
+  ucloud_pub_key      = var.ucloud_pub_key
+  ucloud_secret       = var.ucloud_secret
+  vpc_id              = ucloud_vpc.vpc.id
   ucloud_api_base_url = var.ucloud_api_base_url
+  charge_type         = var.charge_type
+  duration            = var.duration
 }
 
 locals {
