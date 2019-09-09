@@ -101,7 +101,7 @@ if [ ! -f "../terraform.tfvars.json" ]; then
 EOF
 fi
 if [ ! -f "../fabio/terraform.tfvars" ]; then
-  cat>../terraform.tfvars<<-EOF
+  cat>../fabio/terraform.tfvars<<-EOF
   fabio_image = "${fabio_image_id}"
   lb_port = ${fabio_port}
   nomad_cluster_id = "${cluster_id}"
