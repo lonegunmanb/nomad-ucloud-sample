@@ -96,7 +96,8 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "consul_server_data_disk_size": ${consul_server_data_disk_size},
       "consul_server_local_disk_type": "${consul_server_local_disk_type}",
       "consul_server_udisk_type": "${consul_server_udisk_type}",
-      "consul_server_use_udisk": ${consul_server_use_udisk}
+      "consul_server_use_udisk": ${consul_server_use_udisk},
+      "fabio_port": ${fabio_port}
   }
 EOF
 fi
@@ -130,7 +131,7 @@ rm -f destroyed
 if [ ! -f "inited" ]; then
   terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
   terraform workspace new ${cluster_id}
-  terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
+  terraform apply --auto-approve -input=false -var-file=terraform.tfvars
   touch inited
 fi
 
