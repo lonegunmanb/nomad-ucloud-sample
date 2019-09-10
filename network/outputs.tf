@@ -1,17 +1,17 @@
 output mgrVpcId {
-  value = module.mgrVpc.vpc_id
+  value = ucloud_vpc.vpc.id
 }
 
 output clientVpcId {
-  value = module.clientVpc.vpc_id
+  value = ucloud_vpc.vpc.id
 }
 
 output mgrSubnetId {
-  value = module.mgrVpc.subnetId
+  value = ucloud_subnet.subnet.id
 }
 
 output clientSubnetId {
-  value = module.clientVpc.subnetId
+  value = ucloud_subnet.subnet.id
 }
 
 output cluster_id {
