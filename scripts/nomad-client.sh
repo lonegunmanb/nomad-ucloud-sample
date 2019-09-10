@@ -11,6 +11,7 @@ performance {
   raft_multiplier = 1
 }
 bind_addr = "{{ GetInterfaceIP \"eth0\" }}"
+client_addr = "127.0.0.1 {{ GetInterfaceIP \"eth0\" }}"
 EOF
 
 echo "write nomad.d/client.hcl"
@@ -32,6 +33,13 @@ client {
       "docker.privileged.enabled" = "true"
   }
   META
+}
+telemetry {
+  collection_interval = "1s"
+  disable_hostname = true
+  prometheus_metrics = true
+  publish_allocation_metrics = true
+  publish_node_metrics = true
 }
 
 EOF

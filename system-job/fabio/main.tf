@@ -1,16 +1,12 @@
-provider nomad {
-  address = local.nomad_server_access_url
-  region  = local.region
-}
-
 data "template_file" "fabio_job" {
   template = file("${path.module}/job.hcl.tplt")
   vars     = {
-    region       = local.region
+    jobName      = var.job_name
+    region       = var.region
     fabio-image  = var.fabio_image
     lb-port      = var.lb_port
-    consul-lb-ip = local.consul_lb_ip
     node-class   = "nameServer"
+    tagprefix    = var.fabio_tag_prefix
   }
 }
 

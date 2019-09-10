@@ -31,6 +31,20 @@ resource ucloud_security_group consul_server_sg {
     cidr_block = var.allow_ip
     policy     = var.provision_from_kun ? "drop" : "accept"
   }
+  //namesvr index fabio port
+  rules {
+    port_range = var.namesvr_http_endpoint_port
+    protocol   = "tcp"
+    cidr_block = var.allow_ip
+    policy     = var.provision_from_kun ? "drop" : "accept"
+  }
+  //prometheus port
+  rules {
+    port_range = var.prometheus_port
+    protocol   = "tcp"
+    cidr_block = var.allow_ip
+    policy     = var.provision_from_kun ? "drop" : "accept"
+  }
   rules {
     port_range = "20000-32000"
     protocol   = "tcp"
@@ -167,7 +181,7 @@ module "nameServerInternalLb" {
   instance_ids = module.nameServerid.output
   attachment_count = var.name_server_count
   name         = "nameServerInternalLb-${local.cluster_id}"
-  ports        = [var.fabio_port]
+  ports        = [var.namesvr_http_endpoint_port, var.prometheus_port]
   vpc_id       = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id    = data.terraform_remote_state.network.outputs.clientSubnetId
   tag          = local.cluster_id

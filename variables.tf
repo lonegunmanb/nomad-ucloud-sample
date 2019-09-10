@@ -116,13 +116,18 @@ variable consul_server_udisk_type {}
 variable consul_server_use_udisk {
   type = bool
 }
-variable fabio_port {
+variable namesvr_http_endpoint_port {
   type = number
+  default = 8080
 }
-variable "charge_type" {
+variable prometheus_port {
+  type = number
+  default = 9090
+}
+variable charge_type {
   default = "dynamic"
 }
-variable "duration" {
+variable duration {
   type = number
   default = 1
 }

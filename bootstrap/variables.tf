@@ -91,7 +91,9 @@ variable controller_image_repo {}
 variable controller_image_username {}
 variable controller_image_password {}
 variable fabio_image_id {}
-variable fabio_port {}
+variable prometheus_image_id {}
+variable namesvr_fabio_port {}
+variable prometheus_port {}
 variable charge_type {
   default = "dynamic"
 }

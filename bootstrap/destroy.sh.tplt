@@ -1,6 +1,6 @@
 cd /project/${project_dir}/control-network
 export TF_VAR_remote_state_backend_url=http://[$(terraform output -json | jq -r '.backend_ip.value')]:8500
-cd ../fabio
+cd ../system-job
 while true; do
   if [ ! -f "destroyed" ]; then
     terraform destroy -force

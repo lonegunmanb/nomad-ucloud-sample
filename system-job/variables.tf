@@ -1,5 +1,7 @@
 variable "fabio_image" {}
-variable "lb_port" {}
+variable "prometheus_image" {}
+variable "namesvr_fabio_port" {}
+variable "prometheus_port" {}
 
 locals {
   region                  = data.terraform_remote_state.nomad.outputs.region

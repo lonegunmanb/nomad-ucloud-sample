@@ -1,4 +1,4 @@
-job "fabio" {
+job "${jobName}" {
   datacenters = ["${region}"]
   type = "system"
   constraint {
@@ -17,8 +17,10 @@ job "fabio" {
       }
       template {
         data = <<EOF
+          registry.consul.tagprefix = ${tagprefix}
           registry.consul.register.enabled = false
           proxy.addr = :${lb-port}
+          ui.addr = :{{env "NOMAD_PORT_ui"}}
 EOF
         destination = "local/fabio.properties"
       }
@@ -26,6 +28,7 @@ EOF
         cpu    = 200
         memory = 128
         network {
+          port "ui" {}
           port "lb" {
             static = ${lb-port}
           }

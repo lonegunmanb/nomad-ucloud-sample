@@ -67,17 +67,19 @@ data "template_file" "bootstrap_script" {
     name_server_use_udisk           = var.name_server_use_udisk
     broker_use_udisk                = var.broker_use_udisk
     nomad_server_use_udisk          = var.nomad_server_use_udisk
-    nomad_server_local_disk_type  = var.nomad_server_local_disk_type
-    nomad_server_udisk_type       = var.nomad_server_udisk_type
-    nomad_server_data_disk_size   = var.nomad_server_data_disk_size
-    consul_server_use_udisk       = var.consul_server_use_udisk
-    consul_server_udisk_type      = var.consul_server_udisk_type
-    consul_server_local_disk_type = var.consul_server_local_disk_type
-    consul_server_data_disk_size  = var.consul_server_data_disk_size
-    fabio_image_id                = var.fabio_image_id
-    fabio_port                    = var.fabio_port
-    charge_type                   = var.charge_type
-    duration                      = var.duration
+    nomad_server_local_disk_type    = var.nomad_server_local_disk_type
+    nomad_server_udisk_type         = var.nomad_server_udisk_type
+    nomad_server_data_disk_size     = var.nomad_server_data_disk_size
+    consul_server_use_udisk         = var.consul_server_use_udisk
+    consul_server_udisk_type        = var.consul_server_udisk_type
+    consul_server_local_disk_type   = var.consul_server_local_disk_type
+    consul_server_data_disk_size    = var.consul_server_data_disk_size
+    fabio_image_id                  = var.fabio_image_id
+    prometheus_image                = var.prometheus_image_id
+    namesvr_fabio_port              = var.namesvr_fabio_port
+    prometheus_port                 = var.prometheus_port
+    charge_type                     = var.charge_type
+    duration                        = var.duration
   }
 }
 
