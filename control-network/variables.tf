@@ -24,10 +24,7 @@ locals {
   instanceCount = length(var.az)
 }
 
-variable terraform_project_url {}
-variable git_branch {}
 variable project_root_dir {}
-variable project_dir {}
 variable consul_backend_root_password {}
 variable consul_backend_data_volume_size {}
 variable consul_backend_instance_type {}
@@ -48,4 +45,11 @@ variable provision_from_kun {
 }
 locals {
   reconfig_ssh_keys_script = file("./reconfig_ssh_keys.sh")
+}
+
+variable "legacy_vpc_id" {
+  default = ""
+}
+variable "legacy_subnet_id" {
+  default = ""
 }

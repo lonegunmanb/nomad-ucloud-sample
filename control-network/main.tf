@@ -7,16 +7,28 @@ provider "ucloud" {
 }
 
 resource ucloud_vpc vpc {
+  count = var.legacy_vpc_id == "" ? 1 : 0
   name = var.vpcName
   cidr_blocks = [var.cidr]
   tag = var.tag
 }
 
 resource ucloud_subnet subnet {
+  count = var.legacy_vpc_id == "" ? 1 : 0
   name = var.subnetName
   cidr_block = var.cidr
-  vpc_id = ucloud_vpc.vpc.id
+  vpc_id = ucloud_vpc.vpc.*.id[0]
   tag = var.tag
+}
+
+data "ucloud_vpcs" "vpc" {
+  depends_on = [ucloud_vpc.vpc]
+  ids = var.legacy_vpc_id == "" ? [ucloud_vpc.vpc.*.id[0]] : [var.legacy_vpc_id]
+}
+
+data "ucloud_subnets" "subnet" {
+  depends_on = [ucloud_subnet.subnet]
+  ids = [var.legacy_subnet_id] == "" ? [ucloud_subnet.subnet.*.id[0]] : [var.legacy_subnet_id]
 }
 
 locals {
@@ -41,8 +53,8 @@ resource ucloud_instance controller {
   availability_zone = var.az[0]
   image_id          = var.controller_image_id
   instance_type     = var.controler_instance_type
-  vpc_id            = ucloud_vpc.vpc.id
-  subnet_id         = ucloud_subnet.subnet.id
+  vpc_id            = data.ucloud_vpcs.vpc.vpcs.*.id[0]
+  subnet_id         = data.ucloud_subnets.subnet.subnets.*.id[0]
   root_password     = var.root_password
   charge_type       = var.charge_type
   duration          = var.duration
@@ -93,17 +105,6 @@ data template_file mount_disk_script {
   }
 }
 
-data template_file clone_project_script {
-  template = file("./clone-tf-project.sh")
-  vars = {
-    terraform_project_url = var.terraform_project_url
-    project_dir = "/project/${var.project_dir}"
-    branch = var.git_branch
-    project_dir = var.project_dir
-    project_root_dir = var.project_root_dir
-  }
-}
-
 resource null_resource setupController {
   depends_on = [ucloud_eip_association.association]
   count = local.controller_count
@@ -130,11 +131,11 @@ module consul_backend {
   project_id          = var.project_id
   region              = var.region
   root_password       = var.consul_backend_root_password
-  subnet_id           = ucloud_subnet.subnet.id
+  vpc_id              = data.ucloud_vpcs.vpc.vpcs.*.id[0]
+  subnet_id           = data.ucloud_subnets.subnet.subnets.*.id[0]
   tag                 = var.tag
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
-  vpc_id              = ucloud_vpc.vpc.id
   ucloud_api_base_url = var.ucloud_api_base_url
   charge_type         = var.charge_type
   duration            = var.duration
@@ -167,9 +168,9 @@ module "backend_lb" {
   instance_ids = module.consul_backend.uhost_ids
   name = "consulLb-${var.tag}"
   ports = [8500]
-  subnet_id = ucloud_subnet.subnet.id
+  vpc_id            = data.ucloud_vpcs.vpc.vpcs.*.id[0]
+  subnet_id         = data.ucloud_subnets.subnet.subnets.*.id[0]
   tag = var.tag
-  vpc_id = ucloud_vpc.vpc.id
 }
 
 resource "null_resource" "install_consul_server_via_ipv4" {

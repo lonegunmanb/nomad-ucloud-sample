@@ -1,5 +1,5 @@
 output vpcId {
-  value = ucloud_vpc.vpc.id
+  value = data.ucloud_vpcs.vpc.vpcs.*.id[0]
 }
 
 output backend_ip {

@@ -32,6 +32,8 @@ if [ ! -f "terraform.tfvars" ]; then
   provision_from_kun = true
   charge_type = "${charge_type}"
   duration = ${duration}
+  legacy_vpc_id = "${legacy_vpc_id}",
+  legacy_subnet_id = "${legacy_subnet_id}"
 EOF
 fi
 if [ ! -f "inited" ]; then
