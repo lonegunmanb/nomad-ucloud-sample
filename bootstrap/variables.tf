@@ -16,8 +16,8 @@ variable ucloud_secret {}
 variable project_id {}
 variable ucloud_api_base_url {}
 variable controller_cidr {}
-variable mgrVpcCidr {}
-variable clientVpcCidr {}
+variable vpcCidr {}
+variable subnetCidr {}
 variable allow_ip {}
 variable az {
   type = list(string)
@@ -102,3 +102,9 @@ variable duration {
   default = 1
 }
 variable env_name {}
+variable "legacy_vpc_id" {
+  default = ""
+}
+variable "legacy_subnet_id" {
+  default = ""
+}

@@ -1,17 +1,17 @@
 output mgrVpcId {
-  value = ucloud_vpc.vpc.id
+  value = data.ucloud_vpcs.vpc.vpcs.*.id[0]
 }
 
 output clientVpcId {
-  value = ucloud_vpc.vpc.id
+  value = data.ucloud_vpcs.vpc.vpcs.*.id[0]
 }
 
 output mgrSubnetId {
-  value = ucloud_subnet.subnet.id
+  value = data.ucloud_subnets.subnet.subnets.*.id[0]
 }
 
 output clientSubnetId {
-  value = ucloud_subnet.subnet.id
+  value = data.ucloud_subnets.subnet.subnets.*.id[0]
 }
 
 output cluster_id {

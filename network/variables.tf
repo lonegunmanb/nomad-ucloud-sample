@@ -10,6 +10,13 @@ variable vpc_cidr {}
 variable subnetName {}
 variable subnet_cidr {}
 
+variable legacy_vpc_id {
+  default = ""
+}
+variable legacy_subnet_id {
+  default = ""
+}
+
 locals {
   cluster_id = terraform.workspace
 }

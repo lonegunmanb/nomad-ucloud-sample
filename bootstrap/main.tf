@@ -24,7 +24,7 @@ resource "kubernetes_secret" "ucloud_key" {
 
 data "template_file" "bootstrap_script" {
   template = file("${path.module}/bootstrap.sh.tplt")
-  vars     = {
+  vars = {
     consul_backend_root_password    = var.consul_backend_root_password
     terraform_project_url           = var.terraform_project_url
     project_dir                     = var.project_dir
@@ -39,8 +39,10 @@ data "template_file" "bootstrap_script" {
     ucloud_secret                   = var.ucloud_secret
     project_id                      = var.project_id
     controller_cidr                 = var.controller_cidr
-    mgrVpcCidr                      = var.mgrVpcCidr
-    clientVpcCidr                   = var.clientVpcCidr
+    vpcCidr                         = var.vpcCidr
+    subnetCidr                      = var.subnetCidr
+    legacy_vpc_id                   = var.legacy_vpc_id
+    legacy_subnet_id                = var.legacy_subnet_id
     ipv6_api_url                    = var.ipv6_api_url
     allow_ip                        = var.allow_ip
     az                              = join(", ", formatlist("\"%s\"", var.az))
