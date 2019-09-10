@@ -71,7 +71,6 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "consul_server_image_id": "${consul_server_image_id}",
       "consul_server_root_password": "${consul_server_root_password}",
       "consul_server_type": "${consul_server_type}",
-      "mgrSubnetCidr": "${mgrVpcCidr}",
       "nomad_client_broker_type": "${nomad_client_broker_type}",
       "nomad_client_image_id": "${nomad_client_image_id}",
       "nomad_client_namesvr_type": "${nomad_client_namesvr_type}",
