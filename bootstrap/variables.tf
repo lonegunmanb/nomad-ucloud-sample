@@ -92,7 +92,7 @@ variable controller_image_username {}
 variable controller_image_password {}
 variable fabio_image_id {}
 variable prometheus_image_id {}
-variable namesvr_fabio_port {}
+variable namesvr_http_endpoint_port {}
 variable prometheus_port {}
 variable charge_type {
   default = "dynamic"

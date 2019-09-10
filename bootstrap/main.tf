@@ -76,7 +76,7 @@ data "template_file" "bootstrap_script" {
     consul_server_data_disk_size    = var.consul_server_data_disk_size
     fabio_image_id                  = var.fabio_image_id
     prometheus_image                = var.prometheus_image_id
-    namesvr_fabio_port              = var.namesvr_fabio_port
+    namesvr_http_endpoint_port      = var.namesvr_http_endpoint_port
     prometheus_port                 = var.prometheus_port
     charge_type                     = var.charge_type
     duration                        = var.duration
