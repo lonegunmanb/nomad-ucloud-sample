@@ -17,10 +17,7 @@ variable instance_type {}
 variable consul_server_ips {
   type = list(string)
 }
-variable provision_from_kun {
-  type = bool
-  default = false
-}
+variable env_name {}
 variable ipv6_server_url {}
 variable region_id {}
 variable use_udisk {}

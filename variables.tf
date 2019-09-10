@@ -28,9 +28,6 @@ variable "az" {
 variable "project_id" {
 }
 
-variable clientSubnetCidr {}
-variable mgrSubnetCidr {}
-
 variable "consul_server_type" {
   default = "n-highcpu-1"
 }
@@ -71,8 +68,8 @@ variable ipv6_server_url {
 variable region_id {
   default = ""
 }
-variable provision_from_kun {
-  default = false
+variable env_name {
+  default = "test"
 }
 variable ucloud_api_base_url {}
 variable broker_count {

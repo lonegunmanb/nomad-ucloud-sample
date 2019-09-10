@@ -72,11 +72,11 @@ module ipv6 {
   api_server_url = var.ipv6_server_url
   region_id      = var.region_id
   resourceIds    = ucloud_instance.nomad_clients.*.id
-  disable        = !var.provision_from_kun
+  disable        = var.env_name != "public"
 }
 
 locals {
-  server_ips = var.provision_from_kun ? module.ipv6.ipv6s : ucloud_eip.nomad_clients.*.public_ip
+  server_ips = var.env_name == "test" ? ucloud_eip.nomad_clients.*.public_ip : (var.env_name == "public" ? module.ipv6.ipv6s : ucloud_instance.nomad_clients.*.private_ip)
 }
 
 data "template_file" "setup-script" {

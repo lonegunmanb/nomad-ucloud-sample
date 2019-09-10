@@ -30,10 +30,7 @@ variable udisk_type {
 }
 variable data_volume_size {}
 variable class {}
-variable provision_from_kun {
-  type    = bool
-  default = false
-}
+variable env_name {}
 variable ipv6_server_url {}
 variable region_id {}
 variable consul_access_url {}

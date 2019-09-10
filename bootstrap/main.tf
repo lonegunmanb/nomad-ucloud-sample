@@ -80,6 +80,7 @@ data "template_file" "bootstrap_script" {
     prometheus_port                 = var.prometheus_port
     charge_type                     = var.charge_type
     duration                        = var.duration
+    env_name                        = var.env_name
   }
 }
 

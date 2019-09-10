@@ -32,16 +32,16 @@ output "consul_servers_private_ips" {
 
 module "consul_access_ipv6" {
   source = "./ipv6"
-  disable = !var.provision_from_kun
+  disable = var.env_name != "public"
   api_server_url = var.ipv6_server_url
   region_id = var.region_id
   resourceIds = [module.consul_servers.lb_id]
 }
 
 locals {
-  nomad_server_ips  = var.provision_from_kun ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.public_ips
+  nomad_server_ips  = var.env_name == "test" ? module.nomad_servers.public_ips : (var.env_name == "public" ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.private_ips)
   nomad_server_access_ip = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
-  consul_server_ips = var.provision_from_kun ? module.consul_access_ipv6.ipv6s : module.consul_servers.public_ips
+  consul_server_ips = var.env_name == "test" ? module.consul_servers.public_ips : (var.env_name == "public" ? module.consul_access_ipv6.ipv6s : module.consul_servers.private_ips)
   consul_access_ip  = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
   consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
 }
@@ -60,7 +60,7 @@ output "nomad_servers_ips" {
 
 module nomad_lb_ipv6 {
   source = "./ipv6"
-  disable = !var.provision_from_kun
+  disable = var.env_name != "public"
   api_server_url = var.ipv6_server_url
   region_id = var.region_id
   resourceIds = [module.nomad_servers.lb_id]

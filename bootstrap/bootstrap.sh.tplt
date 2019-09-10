@@ -79,7 +79,6 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "region": "${region}",
       "ipv6_server_url": "${ipv6_api_url}",
       "region_id": "${region_id}",
-      "provision_from_kun": true,
       "broker_count": ${broker_count},
       "name_server_count": ${name_server_count},
       "nomad_server_count": ${nomad_server_count},
@@ -101,7 +100,8 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "consul_server_use_udisk": ${consul_server_use_udisk},
       "namesvr_http_endpoint_port": ${namesvr_http_endpoint_port},
       "charge_type": "${charge_type}",
-      "duration": ${duration}
+      "duration": ${duration},
+      "env_name": "${env_name}"
   }
 EOF
 fi

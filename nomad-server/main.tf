@@ -45,7 +45,7 @@ resource "ucloud_disk_attachment" "attachment" {
 }
 
 resource "ucloud_eip" "nomad_servers" {
-  count         = var.provision_from_kun ? 0 : var.instance_count
+  count         = var.env_name != "test" ? 0 : var.instance_count
   name          = "nomad-server-${var.cluster_id}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
@@ -56,7 +56,7 @@ resource "ucloud_eip" "nomad_servers" {
 }
 
 resource "ucloud_eip_association" "nomad_ip" {
-  count       = var.provision_from_kun ? 0 : var.instance_count
+  count       = var.env_name != "test" ? 0 : var.instance_count
   eip_id      = ucloud_eip.nomad_servers.*.id[count.index]
   resource_id = ucloud_instance.nomad_servers.*.id[count.index]
 }
@@ -72,11 +72,11 @@ module ipv6 {
   api_server_url = var.ipv6_server_url
   region_id      = var.region_id
   resourceIds    = ucloud_instance.nomad_servers.*.id
-  disable        = !var.provision_from_kun
+  disable        = var.env_name != "public"
 }
 
 locals {
-  server_ips = var.provision_from_kun ? module.ipv6.ipv6s : ucloud_eip.nomad_servers.*.public_ip
+  server_ips = var.env_name == "test" ? ucloud_eip.nomad_servers.*.public_ip : (var.env_name == "public" ? module.ipv6.ipv6s : ucloud_instance.nomad_servers.*.private_ip)
 }
 
 data "template_file" "setup-script" {

@@ -101,3 +101,4 @@ variable duration {
   type = number
   default = 1
 }
+variable env_name {}

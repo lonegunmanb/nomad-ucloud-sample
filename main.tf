@@ -13,7 +13,7 @@ resource ucloud_security_group consul_server_sg {
     port_range = "22"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = var.provision_from_kun ? "drop" : "accept"
+    policy     = var.env_name != "test" ? "drop" : "accept"
   }
 
   //consul ui port
@@ -21,7 +21,7 @@ resource ucloud_security_group consul_server_sg {
     port_range = "8500"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = var.provision_from_kun ? "drop" : "accept"
+    policy     = var.env_name != "test" ? "drop" : "accept"
   }
 
   //nomad ui port
@@ -29,27 +29,27 @@ resource ucloud_security_group consul_server_sg {
     port_range = "4646"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = var.provision_from_kun ? "drop" : "accept"
+    policy     = var.env_name != "test" ? "drop" : "accept"
   }
   //namesvr index fabio port
   rules {
     port_range = var.namesvr_http_endpoint_port
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = var.provision_from_kun ? "drop" : "accept"
+    policy     = var.env_name != "test" ? "drop" : "accept"
   }
   //prometheus port
   rules {
     port_range = var.prometheus_port
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = var.provision_from_kun ? "drop" : "accept"
+    policy     = var.env_name != "test" ? "drop" : "accept"
   }
   rules {
     port_range = "20000-32000"
     protocol   = "tcp"
     cidr_block = var.allow_ip
-    policy     = "accept"
+    policy     = var.env_name == "private" ? "drop" : "accept"
   }
 }
 
@@ -70,7 +70,7 @@ module consul_servers {
   data_volume_size    = var.consul_server_data_disk_size
   ipv6_server_url     = var.ipv6_server_url
   region_id           = var.region_id
-  provision_from_kun  = var.provision_from_kun
+  env_name            = var.env_name
   project_id          = var.project_id
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
@@ -98,7 +98,7 @@ module nomad_servers {
   data_volume_size    = var.nomad_server_data_disk_size
   ipv6_server_url     = var.ipv6_server_url
   region_id           = var.region_id
-  provision_from_kun  = var.provision_from_kun
+  env_name            = var.env_name
   project_id          = var.project_id
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
@@ -131,7 +131,7 @@ module nameServer {
   class                     = "nameServer"
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id
-  provision_from_kun        = var.provision_from_kun
+  env_name                  = var.env_name
   project_id                = var.project_id
   ucloud_api_base_url       = var.ucloud_api_base_url
   ucloud_pub_key            = var.ucloud_pub_key
@@ -161,7 +161,7 @@ module broker {
   class                     = "broker"
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id
-  provision_from_kun        = var.provision_from_kun
+  env_name                  = var.env_name
   project_id                = var.project_id
   ucloud_api_base_url       = var.ucloud_api_base_url
   ucloud_pub_key            = var.ucloud_pub_key
