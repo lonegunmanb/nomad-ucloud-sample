@@ -15,7 +15,8 @@
     "image_tag": "",
     "docker_login_server": "",
     "docker_login_username": "",
-    "docker_login_password": ""
+    "docker_login_password": "",
+    "code_git_url": ""
   },
 
   "builders": [{
@@ -46,7 +47,8 @@
         "TF_PLUGIN_UCLOUD_VERSION={{user `tf_plugin_ucloud_version`}}",
         "TF_PLUGIN_EXTERNAL_VERSION={{user `tf_plugin_external_version`}}",
         "TF_PLUGIN_LOCAL={{user `tf_plugin_local`}}",
-        "UCLOUD_CLI_VERSION={{user `ucloud_cli_version`}}"
+        "UCLOUD_CLI_VERSION={{user `ucloud_cli_version`}}",
+        "CODE_GIT_URL={{user `code_git_url`}}"
       ]
     }],
   "post-processors": [

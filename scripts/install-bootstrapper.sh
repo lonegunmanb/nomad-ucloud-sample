@@ -21,4 +21,9 @@ wget -nv -O ucloud-cli.tgz https://github.com/ucloud/ucloud-cli/releases/downloa
 tar zxf ucloud-cli.tgz -C /usr/local/bin/
 
 rm -rf /tmp/*
+
+mkdir /code
+cd /code
+git clone ${CODE_GIT_URL}
+
 sync

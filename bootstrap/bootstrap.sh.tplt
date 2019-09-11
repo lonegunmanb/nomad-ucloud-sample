@@ -1,3 +1,7 @@
+if [ -d "/code/${project_dir}" ]; then
+  cp /code/${project_dir} /project/${project_dir}
+fi
+
 cd /project
 if [ ! -d "${project_dir}" ]; then
   git clone ${terraform_project_url}
