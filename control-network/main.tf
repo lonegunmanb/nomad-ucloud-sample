@@ -28,7 +28,7 @@ data "ucloud_vpcs" "vpc" {
 
 data "ucloud_subnets" "subnet" {
   depends_on = [ucloud_subnet.subnet]
-  ids = [var.legacy_subnet_id] == "" ? [ucloud_subnet.subnet.*.id[0]] : [var.legacy_subnet_id]
+  ids = var.legacy_subnet_id == "" ? [ucloud_subnet.subnet.*.id[0]] : [var.legacy_subnet_id]
 }
 
 locals {
