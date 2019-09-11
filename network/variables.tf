@@ -2,22 +2,22 @@ variable ucloud_pub_key {}
 variable region {}
 variable ucloud_secret {}
 variable project_id {}
-
-variable ucloud_api_base_url {}
-
-variable vpcName {}
-variable vpc_cidr {}
-variable subnetName {}
-variable subnet_cidr {}
-
-variable legacy_vpc_id {
+variable mgrVpcCidr {}
+variable clientVpcCidr {}
+variable controllerVpcId {
   default = ""
 }
-variable legacy_subnet_id {
-  default = ""
-}
+variable "ucloud_api_base_url" {}
+variable "legacy_vpc_id" {}
+variable "legacy_subnet_id" {}
 
 locals {
   cluster_id = terraform.workspace
+  mgrVpcName = "nomadMgrVpc-${local.cluster_id}"
+  mgrSubnetName = "nomadMgrSubnet-${local.cluster_id}"
+  clientVpcName = "nomadClientVpc-${local.cluster_id}"
+  clientSubnetName = "nomadClientSubnet-${local.cluster_id}"
+  externalVpcName = "externalVpc-${local.cluster_id}"
+  externalSubnetName = "externalVpc-${local.cluster_id}"
 }
 

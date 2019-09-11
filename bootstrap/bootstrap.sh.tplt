@@ -53,10 +53,8 @@ if [ ! -f "../network/terraform.tfvars.json" ]; then
     "region": "${region}",
     "project_id": "${project_id}",
 
-    "vpcName": "rocketmq_vpc",
-    "vpc_cidr": "${vpcCidr}",
-    "subnetName": "rocketmq_subnet",
-    "subnet_cidr": "${subnetCidr}",
+    "mgrVpcCidr": "${mgrVpcCidr}",
+    "clientVpcCidr": "${clientVpcCidr}",
     "legacy_vpc_id": "${legacy_vpc_id}",
     "legacy_subnet_id": "${legacy_subnet_id}"
   }

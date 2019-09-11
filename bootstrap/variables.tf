@@ -16,8 +16,8 @@ variable ucloud_secret {}
 variable project_id {}
 variable ucloud_api_base_url {}
 variable controller_cidr {}
-variable vpcCidr {}
-variable subnetCidr {}
+variable mgrVpcCidr {}
+variable clientVpcCidr {}
 variable allow_ip {}
 variable az {
   type = list(string)
