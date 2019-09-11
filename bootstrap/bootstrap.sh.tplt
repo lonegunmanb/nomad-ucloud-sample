@@ -20,10 +20,7 @@ if [ ! -f "terraform.tfvars" ]; then
   allow_ip = "${allow_ip}"
   root_password = ""
   tag = "${cluster_id}"
-  terraform_project_url = ""
-  git_branch = ""
   project_root_dir = ""
-  project_dir = ""
   consul_backend_root_password = "${consul_backend_root_password}"
   consul_backend_data_volume_size = ${consul_backend_data_volume_size}
   consul_backend_instance_type = "${consul_backend_instance_type}"
