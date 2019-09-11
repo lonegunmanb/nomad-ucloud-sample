@@ -30,8 +30,15 @@ variable internal_use {
   type = bool
   default = false
 }
-locals {
-  base_bandwidth = 50
-  base_cpu       = 1500
-  base_memory    = 4096
+
+variable "base_bandwidth" {
+  default = 50
+}
+
+variable "base_cpu" {
+  default = 1500
+}
+
+variable "base_memory" {
+  default = 4096
 }
