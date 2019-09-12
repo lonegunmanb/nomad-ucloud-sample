@@ -8,7 +8,9 @@
     "image_id": "uimage-dpdgyw",
     "consul_version": "1.5.1",
     "region": "cn-bj2",
-    "az": "cn-bj2-02"
+    "az": "cn-bj2-02",
+    "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",
+    "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
   },
 
   "builders": [{
@@ -33,7 +35,9 @@
         "../scripts/consul-server.sh"
       ],
       "environment_vars": [
-        "CONSUL_VERSION={{user `consul_version`}}"
+        "CONSUL_VERSION={{user `consul_version`}}",
+        "YUM_BASE={{user `yum_base`}}",
+        "YUM_DOCKER={{user `yum_docker`}}"
       ]
     }]
 }

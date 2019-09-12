@@ -1,8 +1,8 @@
 echo "add yum repo"
 sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/fastestmirror.conf
 rm -f /etc/yum.repos.d/CentOS-Base.repo
-curl http://mirrors.163.com/.help/CentOS7-Base-163.repo -o /etc/yum.repos.d/CentOS-Base.repo
-yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+curl ${YUM_BASE} -o /etc/yum.repos.d/CentOS-Base.repo
+yum-config-manager --add-repo ${YUM_DOCKER}
 yum makecache
 yum install -y wget
 echo "yum upgrade"

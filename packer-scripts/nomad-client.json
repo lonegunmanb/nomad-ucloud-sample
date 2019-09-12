@@ -15,7 +15,9 @@
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
     "tf_plugin_ucloud_version": "1.12.1",
-    "tf_plugin_external_version": "1.2.0"
+    "tf_plugin_external_version": "1.2.0",
+    "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",
+    "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
   },
 
   "builders": [{
@@ -45,6 +47,8 @@
       "environment_vars": [
         "CONSUL_VERSION={{user `consul_version`}}",
         "NOMAD_VERSION={{user `nomad_version`}}",
+        "YUM_BASE={{user `yum_base`}}",
+        "YUM_DOCKER={{user `yum_docker`}}",
         "TF_PLUGIN_CONSUL_VERSION={{user `tf_plugin_consul_version`}}",
         "TF_PLUGIN_NOMAD_VERSION={{user `tf_plugin_nomad_version`}}",
         "TF_PLUGIN_NULL_VERSION={{user `tf_plugin_null_version`}}",
