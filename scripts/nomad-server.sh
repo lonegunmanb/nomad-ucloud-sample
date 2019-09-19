@@ -23,7 +23,7 @@ name = "NODENAME"
 server {
   data_dir = "/data/nomadServer"
   enabled          = true
-  bootstrap_expect = EXPECTEDSVRS
+  bootstrap_expect = 3
   job_gc_threshold = "1h"
   deployment_gc_threshold = "10m"
 }
