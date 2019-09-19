@@ -171,6 +171,7 @@ job "${job-name}" {
             }
 
             resource "ucloud_lb_attachment" "nameServer-${cluster-id}-{{ env "NOMAD_ALLOC_INDEX" }}" {
+                count            = ${attachment-count}
                 load_balancer_id = "${load_balancer_id}"
                 listener_id      = "${nameServerListenerId}"
                 resource_id      = "{{env "node.unique.name"}}"

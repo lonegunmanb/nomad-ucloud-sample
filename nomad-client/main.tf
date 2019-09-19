@@ -45,7 +45,7 @@ resource "ucloud_disk_attachment" "disk_attachment" {
 }
 
 resource "ucloud_eip" "nomad_clients" {
-  count         = var.instance_count
+  count         = var.env_name == "private" ? 0 : var.instance_count
   name          = "nomad-client-${var.cluster_id}-${var.class}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
@@ -57,7 +57,7 @@ resource "ucloud_eip" "nomad_clients" {
 
 resource "ucloud_eip_association" "nomad_ip" {
   depends_on = [ucloud_instance.nomad_clients, ucloud_eip.nomad_clients]
-  count       = var.instance_count
+  count       = var.env_name == "private" ? 0 : var.instance_count
   eip_id      = ucloud_eip.nomad_clients.*.id[count.index]
   resource_id = ucloud_instance.nomad_clients.*.id[count.index]
 }
@@ -92,7 +92,7 @@ data "template_file" "setup-script" {
     <<EOF
                         meta {
                           az = \"${var.az[count.index % length(var.az)]}\"
-                          eip = \"${ucloud_eip.nomad_clients.*.public_ip[count.index]}\"
+                          eip = \"${length(ucloud_eip.nomad_clients.*.public_ip) > 0 ? ucloud_eip.nomad_clients.*.public_ip[count.index] : ""}\"
                           hostIp = \"${ucloud_instance.nomad_clients.*.private_ip[count.index]}\"
                         }
 EOF

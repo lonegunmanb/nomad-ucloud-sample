@@ -11,7 +11,7 @@ provider "ucloud" {
 }
 
 resource "ucloud_eip" "broker_eip" {
-  count = 3
+  count = var.internal_use ? 0 : 3
   internet_type = "bgp"
   name = "broker-${local.broker_clusterId}-${count.index}"
   charge_mode = "traffic"
@@ -21,7 +21,7 @@ resource "ucloud_eip" "broker_eip" {
 }
 //because we create ucloud_eip_association inside nomad job, so before we destroy eip, we must unbind eip first, by ucloud cli
 resource "null_resource" "eip_destroy_helper" {
-  count = 3
+  count = var.internal_use ? 0 : 3
   depends_on = [ucloud_eip.broker_eip]
   provisioner "local-exec" {
     when = "destroy"
@@ -35,7 +35,7 @@ provider "consul" {
 }
 
 resource "consul_keys" "eip_public_ip" {
-  count = 3
+  count = var.internal_use ? 0 : 3
   key {
     path = "brokerEip/${local.broker_clusterId}/eip/${count.index}"
     value = ucloud_eip.broker_eip.*.public_ip[count.index]
@@ -44,7 +44,7 @@ resource "consul_keys" "eip_public_ip" {
 }
 
 resource "consul_keys" "eip_id" {
-  count = 3
+  count = var.internal_use ? 0 : 3
   key {
     path  = "brokerEip/${local.broker_clusterId}/eipId/${count.index}"
     value = ucloud_eip.broker_eip.*.id[count.index]
@@ -89,6 +89,7 @@ data "template_file" "broker-job" {
     region              = local.region
     ucloud_api_base_url = var.ucloud_api_base_url
     internal            = var.internal_use ? "yes" : ""
+    eip-count           = var.internal_use ? 0 : 1
   }
 }
 

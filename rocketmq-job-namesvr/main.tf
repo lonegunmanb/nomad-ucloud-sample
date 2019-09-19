@@ -18,6 +18,7 @@ provider "ucloud" {
 }
 
 resource ucloud_lb rocketMQLoadBalancer {
+  count = var.internal_use ? 0 : 1
   name = "RocketMQLb-${local.namesvr_clusterId}"
   tag = local.namesvr_clusterId
   internal = "false"
@@ -26,6 +27,7 @@ resource ucloud_lb rocketMQLoadBalancer {
 }
 
 resource ucloud_eip nameSvrLoadBalancer {
+  count = var.internal_use ? 0 : 1
   bandwidth            = 200
   charge_mode          = "traffic"
   name                 = "rocketmq-namesvr-lb-${local.namesvr_clusterId}"
@@ -34,19 +36,22 @@ resource ucloud_eip nameSvrLoadBalancer {
 }
 
 resource ucloud_eip_association rocketMQLoadBalancer {
-  resource_id   = ucloud_lb.rocketMQLoadBalancer.id
-  eip_id        = ucloud_eip.nameSvrLoadBalancer.id
+  count = var.internal_use ? 0 : 1
+  resource_id   = ucloud_lb.rocketMQLoadBalancer.*.id[0]
+  eip_id        = ucloud_eip.nameSvrLoadBalancer.*.id[0]
 }
 
 resource ucloud_lb_listener nameServerListener {
-  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.id
+  count = var.internal_use ? 0 : 1
+  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.*.id[0]
   protocol         = "tcp"
   listen_type      = "request_proxy"
   port             = 9876
 }
 
 resource ucloud_lb_listener consoleListener {
-  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.id
+  count = var.internal_use ? 0 : 1
+  load_balancer_id = ucloud_lb.rocketMQLoadBalancer.*.id[0]
   protocol         = "tcp"
   listen_type      = "request_proxy"
   port             = 8080
@@ -87,8 +92,8 @@ module "namesvr" {
   ucloud_secret              = var.ucloud_secret
   ucloud_api_base_url        = var.ucloud_api_base_url
   projectId                  = data.terraform_remote_state.nomad.outputs.projectId
-  load_balancer_id           = ucloud_lb.rocketMQLoadBalancer.id
-  nameServerListenerId       = ucloud_lb_listener.nameServerListener.id
+  load_balancer_id           = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.id
+  nameServerListenerId       = var.internal_use ? "" : ucloud_lb_listener.nameServerListener.id
   golang-image               = var.golang-image
 }
 
@@ -103,7 +108,7 @@ module "console" {
   ucloud_pub_key      = var.ucloud_pubkey
   ucloud_secret       = var.ucloud_secret
   terraform-image     = var.terraform-image
-  load_balancer_id    = ucloud_lb.rocketMQLoadBalancer.id
-  consoleListenerId   = ucloud_lb_listener.consoleListener.id
-  openWebConsole      = true
+  load_balancer_id    = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.id
+  consoleListenerId   = var.internal_use ? "" : ucloud_lb_listener.consoleListener.id
+  openWebConsole      = !var.internal_use
 }

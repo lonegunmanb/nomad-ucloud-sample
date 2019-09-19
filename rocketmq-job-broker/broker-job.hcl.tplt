@@ -177,6 +177,7 @@ EOF
             }
 
             resource "ucloud_eip_association" "association-{{ env "NOMAD_ALLOC_INDEX" }}" {
+              count = ${eip-count}
               {{$allocId := env "NOMAD_ALLOC_INDEX"}}
               eip_id      = "{{key (printf "brokerEip/${cluster-id}/eipId/%s" $allocId)}}"
               resource_id = "{{env "node.unique.name"}}"
