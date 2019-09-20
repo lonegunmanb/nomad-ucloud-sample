@@ -133,9 +133,6 @@ resource "null_resource" "ensoure_consul_ready" {
     ucloud_instance.consul_server,
     null_resource.install_consul_server
   ]
-  triggers = {
-    rand_id = uuid()
-  }
   provisioner "remote-exec" {
     connection {
       type     = "ssh"
