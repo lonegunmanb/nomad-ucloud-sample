@@ -127,6 +127,28 @@ resource "null_resource" "install_consul_server" {
   }
 }
 
+resource "null_resource" "ensoure_consul_ready" {
+  count      = local.instance_count
+  depends_on = [
+    ucloud_instance.consul_server,
+    null_resource.install_consul_server
+  ]
+  triggers = {
+    rand_id = uuid()
+  }
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = local.server_ips[count.index]
+    }
+    inline = [
+      file("${path.module}/ensure_consul_ready.sh")
+    ]
+  }
+}
+
 data "null_data_source" "finish_signal" {
   depends_on = [null_resource.install_consul_server]
   inputs = {
