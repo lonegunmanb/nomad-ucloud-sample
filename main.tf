@@ -202,19 +202,3 @@ resource "null_resource" "setup_loopback_for_internal_lb" {
     ]
   }
 }
-
-resource "null_resource" "ensure_nomad_ready" {
-  depends_on = [null_resource.setup_loopback_for_internal_lb, module.nomad_servers.finish_signal]
-  count = var.nomad_server_count
-  provisioner "remote-exec" {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.nomad_server_root_password
-      host     = module.nomad_servers.ssh_ip[count.index]
-    }
-    inline = [
-      file("./ensure_nomad_ready.sh")
-    ]
-  }
-}

@@ -121,6 +121,7 @@ resource "null_resource" "setup" {
       data.template_file.setup-script[count.index].rendered,
       module.nomad_server_lb.setup_loopback_script,
       local.reconfig-ssh-keys-script,
+      file("${path.module}/ensure_nomad_ready.sh")
     ]
   }
 }
