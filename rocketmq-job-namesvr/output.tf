@@ -1,3 +1,3 @@
 output "nameSvrLbIp" {
-  value = ucloud_eip.nameSvrLoadBalancer.public_ip
+  value = length(ucloud_eip.nameSvrLoadBalancer.*.public_ip) == 0 ? "" : ucloud_eip.nameSvrLoadBalancer.*.public_ip[0]
 }

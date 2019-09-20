@@ -92,9 +92,10 @@ module "namesvr" {
   ucloud_secret              = var.ucloud_secret
   ucloud_api_base_url        = var.ucloud_api_base_url
   projectId                  = data.terraform_remote_state.nomad.outputs.projectId
-  load_balancer_id           = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.id
-  nameServerListenerId       = var.internal_use ? "" : ucloud_lb_listener.nameServerListener.id
+  load_balancer_id           = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.*.id[0]
+  nameServerListenerId       = var.internal_use ? "" : ucloud_lb_listener.nameServerListener.*.id[0]
   golang-image               = var.golang-image
+  internal_use               = var.internal_use
 }
 
 module "console" {
@@ -108,7 +109,7 @@ module "console" {
   ucloud_pub_key      = var.ucloud_pubkey
   ucloud_secret       = var.ucloud_secret
   terraform-image     = var.terraform-image
-  load_balancer_id    = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.id
-  consoleListenerId   = var.internal_use ? "" : ucloud_lb_listener.consoleListener.id
+  load_balancer_id    = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.*.id[0]
+  consoleListenerId   = var.internal_use ? "" : ucloud_lb_listener.consoleListener.*.id[0]
   openWebConsole      = !var.internal_use
 }
