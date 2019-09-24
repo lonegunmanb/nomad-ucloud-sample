@@ -1,6 +1,9 @@
 variable "nomad_cluster_id" {}
 variable "remote_state_backend_url" {}
 variable "root_password" {}
+variable "mod" {
+  type = number
+}
 locals {
   remote_state = var.nomad_cluster_id == "" ? "rktClusterState" : "rktClusterState-env:${var.nomad_cluster_id}"
 }
@@ -18,4 +21,6 @@ module "rolling_update" {
   nomad_client_ips = data.terraform_remote_state.nomad.outputs.nomad_broker_ssh_ips
   module = "module.broker"
   root_password = var.root_password
+  mod = var.mod
+  az = data.terraform_remote_state.nomad.outputs.az
 }
