@@ -36,8 +36,7 @@ resource "null_resource" "update" {
       host     = var.nomad_client_ips[count.index]
     }
     inline = [
-      "echo stop drain node",
-      "nomad node drain -self -disable"
+      file("${path.module}/unset_drain.sh")
     ]
   }
 }
