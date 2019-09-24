@@ -74,6 +74,10 @@ output "nomad_server_access_url" {
   value = length(local.nomad_server_access_ip) > 15 ? "http://[${local.nomad_server_access_ip}]:4646" : "http://${local.nomad_server_access_ip}:4646"
 }
 
+output "nomad_broker_ssh_ips" {
+  value = module.broker.ssh_ip
+}
+
 output "nomad_broker_public_ips" {
   value = module.broker.public_ips
 }
@@ -84,6 +88,10 @@ output "nomad_broker_private_ips" {
 
 output "nomad_broker_ids" {
   value = module.broker.ids
+}
+
+output "nomad_namesvr_ssh_ips" {
+  value = module.nameServer.ssh_ip
 }
 
 output "nomad_namesvr_public_ips" {
