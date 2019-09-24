@@ -16,6 +16,6 @@ data terraform_remote_state nomad {
 module "rolling_update" {
   source = "../nomad-client"
   nomad_client_ips = data.terraform_remote_state.nomad.outputs.nomad_namesvr_ssh_ips
-  resource = "module.nameServer.ucloud_instance.nomad_clients"
+  module = "module.nameServer"
   root_password = var.root_password
 }
