@@ -1,3 +1,9 @@
+if [ ! -d "/plugin" ]; then
+  terraform init
+else
+  terraform init -plugin-dir=/plugin
+fi
+
 if [ ! -f "/backend/remote.tfvars" ]; then
   terraform apply --auto-approve -parallelism=1 -input=false
 else
