@@ -10,6 +10,7 @@ variable "mod" {
 variable "az" {
   type = list(string)
 }
+variable "remote_state_backend_url" {}
 locals {
   target = {for i, ip in var.nomad_client_ips: i => ip if i % length(var.az) == var.mod}
 }
@@ -41,7 +42,7 @@ resource "null_resource" "update" {
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../../"
-    command = "terraform apply --auto-approve -target=${var.module}.ucloud_instance.nomad_clients[${each.key}] -target=${var.module}.ucloud_disk_attachment.disk_attachment[${each.key}] -target=${var.module}.ucloud_eip_association.nomad_ip[${each.key}] -target=${var.module}.null_resource.setup[${each.key}]"
+    command = "terraform apply --auto-approve -target=${var.module}.ucloud_instance.nomad_clients[${each.key}] -target=${var.module}.ucloud_disk_attachment.disk_attachment[${each.key}] -target=${var.module}.ucloud_eip_association.nomad_ip[${each.key}] -target=${var.module}.null_resource.setup[${each.key}] -var 'remote_state_backend_url=${var.remote_state_backend_url}'"
   }
   provisioner "remote-exec" {
     connection {

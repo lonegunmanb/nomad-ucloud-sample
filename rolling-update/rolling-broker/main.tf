@@ -23,4 +23,5 @@ module "rolling_update" {
   root_password = var.root_password
   mod = var.mod
   az = data.terraform_remote_state.nomad.outputs.az
+  remote_state_backend_url = var.remote_state_backend_url
 }
