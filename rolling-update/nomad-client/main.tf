@@ -42,17 +42,10 @@ resource "null_resource" "update" {
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../../"
-    command = "terraform apply --auto-approve -target=${var.module}.ucloud_instance.nomad_clients[${each.key}] -target=${var.module}.ucloud_disk_attachment.disk_attachment[${each.key}] -target=${var.module}.ucloud_eip_association.nomad_ip[${each.key}] -target=${var.module}.null_resource.setup[${each.key}] -var 'remote_state_backend_url=${var.remote_state_backend_url}'"
+    command = "terraform taint ${var.module}.ucloud_eip.nomad_clients[${each.key}]"
   }
-  provisioner "remote-exec" {
-    connection {
-      type     = "ssh"
-      user     = "root"
-      password = var.root_password
-      host     = each.value
-    }
-    inline = [
-      file("${path.module}/ensure_nomad_ready.sh")
-    ]
+  provisioner "local-exec" {
+    working_dir = "${path.module}/../../"
+    command = "terraform apply --auto-approve -target=${var.module}.ucloud_instance.nomad_clients[${each.key}] -target=${var.module}.ucloud_disk_attachment.disk_attachment[${each.key}] -target=${var.module}.ucloud_eip.nomad_clients[${each.key}] -target=${var.module}.ucloud_eip_association.nomad_ip[${each.key}] -target=${var.module}.null_resource.setup[${each.key}] -var 'remote_state_backend_url=${var.remote_state_backend_url}'"
   }
 }
