@@ -67,23 +67,23 @@ locals {
   reconfig-ssh-keys-script = file("${path.module}/reconfig_ssh_keys.sh")
 }
 
-module ipv6 {
-  source         = "../ipv6"
-  api_server_url = var.ipv6_server_url
-  region_id      = var.region_id
-  resourceIds    = ucloud_instance.nomad_clients.*.id
-  disable        = var.env_name != "public"
-}
-//data "external" "ipv6" {
-//  depends_on = [ucloud_instance.nomad_clients]
-//  count = var.env_name != "public" ? 0 : length(ucloud_instance.nomad_clients.*.id)
-//  program = ["python", "${path.module}/ipv6.py"]
-//  query = {
-//    url = var.ipv6_server_url
-//    resourceId = ucloud_instance.nomad_clients.*.id[count.index]
-//    regionId = var.region_id
-//  }
+//module ipv6 {
+//  source         = "../ipv6"
+//  api_server_url = var.ipv6_server_url
+//  region_id      = var.region_id
+//  resourceIds    = ucloud_instance.nomad_clients.*.id
+//  disable        = var.env_name != "public"
 //}
+data "external" "ipv6" {
+  depends_on = [ucloud_instance.nomad_clients]
+  count = var.env_name != "public" ? 0 : length(ucloud_instance.nomad_clients.*.id)
+  program = ["python", "${path.module}/ipv6.py"]
+  query = {
+    url = var.ipv6_server_url
+    resourceId = ucloud_instance.nomad_clients.*.id[count.index]
+    regionId = var.region_id
+  }
+}
 //data "external" "ipv6" {
 //  depends_on = [ucloud_instance.nomad_clients, ucloud_eip.nomad_clients]
 //  count = length(ucloud_instance.nomad_clients.*.id)
@@ -123,15 +123,15 @@ resource "null_resource" "setup" {
     ucloud_eip_association.nomad_ip,
     ucloud_disk_attachment.disk_attachment,
     ucloud_eip.nomad_clients,
-//    data.external.ipv6
+    data.external.ipv6
   ]
   provisioner "remote-exec" {
     connection {
       type     = "ssh"
       user     = "root"
       password = var.root_password
-      host     = module.ipv6.ipv6s[count.index]
-//      host     = data.external.ipv6.*.result[count.index]["ip"]
+//      host     = module.ipv6.ipv6s[count.index]
+      host     = data.external.ipv6.*.result[count.index]["ip"]
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
