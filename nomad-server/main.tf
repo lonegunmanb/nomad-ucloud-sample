@@ -67,16 +67,19 @@ locals {
   reconfig-ssh-keys-script      = file(local.reconfig-ssh-keys-script-path)
 }
 
-module ipv6 {
-  source         = "../ipv6"
-  api_server_url = var.ipv6_server_url
-  region_id      = var.region_id
-  resourceIds    = ucloud_instance.nomad_servers.*.id
-  disable        = var.env_name != "public"
+data "external" "ipv6" {
+  depends_on = [ucloud_instance.nomad_servers]
+  count = var.env_name != "public" ? 0 : length(ucloud_instance.nomad_servers.*.id)
+  program = ["python", "${path.module}/ipv6.py"]
+  query = {
+    url = var.ipv6_server_url
+    resourceId = ucloud_instance.nomad_servers.*.id[count.index]
+    regionId = var.region_id
+  }
 }
 
 locals {
-  server_ips = var.env_name == "test" ? ucloud_eip.nomad_servers.*.public_ip : (var.env_name == "public" ? module.ipv6.ipv6s : ucloud_instance.nomad_servers.*.private_ip)
+  server_ips = var.env_name == "test" ? ucloud_eip.nomad_servers.*.public_ip : (var.env_name == "public" ? [for map in data.external.ipv6.*.result: map["ip"]] : ucloud_instance.nomad_servers.*.private_ip)
 }
 
 data "template_file" "setup-script" {

@@ -114,3 +114,6 @@ output "brokersvr_ids" {
   value = module.broker.ids
 }
 
+output "nomad_server_ssh_ips" {
+  value = module.nomad_servers.ssh_ip
+}
