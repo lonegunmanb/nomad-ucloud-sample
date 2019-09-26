@@ -87,6 +87,9 @@ variable controller_svc_port {
 variable controller_pod_port {
   type = number
 }
+variable controller_env_map {
+  type = map(string)
+}
 variable controller_image_repo {}
 variable controller_image_username {}
 variable controller_image_password {}

@@ -316,6 +316,13 @@ resource "kubernetes_deployment" "controller" {
               }
             }
           }
+          dynamic "env" {
+            for_each = var.controller_env_map
+            content {
+              name = env.key
+              value = env.value
+            }
+          }
           resources {
             limits {
               cpu    = var.controller_limit_cpu
