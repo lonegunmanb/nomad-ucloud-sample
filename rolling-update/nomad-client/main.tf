@@ -43,6 +43,7 @@ resource "null_resource" "update" {
   provisioner "local-exec" {
     working_dir = "${path.module}/../../"
     command = "terraform taint ${var.module}.ucloud_eip.nomad_clients[${each.key}]"
+    on_failure = "continue"
   }
   provisioner "local-exec" {
     working_dir = "${path.module}/../../"
