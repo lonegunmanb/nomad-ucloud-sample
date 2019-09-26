@@ -1,5 +1,9 @@
+if [ ! -d "project" ]; then
+  mkdir project
+fi
+
 if [ -d "/code/${project_dir}" ]; then
-  cp /code/${project_dir} /project/${project_dir}
+  cp -R /code/${project_dir} /project/${project_dir}
 fi
 
 cd /project

@@ -22,8 +22,9 @@ tar zxf ucloud-cli.tgz -C /usr/local/bin/
 
 rm -rf /tmp/*
 
-mkdir /code
-cd /code
-git clone ${CODE_GIT_URL}
-
+if [ ! -z ${CODE_GIT_URL} ]; then
+  mkdir /code
+  cd /code
+  git clone ${CODE_GIT_URL}
+fi
 sync
