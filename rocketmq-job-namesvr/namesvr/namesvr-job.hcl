@@ -5,11 +5,6 @@ job "${job-name}" {
     attribute = "$${node.class}"
     value = "${node-class}"
   }
-  constraint {
-    attribute = "$${meta.az}"
-    operator = "distinct_property"
-    value = "${task-limit-per-az}"
-  }
   task "namesvr-index" {
     driver = "docker"
     config {
@@ -62,6 +57,11 @@ job "${job-name}" {
     count = ${count}
     spread {
       attribute = "$${meta.az}"
+    }
+    constraint {
+      attribute = "$${meta.az}"
+      operator = "distinct_property"
+      value = "${task-limit-per-az}"
     }
     update {
       max_parallel = 1
