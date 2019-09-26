@@ -8,6 +8,7 @@ resource "null_resource" "controller_image_repo_secret" {
   provisioner "local-exec" {
     when = "destroy"
     command = "kubectl delete secret -n ${var.k8s_namespace} ${local.controller_image_repo_secret_name}"
+    on_failure = "continue"
   }
 }
 
