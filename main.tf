@@ -176,12 +176,16 @@ module "nameServerid" {
   input  = module.nameServer.ids
 }
 
+locals {
+  nameServerExposePots = [var.namesvr_http_endpoint_port, var.prometheus_port]
+}
+
 module "nameServerInternalLb" {
   source       = "./internal_lb"
   instance_ids = module.nameServerid.output
-  attachment_count = var.name_server_count
+  attachment_count = var.name_server_count * length(local.nameServerExposePots)
   name         = "nameServerInternalLb-${local.cluster_id}"
-  ports        = [var.namesvr_http_endpoint_port, var.prometheus_port]
+  ports        = local.nameServerExposePots
   vpc_id       = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id    = data.terraform_remote_state.network.outputs.clientSubnetId
   tag          = local.cluster_id
@@ -190,6 +194,9 @@ module "nameServerInternalLb" {
 resource "null_resource" "setup_loopback_for_internal_lb" {
   depends_on = [module.nameServer.finish_signal]
   count = var.name_server_count
+  triggers = {
+    ip = module.nameServer.ssh_ip[count.index]
+  }
   provisioner "remote-exec" {
       connection {
         type     = "ssh"
