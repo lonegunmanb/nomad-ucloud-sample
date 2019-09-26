@@ -138,7 +138,7 @@ job "${job-name}" {
       }
       resources {
         cpu = 100
-        memory = 50
+        memory = 200
       }
       template {
         data = <<EOF
