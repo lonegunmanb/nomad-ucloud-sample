@@ -41,11 +41,11 @@ if [ ! -f "terraform.tfvars" ]; then
   legacy_subnet_id = "${legacy_subnet_id}"
 EOF
 fi
-if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin
-  terraform apply --auto-approve -input=false
-  touch inited
-fi
+#if [ ! -f "inited" ]; then
+#  terraform init -plugin-dir=/plugin
+#  terraform apply --auto-approve -input=false
+#  touch inited
+#fi
 #give consul some time to be stablized
 sleep 10
 if [ ! -d "/backend" ]; then
@@ -117,58 +117,58 @@ if [ ! -f "../terraform.tfvars.json" ]; then
   }
 EOF
 fi
-if [ ! -f "../system-job/terraform.tfvars" ]; then
-  cat>../system-job/terraform.tfvars<<-EOF
-  fabio_image = "${fabio_image_id}"
-  prometheus_image = "${prometheus_image}"
-  namesvr_fabio_port = ${namesvr_http_endpoint_port}
-  prometheus_port = ${prometheus_port}
-  nomad_cluster_id = "${cluster_id}"
-EOF
-fi
-
-if [ ! -f "../rolling-update/rolling-broker/terraform.tfvars" ]; then
-  cat>../rolling-update/rolling-broker/terraform.tfvars<<-EOF
-  nomad_cluster_id = "${cluster_id}"
-  root_password = "${nomad_client_root_password}"
-  mod = 0
-EOF
-fi
-
-if [ ! -f "../rolling-update/rolling-namesvr/terraform.tfvars" ]; then
-  cat>../rolling-update/rolling-namesvr/terraform.tfvars<<-EOF
-  nomad_cluster_id = "${cluster_id}"
-  root_password = "${nomad_client_root_password}"
-  mod = 0
-EOF
-fi
-
-cd ../network
-rm -f destroyed
-if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
-  terraform workspace new ${cluster_id}
-  terraform workspace select ${cluster_id}
-  terraform apply --auto-approve -input=false
-  touch inited
-fi
-cd ..
-rm -f destroyed
-if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
-  terraform workspace new ${cluster_id}
-  terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
-  touch inited
-fi
-
-cd system-job
-rm -f destroyed
-if [ ! -f "inited" ]; then
-  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
-  terraform workspace new ${cluster_id}
-  terraform apply --auto-approve -input=false -var-file=terraform.tfvars
-  touch inited
-fi
+#if [ ! -f "../system-job/terraform.tfvars" ]; then
+#  cat>../system-job/terraform.tfvars<<-EOF
+#  fabio_image = "${fabio_image_id}"
+#  prometheus_image = "${prometheus_image}"
+#  namesvr_fabio_port = ${namesvr_http_endpoint_port}
+#  prometheus_port = ${prometheus_port}
+#  nomad_cluster_id = "${cluster_id}"
+#EOF
+#fi
+#
+#if [ ! -f "../rolling-update/rolling-broker/terraform.tfvars" ]; then
+#  cat>../rolling-update/rolling-broker/terraform.tfvars<<-EOF
+#  nomad_cluster_id = "${cluster_id}"
+#  root_password = "${nomad_client_root_password}"
+#  mod = 0
+#EOF
+#fi
+#
+#if [ ! -f "../rolling-update/rolling-namesvr/terraform.tfvars" ]; then
+#  cat>../rolling-update/rolling-namesvr/terraform.tfvars<<-EOF
+#  nomad_cluster_id = "${cluster_id}"
+#  root_password = "${nomad_client_root_password}"
+#  mod = 0
+#EOF
+#fi
+#
+#cd ../network
+#rm -f destroyed
+#if [ ! -f "inited" ]; then
+#  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+#  terraform workspace new ${cluster_id}
+#  terraform workspace select ${cluster_id}
+#  terraform apply --auto-approve -input=false
+#  touch inited
+#fi
+#cd ..
+#rm -f destroyed
+#if [ ! -f "inited" ]; then
+#  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+#  terraform workspace new ${cluster_id}
+#  terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
+#  touch inited
+#fi
+#
+#cd system-job
+#rm -f destroyed
+#if [ ! -f "inited" ]; then
+#  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+#  terraform workspace new ${cluster_id}
+#  terraform apply --auto-approve -input=false -var-file=terraform.tfvars
+#  touch inited
+#fi
 
 echo "Finished"
 tail -f /dev/null
