@@ -41,11 +41,11 @@ if [ ! -f "terraform.tfvars" ]; then
   legacy_subnet_id = "${legacy_subnet_id}"
 EOF
 fi
-#if [ ! -f "inited" ]; then
-#  terraform init -plugin-dir=/plugin
-#  terraform apply --auto-approve -input=false
-#  touch inited
-#fi
+if [ ! -f "inited" ]; then
+  terraform init -plugin-dir=/plugin
+  terraform apply --auto-approve -input=false
+  touch inited
+fi
 #give consul some time to be stablized
 sleep 10
 if [ ! -d "/backend" ]; then
@@ -142,24 +142,24 @@ fi
 #  mod = 0
 #EOF
 #fi
-#
-#cd ../network
-#rm -f destroyed
-#if [ ! -f "inited" ]; then
-#  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
-#  terraform workspace new ${cluster_id}
-#  terraform workspace select ${cluster_id}
-#  terraform apply --auto-approve -input=false
-#  touch inited
-#fi
-#cd ..
-#rm -f destroyed
-#if [ ! -f "inited" ]; then
-#  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
-#  terraform workspace new ${cluster_id}
+
+cd ../network
+rm -f destroyed
+if [ ! -f "inited" ]; then
+  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+  terraform workspace new ${cluster_id}
+  terraform workspace select ${cluster_id}
+  terraform apply --auto-approve -input=false
+  touch inited
+fi
+cd ..
+rm -f destroyed
+if [ ! -f "inited" ]; then
+  terraform init -plugin-dir=/plugin -backend-config=/backend/backend.tfvars -backend-config=/backend/remote.tfvars
+  terraform workspace new ${cluster_id}
 #  terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json
 #  touch inited
-#fi
+fi
 #
 #cd system-job
 #rm -f destroyed
