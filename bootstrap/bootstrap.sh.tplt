@@ -79,7 +79,7 @@ if [ ! -f "../terraform.tfvars.json" ]; then
       "nomad_client_broker_type": ${nomad_client_broker_type},
       "nomad_client_image_id": ${nomad_client_image_id},
       "nomad_client_namesvr_type": ${nomad_client_namesvr_type},
-      "nomad_client_root_password": "${nomad_client_root_password}",
+      "nomad_client_root_password": ${nomad_client_root_password},
       "nomad_server_image_id": "${nomad_server_image_id}",
       "nomad_server_root_password": "${nomad_server_root_password}",
       "nomad_server_type": "${nomad_server_type}",
