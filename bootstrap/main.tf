@@ -61,7 +61,7 @@ data "template_file" "bootstrap_script" {
     broker_count                    = local.broker_count
     name_server_count               = local.name_server_count
     nomad_server_count              = var.nomad_server_count
-    name_server_local_disk_type     = var.name_server_local_disk_type
+    name_server_local_disk_type     = local.name_server_local_disk_type
     name_server_udisk_type          = local.name_server_udisk_type
     name_server_data_disk_size      = local.name_server_data_disk_size
     broker_local_disk_type          = local.broker_local_disk_type
