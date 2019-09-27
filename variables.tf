@@ -5,6 +5,7 @@ variable "nomad_server_root_password" {
 }
 
 variable "nomad_client_root_password" {
+  type = list(string)
 }
 
 variable "ucloud_pub_key" {
@@ -24,7 +25,9 @@ variable "az" {
     "cn-bj2-04",
   ]
 }
-
+locals {
+  az = length(var.az) == 1 ? [for i in range(3): var.az[0]] : var.az
+}
 variable "project_id" {
 }
 
@@ -37,11 +40,11 @@ variable "nomad_server_type" {
 }
 
 variable "nomad_client_namesvr_type" {
-  default = "n-highmem-1"
+  type = list(string)
 }
 
 variable "nomad_client_broker_type" {
-  default = "n-highmem-1"
+  type = list(string)
 }
 
 variable "allow_ip" {
@@ -55,6 +58,7 @@ variable "nomad_server_image_id" {
 }
 
 variable "nomad_client_image_id" {
+  type = list(string)
 }
 
 locals  {
@@ -73,29 +77,47 @@ variable env_name {
 }
 variable ucloud_api_base_url {}
 variable broker_count {
-  type = number
+  type = list(number)
 }
 variable name_server_count {
-  type = number
+  type = list(number)
 }
 variable nomad_server_count {
   type = number
 }
-variable name_server_local_disk_type {}
-variable name_server_udisk_type {}
-variable name_server_data_disk_size {
-  type = number
+variable name_server_local_disk_type {
+  type = list(string)
 }
-variable broker_local_disk_type {}
-variable broker_udisk_type {}
+variable name_server_udisk_type {
+  type = list(string)
+}
+variable name_server_data_disk_size {
+  type = list(number)
+}
+variable broker_local_disk_type {
+  type = list(string)
+}
+variable broker_udisk_type {
+  type = list(string)
+}
 variable broker_data_disk_size {
-  type = number
+  type = list(number)
 }
 variable name_server_use_udisk {
-  type = bool
+  type = list(bool)
 }
 variable broker_use_udisk {
-  type = bool
+  type = list(bool)
+}
+locals {
+  name_server_local_disk_type = length(var.name_server_local_disk_type) == 1 ? [for i in range(3): var.name_server_local_disk_type[0]] : var.name_server_local_disk_type
+  name_server_udisk_type      = length(var.name_server_udisk_type) == 1 ? [for i in range(3):var.name_server_udisk_type[0]] : var.name_server_udisk_type
+  name_server_data_disk_size  = length(var.name_server_data_disk_size) == 1 ? [for i in range(3):var.name_server_data_disk_size[0]] : var.name_server_data_disk_size
+  broker_local_disk_type      = length(var.broker_local_disk_type) == 1 ? [for i in range(3):var.broker_local_disk_type[0]] : var.broker_local_disk_type
+  broker_udisk_type           = length(var.broker_udisk_type) == 1 ? [for i in range(3):var.broker_udisk_type[0]] : var.broker_udisk_type
+  broker_data_disk_size       = length(var.broker_data_disk_size) == 1 ? [for i in range(3):var.broker_data_disk_size[0]] : var.broker_data_disk_size
+  name_server_use_udisk       = length(var.name_server_use_udisk) == 1 ? [for i in range(3):var.name_server_use_udisk[0]] : var.name_server_use_udisk
+  broker_use_udisk            = length(var.broker_use_udisk) == 1 ? [for i in range(3):var.broker_use_udisk[0]] : var.broker_use_udisk
 }
 variable nomad_server_use_udisk {
   type = bool
@@ -121,10 +143,28 @@ variable prometheus_port {
   type = number
   default = 9090
 }
-variable charge_type {
+variable "consul_server_charge_type" {
   default = "dynamic"
 }
-variable duration {
-  type = number
+variable "consul_server_charge_duration" {
   default = 1
+}
+variable nomad_server_charge_type {
+  default = "dynamic"
+}
+variable "nomad_server_charge_duration" {
+  default = 1
+}
+variable client_charge_type {
+  type = list(string)
+  default = ["dynamic"]
+}
+variable client_charge_duration {
+  type = list(number)
+  default = [1]
+}
+
+locals {
+  client_charge_type = length(var.client_charge_type) == 1 ? [for i in range(3):var.client_charge_type[0]] : var.client_charge_type
+  client_charge_duration = length(var.client_charge_duration) == 1 ? [for i in range(3):var.client_charge_duration[0]] : var.client_charge_duration
 }

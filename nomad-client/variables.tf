@@ -1,10 +1,10 @@
 variable region {}
-variable ucloud_pub_key {}
-variable ucloud_secret {}
-variable project_id {}
-variable ucloud_api_base_url {}
+//variable ucloud_pub_key {}
+//variable ucloud_secret {}
+//variable project_id {}
+//variable ucloud_api_base_url {}
 variable az {
-  type = list(string)
+  type = string
 }
 variable root_password {}
 variable sg_id {}
@@ -40,4 +40,8 @@ variable charge_type {
 variable duration {
   default = 1
   type    = number
+}
+
+variable group {
+  type = string
 }

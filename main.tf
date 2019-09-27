@@ -58,7 +58,7 @@ module consul_servers {
   region              = var.region
   instance_type       = var.consul_server_type
   image_id            = var.consul_server_image_id
-  az                  = var.az
+  az                  = local.az
   cluster_id          = local.cluster_id
   sg_id               = ucloud_security_group.consul_server_sg.id
   root_password       = var.consul_server_root_password
@@ -75,14 +75,14 @@ module consul_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
-  charge_type         = var.charge_type
-  duration            = var.duration
+  charge_type         = var.consul_server_charge_type
+  duration            = var.consul_server_charge_duration
 }
 
 module nomad_servers {
   source              = "./nomad-server"
   region              = var.region
-  az                  = var.az
+  az                  = local.az
   cluster_id          = local.cluster_id
   image_id            = var.nomad_server_image_id
   instance_count      = var.nomad_server_count
@@ -103,28 +103,32 @@ module nomad_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
-  charge_type         = var.charge_type
-  duration            = var.duration
+  charge_type         = var.nomad_server_charge_type
+  duration            = var.nomad_server_charge_duration
 }
 
 locals {
   nameServerIdFile = "./nameServerId"
+  nomad_client_image_id = length(var.nomad_client_image_id) == 1 ? [for i in range(3): var.nomad_client_image_id[0]] : var.nomad_client_image_id
+  namesvr_instance_type = length(var.nomad_client_namesvr_type) == 1 ? [for i in range(3): var.nomad_client_namesvr_type[0]] : var.nomad_client_namesvr_type
+  broker_instance_type = length(var.nomad_client_broker_type) == 1 ? [for i in range(3): var.nomad_client_broker_type[0]] : var.nomad_client_broker_type
+  client_root_password = length(var.nomad_client_root_password) == 1 ? [for i in range(3): var.nomad_client_root_password[0]] : var.nomad_client_root_password
 }
 
-module nameServer {
+module nameServer0 {
   source                    = "./nomad-client"
-  az                        = var.az
+  az                        = local.az[0]
   cluster_id                = local.cluster_id
   consul_server_private_ips = module.consul_servers.private_ips
-  use_udisk                 = var.name_server_use_udisk
-  local_disk_type           = var.name_server_local_disk_type
-  udisk_type                = var.name_server_udisk_type
-  data_volume_size          = var.name_server_data_disk_size
-  image_id                  = var.nomad_client_image_id
-  instance_count            = var.name_server_count
-  instance_type             = var.nomad_client_namesvr_type
+  use_udisk                 = local.name_server_use_udisk[0]
+  local_disk_type           = local.name_server_local_disk_type[0]
+  udisk_type                = local.name_server_udisk_type[0]
+  data_volume_size          = local.name_server_data_disk_size[0]
+  image_id                  = local.nomad_client_image_id[0]
+  instance_count            = var.name_server_count[0]
+  instance_type             = local.namesvr_instance_type[0]
   region                    = var.region
-  root_password             = var.nomad_client_root_password
+  root_password             = local.client_root_password[0]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -132,29 +136,80 @@ module nameServer {
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id
   env_name                  = var.env_name
-  project_id                = var.project_id
-  ucloud_api_base_url       = var.ucloud_api_base_url
-  ucloud_pub_key            = var.ucloud_pub_key
-  ucloud_secret             = var.ucloud_secret
   consul_access_url         = local.consul_access_url
-  charge_type               = var.charge_type
-  duration                  = var.duration
+  charge_type               = local.client_charge_type[0]
+  duration                  = local.client_charge_duration[0]
+  group                     = "${local.az[0]}-0"
 }
 
-module broker {
+module nameServer1 {
   source                    = "./nomad-client"
-  az                        = var.az
+  az                        = local.az[1]
   cluster_id                = local.cluster_id
   consul_server_private_ips = module.consul_servers.private_ips
-  use_udisk                 = var.broker_use_udisk
-  local_disk_type           = var.broker_local_disk_type
-  udisk_type                = var.broker_udisk_type
-  data_volume_size          = var.broker_data_disk_size
-  image_id                  = var.nomad_client_image_id
-  instance_count            = var.broker_count
-  instance_type             = var.nomad_client_broker_type
+  use_udisk                 = local.name_server_use_udisk[1]
+  local_disk_type           = local.name_server_local_disk_type[1]
+  udisk_type                = local.name_server_udisk_type[1]
+  data_volume_size          = local.name_server_data_disk_size[1]
+  image_id                  = local.nomad_client_image_id[1]
+  instance_count            = var.name_server_count[1]
+  instance_type             = local.namesvr_instance_type[1]
   region                    = var.region
-  root_password             = var.nomad_client_root_password
+  root_password             = local.client_root_password[1]
+  sg_id                     = ucloud_security_group.consul_server_sg.id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
+  class                     = "nameServer"
+  ipv6_server_url           = var.ipv6_server_url
+  region_id                 = var.region_id
+  env_name                  = var.env_name
+  consul_access_url         = local.consul_access_url
+  charge_type               = local.client_charge_type[1]
+  duration                  = local.client_charge_duration[1]
+  group                     = "${local.az[1]}-1"
+}
+
+module nameServer2 {
+  source                    = "./nomad-client"
+  az                        = local.az[2]
+  cluster_id                = local.cluster_id
+  consul_server_private_ips = module.consul_servers.private_ips
+  use_udisk                 = local.name_server_use_udisk[2]
+  local_disk_type           = local.name_server_local_disk_type[2]
+  udisk_type                = local.name_server_udisk_type[2]
+  data_volume_size          = local.name_server_data_disk_size[2]
+  image_id                  = local.nomad_client_image_id[2]
+  instance_count            = var.name_server_count[2]
+  instance_type             = local.namesvr_instance_type[2]
+  region                    = var.region
+  root_password             = local.client_root_password[2]
+  sg_id                     = ucloud_security_group.consul_server_sg.id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
+  class                     = "nameServer"
+  ipv6_server_url           = var.ipv6_server_url
+  region_id                 = var.region_id
+  env_name                  = var.env_name
+  consul_access_url         = local.consul_access_url
+  charge_type               = local.client_charge_type[2]
+  duration                  = local.client_charge_duration[2]
+  group                     = "${local.az[2]}-2"
+}
+
+module broker0 {
+  source                    = "./nomad-client"
+  az                        = local.az[0]
+  cluster_id                = local.cluster_id
+  consul_server_private_ips = module.consul_servers.private_ips
+  use_udisk                 = local.broker_use_udisk[0]
+  local_disk_type           = local.broker_local_disk_type[0]
+  udisk_type                = local.broker_udisk_type[0]
+  data_volume_size          = local.broker_data_disk_size[0]
+  image_id                  = local.nomad_client_image_id[0]
+  instance_count            = var.broker_count[0]
+  instance_type             = local.broker_instance_type[0]
+  region                    = var.region
+  root_password             = local.client_root_password[0]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -162,28 +217,80 @@ module broker {
   ipv6_server_url           = var.ipv6_server_url
   region_id                 = var.region_id
   env_name                  = var.env_name
-  project_id                = var.project_id
-  ucloud_api_base_url       = var.ucloud_api_base_url
-  ucloud_pub_key            = var.ucloud_pub_key
-  ucloud_secret             = var.ucloud_secret
   consul_access_url         = local.consul_access_url
-  charge_type               = var.charge_type
-  duration                  = var.duration
+  charge_type               = local.client_charge_type[0]
+  duration                  = local.client_charge_duration[0]
+  group                     = "${local.az[0]}-0"
+}
+
+module broker1 {
+  source                    = "./nomad-client"
+  az                        = var.az[1]
+  cluster_id                = local.cluster_id
+  consul_server_private_ips = module.consul_servers.private_ips
+  use_udisk                 = local.broker_use_udisk[1]
+  local_disk_type           = local.broker_local_disk_type[1]
+  udisk_type                = local.broker_udisk_type[1]
+  data_volume_size          = local.broker_data_disk_size[1]
+  image_id                  = local.nomad_client_image_id[1]
+  instance_count            = var.broker_count[1]
+  instance_type             = local.broker_instance_type[1]
+  region                    = var.region
+  root_password             = local.client_root_password[1]
+  sg_id                     = ucloud_security_group.consul_server_sg.id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
+  class                     = "broker"
+  ipv6_server_url           = var.ipv6_server_url
+  region_id                 = var.region_id
+  env_name                  = var.env_name
+  consul_access_url         = local.consul_access_url
+  charge_type               = local.client_charge_type[1]
+  duration                  = local.client_charge_duration[1]
+  group                     = "${local.az[1]}-1"
+}
+
+module broker2 {
+  source                    = "./nomad-client"
+  az                        = var.az[2]
+  cluster_id                = local.cluster_id
+  consul_server_private_ips = module.consul_servers.private_ips
+  use_udisk                 = local.broker_use_udisk[2]
+  local_disk_type           = local.broker_local_disk_type[2]
+  udisk_type                = local.broker_udisk_type[2]
+  data_volume_size          = local.broker_data_disk_size[2]
+  image_id                  = local.nomad_client_image_id[2]
+  instance_count            = var.broker_count[2]
+  instance_type             = local.broker_instance_type[2]
+  region                    = var.region
+  root_password             = local.client_root_password[2]
+  sg_id                     = ucloud_security_group.consul_server_sg.id
+  vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
+  class                     = "broker"
+  ipv6_server_url           = var.ipv6_server_url
+  region_id                 = var.region_id
+  env_name                  = var.env_name
+  consul_access_url         = local.consul_access_url
+  charge_type               = local.client_charge_type[2]
+  duration                  = local.client_charge_duration[2]
+  group                     = "${local.az[2]}-2"
 }
 
 module "nameServerid" {
   source = "./module_variables"
-  input  = module.nameServer.ids
+  input  = concat(module.nameServer0.ids, module.nameServer1.ids, module.nameServer2.ids)//module.nameServer.ids
 }
 
 locals {
   nameServerExposePots = [var.namesvr_http_endpoint_port, var.prometheus_port]
+  total_name_server_count = length(flatten([for i in var.name_server_count:range(i)]))
 }
 
 module "nameServerInternalLb" {
   source       = "./internal_lb"
   instance_ids = module.nameServerid.output
-  attachment_count = var.name_server_count * length(local.nameServerExposePots)
+  attachment_count = local.total_name_server_count  * length(local.nameServerExposePots)
   name         = "nameServerInternalLb-${local.cluster_id}"
   ports        = local.nameServerExposePots
   vpc_id       = data.terraform_remote_state.network.outputs.clientVpcId
@@ -191,18 +298,26 @@ module "nameServerInternalLb" {
   tag          = local.cluster_id
 }
 
+locals {
+  nameServerSshIp = concat(module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip)
+}
+
+locals {
+  nameServerRootPasswords = concat([for i in range(var.name_server_count[0]):local.client_root_password[0]], [for i in range(var.name_server_count[1]):local.client_root_password[1]], [for i in range(var.name_server_count[2]):local.client_root_password[2]])
+}
+
 resource "null_resource" "setup_loopback_for_internal_lb" {
-  depends_on = [module.nameServer.finish_signal]
-  count = var.name_server_count
+  depends_on = [module.nameServer0.finish_signal]
+  count = var.name_server_count[0] + var.name_server_count[1] + var.name_server_count[2]
   triggers = {
-    ip = module.nameServer.ssh_ip[count.index]
+    ip = local.nameServerSshIp[count.index]
   }
   provisioner "remote-exec" {
       connection {
         type     = "ssh"
         user     = "root"
-        password = var.nomad_client_root_password
-        host     = module.nameServer.ssh_ip[count.index]
+        password = local.nameServerRootPasswords[count.index]
+        host     = local.nameServerSshIp[count.index]
       }
     inline = [
       module.nameServerInternalLb.setup_loopback_script

@@ -19,7 +19,7 @@ output "region" {
 }
 
 output "az" {
-  value = var.az
+  value = local.az
 }
 
 output "consul_servers_public_ips" {
@@ -75,43 +75,43 @@ output "nomad_server_access_url" {
 }
 
 output "nomad_broker_ssh_ips" {
-  value = module.broker.ssh_ip
+  value = concat(module.broker0.ssh_ip, module.broker1.ssh_ip, module.broker2.ssh_ip)
 }
 
 output "nomad_broker_public_ips" {
-  value = module.broker.public_ips
+  value = concat(module.broker0.public_ips, module.broker1.public_ips, module.broker2.public_ips)
 }
 
 output "nomad_broker_private_ips" {
-  value = module.broker.private_ips
+  value = concat(module.broker0.private_ips, module.broker1.private_ips, module.broker2.private_ips)
 }
 
 output "nomad_broker_ids" {
-  value = module.broker.ids
+  value = concat(module.broker0.ids, module.broker1.ids, module.broker2.ids)
 }
 
 output "nomad_namesvr_ssh_ips" {
-  value = module.nameServer.ssh_ip
+  value = concat(module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip)
 }
 
 output "nomad_namesvr_public_ips" {
-  value = module.nameServer.public_ips
+  value = concat(module.nameServer0.public_ips, module.nameServer1.public_ips, module.nameServer2.public_ips)
 }
 
 output "namesvr_private_ips" {
-  value = module.nameServer.private_ips
+  value = concat(module.nameServer0.private_ips, module.nameServer1.private_ips, module.nameServer2.private_ips)
 }
 
 output "namesvr_ids" {
-  value = module.nameServer.ids
+  value = concat(module.nameServer0.ids, module.nameServer1.ids, module.nameServer2.ids)
 }
 
 output "brokersvr_private_ips" {
-  value = module.broker.private_ips
+  value = concat(module.broker0.private_ips, module.broker1.private_ips, module.broker2.private_ips)
 }
 
 output "brokersvr_ids" {
-  value = module.broker.ids
+  value = concat(module.broker0.ids, module.broker1.ids, module.broker2.ids)
 }
 
 output "nomad_server_ssh_ips" {

@@ -1,16 +1,8 @@
-provider "ucloud" {
-  region      = var.region
-  public_key  = var.ucloud_pub_key
-  private_key = var.ucloud_secret
-  project_id  = var.project_id
-  base_url    = var.ucloud_api_base_url
-}
-
 resource "ucloud_instance" "nomad_clients" {
   count             = var.instance_count
-  name              = "nomad-client-${var.class}-${count.index}"
+  name              = "nomad-client-${var.class}-${var.group}-${count.index}"
   tag               = var.cluster_id
-  availability_zone = var.az[count.index % length(var.az)]
+  availability_zone = var.az
   image_id          = var.image_id
   instance_type     = var.instance_type
   root_password     = var.root_password
@@ -22,6 +14,7 @@ resource "ucloud_instance" "nomad_clients" {
   boot_disk_type    = var.use_udisk ? (var.udisk_type == "rssd_data_disk" ? "cloud_ssd" : "local_ssd") : var.local_disk_type
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
+  remark            = var.az
   provisioner "local-exec" {
     command = "sleep 10"
   }
@@ -29,8 +22,8 @@ resource "ucloud_instance" "nomad_clients" {
 
 resource "ucloud_disk" "data_disk" {
   count             = var.use_udisk && var.data_volume_size>0 ? var.instance_count : 0
-  name              = "nomad-${var.class}-data-${count.index}"
-  availability_zone = var.az[count.index % length(var.az)]
+  name              = "nomad-${var.class}-data-${var.group}-${count.index}"
+  availability_zone = var.az
   disk_type         = var.udisk_type
   disk_size         = var.data_volume_size
   charge_type       = var.charge_type
@@ -39,14 +32,14 @@ resource "ucloud_disk" "data_disk" {
 
 resource "ucloud_disk_attachment" "disk_attachment" {
   count             = var.use_udisk && var.data_volume_size>0 ? var.instance_count : 0
-  availability_zone = var.az[count.index % length(var.az)]
+  availability_zone = var.az
   disk_id           = ucloud_disk.data_disk.*.id[count.index]
   instance_id       = ucloud_instance.nomad_clients.*.id[count.index]
 }
 
 resource "ucloud_eip" "nomad_clients" {
   count         = var.env_name == "private" ? 0 : var.instance_count
-  name          = "nomad-client-${var.cluster_id}-${var.class}-${count.index}"
+  name          = "nomad-client-${var.cluster_id}-${var.class}-${var.group}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
@@ -56,7 +49,9 @@ resource "ucloud_eip" "nomad_clients" {
 }
 
 resource "ucloud_eip_association" "nomad_ip" {
-  depends_on = [ucloud_instance.nomad_clients, ucloud_eip.nomad_clients]
+  depends_on  = [
+    ucloud_instance.nomad_clients,
+    ucloud_eip.nomad_clients]
   count       = var.env_name == "private" ? 0 : var.instance_count
   eip_id      = ucloud_eip.nomad_clients.*.id[count.index]
   resource_id = ucloud_instance.nomad_clients.*.id[count.index]
@@ -68,13 +63,16 @@ locals {
 }
 
 data "external" "ipv6" {
-  depends_on = [ucloud_instance.nomad_clients]
-  count = var.env_name != "public" ? 0 : length(ucloud_instance.nomad_clients.*.id)
-  program = ["python", "${path.module}/ipv6.py"]
-  query = {
-    url = var.ipv6_server_url
+  depends_on = [
+    ucloud_instance.nomad_clients]
+  count      = var.env_name != "public" ? 0 : length(ucloud_instance.nomad_clients.*.id)
+  program    = [
+    "python",
+    "${path.module}/ipv6.py"]
+  query      = {
+    url        = var.ipv6_server_url
     resourceId = ucloud_instance.nomad_clients.*.id[count.index]
-    regionId = var.region_id
+    regionId   = var.region_id
   }
 }
 //data "external" "ipv6" {
@@ -90,18 +88,19 @@ locals {
 }
 
 data "template_file" "setup-script" {
-  depends_on = [ucloud_instance.nomad_clients]
+  depends_on = [
+    ucloud_instance.nomad_clients]
   count      = var.instance_count
   template   = file(local.setup-script-path)
   vars       = {
     region             = var.region
-    az                 = var.az[count.index % length(var.az)]
+    az                 = var.az
     node-name          = ucloud_instance.nomad_clients[count.index].id
     node-class         = var.class
     node-meta          = replace(
     <<EOF
                         meta {
-                          az = \"${var.az[count.index % length(var.az)]}\"
+                          az = \"${var.az}\"
                           eip = \"${length(ucloud_eip.nomad_clients.*.public_ip) > 0 ? ucloud_eip.nomad_clients.*.public_ip[count.index] : ""}\"
                           hostIp = \"${ucloud_instance.nomad_clients.*.private_ip[count.index]}\"
                         }
@@ -136,8 +135,10 @@ resource "null_resource" "setup" {
 }
 
 data "null_data_source" "finish_signal" {
-  depends_on = [null_resource.setup, ucloud_instance.nomad_clients]
-  inputs = {
+  depends_on = [
+    null_resource.setup,
+    ucloud_instance.nomad_clients]
+  inputs     = {
     signal = "finish"
   }
 }
