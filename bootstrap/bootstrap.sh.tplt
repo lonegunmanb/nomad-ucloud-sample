@@ -35,8 +35,8 @@ if [ ! -f "terraform.tfvars" ]; then
   ipv6_api_url = "${ipv6_api_url}"
   controller_count = 0
   provision_from_kun = true
-  charge_type = "${charge_type}"
-  duration = ${duration}
+  charge_type = "${consul_server_charge_type}"
+  duration = ${consul_server_charge_duration}
   legacy_vpc_id = "${legacy_vpc_id}"
   legacy_subnet_id = "${legacy_subnet_id}"
 EOF
