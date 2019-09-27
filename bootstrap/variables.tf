@@ -37,10 +37,10 @@ variable nomad_client_root_password {
   type = list(string)
 }
 variable broker_count {
-  type = number
+  type = list(number)
 }
 variable name_server_count {
-  type = number
+  type = list(number)
 }
 variable nomad_server_count {
   type = number
