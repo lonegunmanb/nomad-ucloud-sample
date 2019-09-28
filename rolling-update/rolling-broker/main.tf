@@ -18,8 +18,8 @@ data terraform_remote_state nomad {
 
 module "rolling_update" {
   source = "../nomad-client"
-  nomad_client_ips = data.terraform_remote_state.nomad.outputs.nomad_broker_ssh_ips
-  module = "module.broker"
+  nomad_client_ips = data.terraform_remote_state.nomad.outputs.nomad_broker_ssh_ip_array[var.mod]
+  module = "broker"
   root_password = var.root_password
   mod = var.mod
   az = data.terraform_remote_state.nomad.outputs.az

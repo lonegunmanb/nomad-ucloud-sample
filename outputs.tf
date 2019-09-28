@@ -78,6 +78,10 @@ output "nomad_broker_ssh_ips" {
   value = concat(module.broker0.ssh_ip, module.broker1.ssh_ip, module.broker2.ssh_ip)
 }
 
+output "nomad_broker_ssh_ip_array" {
+  value = [module.broker0.ssh_ip, module.broker1.ssh_ip, module.broker2.ssh_ip]
+}
+
 output "nomad_broker_public_ips" {
   value = concat(module.broker0.public_ips, module.broker1.public_ips, module.broker2.public_ips)
 }
@@ -92,6 +96,10 @@ output "nomad_broker_ids" {
 
 output "nomad_namesvr_ssh_ips" {
   value = concat(module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip)
+}
+
+output "nomad_namesvr_ssh_ip_array" {
+  value = [module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip]
 }
 
 output "nomad_namesvr_public_ips" {
