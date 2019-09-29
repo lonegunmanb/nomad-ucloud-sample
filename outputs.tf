@@ -39,8 +39,8 @@ module "consul_access_ipv6" {
 }
 
 locals {
-  nomad_server_public_ips = concat(module.nomad_servers0.public_ips, module.nomad_servers1.public_ips, module.nomad_servers2.public_ips)
-  nomad_server_ssh_ips = concat(module.nomad_servers0.ssh_ip, module.nomad_servers1.ssh_ip, module.nomad_servers2.ssh_ip)
+  nomad_server_public_ips = concat(module.nomad_server0.public_ips, module.nomad_server1.public_ips, module.nomad_server2.public_ips)
+  nomad_server_ssh_ips = concat(module.nomad_server0.ssh_ip, module.nomad_server1.ssh_ip, module.nomad_server2.ssh_ip)
   nomad_server_ips  = var.env_name == "test" ? local.nomad_server_public_ips : (var.env_name == "public" ? module.nomad_lb_ipv6.ipv6s : local.nomad_server_public_ips)
   nomad_server_access_ip = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
   consul_server_ips = var.env_name == "test" ? module.consul_servers.public_ips : (var.env_name == "public" ? module.consul_access_ipv6.ipv6s : module.consul_servers.private_ips)
@@ -126,4 +126,8 @@ output "brokersvr_ids" {
 
 output "nomad_server_ssh_ips" {
   value = local.nomad_server_ssh_ips
+}
+
+output "nomad_server_ssh_ip_array" {
+  value = [module.nomad_server0.ssh_ip, module.nomad_server1.ssh_ip, module.nomad_server2.ssh_ip]
 }

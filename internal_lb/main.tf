@@ -34,7 +34,8 @@ resource "ucloud_lb_attachment" "attachment" {
   lifecycle {
     ignore_changes = [
       listener_id,
-      resource_id
+      resource_id,
+      port
     ]
   }
 }

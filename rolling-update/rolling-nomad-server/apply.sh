@@ -1,6 +1,8 @@
 if [ ! -d "/plugin" ]; then
+  echo terraform init
   terraform init
 else
+  echo terraform init -plugin-dir=/plugin
   terraform init -plugin-dir=/plugin
 fi
 

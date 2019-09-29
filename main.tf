@@ -96,14 +96,14 @@ locals {
   nomad_port = 4646
 }
 
-resource ucloud_lb_listener nomad_server_lb_listener {
+resource ucloud_lb_listener nomad_server_4646_listener {
   load_balancer_id = ucloud_lb.nomad_server_lb.id
   protocol = "tcp"
   name = "nomad_4646"
   port = local.nomad_port
 }
 
-module nomad_servers0 {
+module nomad_server0 {
   source                      = "./nomad-server"
   region                      = var.region
   az                          = local.az[0]
@@ -126,13 +126,12 @@ module nomad_servers0 {
   charge_type                 = local.nomad_server_charge_type[0]
   duration                    = local.nomad_server_charge_duration[0]
   group                       = "${local.az[0]}-0"
-  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
-  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_4646_listener_id = ucloud_lb_listener.nomad_server_4646_listener.id
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
 }
 
-module nomad_servers1 {
+module nomad_server1 {
   source                      = "./nomad-server"
   region                      = var.region
   az                          = local.az[1]
@@ -155,13 +154,12 @@ module nomad_servers1 {
   charge_type                 = local.nomad_server_charge_type[1]
   duration                    = local.nomad_server_charge_duration[1]
   group                       = "${local.az[1]}-1"
-  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
-  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_4646_listener_id = ucloud_lb_listener.nomad_server_4646_listener.id
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
 }
 
-module nomad_servers2 {
+module nomad_server2 {
   source                      = "./nomad-server"
   region                      = var.region
   az                          = local.az[2]
@@ -184,9 +182,8 @@ module nomad_servers2 {
   charge_type                 = local.nomad_server_charge_type[2]
   duration                    = local.nomad_server_charge_duration[2]
   group                       = "${local.az[2]}-2"
-  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
-  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_4646_listener_id = ucloud_lb_listener.nomad_server_4646_listener.id
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
 }
 
@@ -383,9 +380,6 @@ module "nameServerInternalLb" {
 
 locals {
   nameServerSshIp = concat(module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip)
-}
-
-locals {
   nameServerRootPasswords = concat([for i in range(var.name_server_count[0]):local.client_root_password[0]], [for i in range(var.name_server_count[1]):local.client_root_password[1]], [for i in range(var.name_server_count[2]):local.client_root_password[2]])
 }
 

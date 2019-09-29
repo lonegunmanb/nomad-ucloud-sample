@@ -1,0 +1,8 @@
+touch /etc/sysconfig/network-scripts/ifcfg-${device}
+cat > /etc/sysconfig/network-scripts/ifcfg-${device} <<EOF
+DEVICE=${device}
+IPADDR=${vip}
+NETMASK=255.255.255.255
+ONBOOT=yes
+EOF
+ifup ${device}

@@ -40,9 +40,6 @@ variable nomad_server_lb_id {
 variable nomad_server_lb_private_ip {
   type = string
 }
-variable nomad_server_lb_listener_id {
-  type = list(string)
-}
-variable nomad_port {
-  type = list(number)
+variable nomad_server_4646_listener_id {
+  type = string
 }

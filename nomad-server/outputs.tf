@@ -6,14 +6,6 @@ output "private_ips" {
   value = ucloud_instance.nomad_servers.*.private_ip
 }
 
-output "lb_id" {
-  value = module.nomad_server_lb.lb_id
-}
-
-output "lb_ip" {
-  value = module.nomad_server_lb.lb_ip
-}
-
 output "ssh_ip" {
   value = local.server_ips
 }

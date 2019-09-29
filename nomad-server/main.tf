@@ -89,18 +89,20 @@ data "template_file" "setup-script" {
   }
 }
 
-module "nomad_server_lb" {
-  source               = "../internal_lb"
-  instance_ids         = ucloud_instance.nomad_servers.*.id
-  name                 = "nomadServerLb-${var.cluster_id}"
-  ports                = var.nomad_port
-  subnet_id            = var.subnet_id
-  tag                  = var.cluster_id
-  vpc_id               = var.vpc_id
-  attachment_only      = true
-  legacy_lb_id         = var.nomad_server_lb_id
-  legacy_listener_id   = var.nomad_server_lb_listener_id
-  legacy_lb_private_ip = var.nomad_server_lb_private_ip
+data "template_file" "add-loopback-script" {
+  template = file("${path.module}/add-loopback.sh.tplt")
+  vars     = {
+    vip    = var.nomad_server_lb_private_ip
+    device = "lo:1"
+  }
+}
+
+resource "ucloud_lb_attachment" "attachment" {
+  count            = var.instance_count
+  load_balancer_id = var.nomad_server_lb_id
+  resource_id      = ucloud_instance.nomad_servers.*.id[count.index]
+  port             = 4646
+  listener_id      = var.nomad_server_4646_listener_id
 }
 
 resource "null_resource" "setup" {
@@ -118,7 +120,7 @@ resource "null_resource" "setup" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      module.nomad_server_lb.setup_loopback_script,
+      data.template_file.add-loopback-script.rendered,
       local.reconfig-ssh-keys-script,
       file("${path.module}/ensure_nomad_ready.sh")
     ]
