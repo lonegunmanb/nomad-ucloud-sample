@@ -85,7 +85,7 @@ locals {
   nomad_server_udisk_type      = format("[%s]", join(", ", [for type in var.nomad_server_udisk_type: format("\"%s\"", type)]))
   nomad_server_data_disk_size  = format("[%s]", join(", ", [for size in var.nomad_server_data_disk_size: format("\"%d\"", size)]))
   nomad_server_count           = format("[%s]", join(", ", [for count in var.nomad_server_count: format("\"%d\"", count)]))
-  nomad_server_charge_type     = format("[%s]", join(", ", [for type in var.nomad_server_charge_type: format("\"%d\"", type)]))
+  nomad_server_charge_type     = format("[%s]", join(", ", [for type in var.nomad_server_charge_type: format("\"%s\"", type)]))
   nomad_server_charge_duration = format("[%s]", join(", ", [for d in var.nomad_server_charge_duration: format("\"%d\"", d)]))
   nomad_client_image_id        = format("[%s]", join(", ", [for id in var.nomad_client_image_id: format("\"%s\"", id)]))
   nomad_client_namesvr_type    = format("[%s]", join(", ", [for type in var.nomad_client_namesvr_type: format("\"%s\"", type)]))
@@ -139,6 +139,7 @@ variable controller_pod_port {
 }
 variable controller_env_map {
   type = map(string)
+  default = {}
 }
 variable controller_image_repo {}
 variable controller_image_username {}
