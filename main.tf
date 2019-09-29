@@ -189,7 +189,8 @@ module nomad_server2 {
 
 locals {
   nameServerIdFile = "./nameServerId"
-  nomad_client_image_id = length(var.nomad_client_image_id) == 1 ? [for i in range(3): var.nomad_client_image_id[0]] : var.nomad_client_image_id
+  nomad_client_broker_image_id = length(var.nomad_client_broker_image_id) == 1 ? [for i in range(3): var.nomad_client_broker_image_id[0]] : var.nomad_client_broker_image_id
+  nomad_client_namesvr_image_id = length(var.nomad_client_namesvr_image_id) == 1 ? [for i in range(3): var.nomad_client_namesvr_image_id[0]] : var.nomad_client_namesvr_image_id
   namesvr_instance_type = length(var.nomad_client_namesvr_type) == 1 ? [for i in range(3): var.nomad_client_namesvr_type[0]] : var.nomad_client_namesvr_type
   broker_instance_type = length(var.nomad_client_broker_type) == 1 ? [for i in range(3): var.nomad_client_broker_type[0]] : var.nomad_client_broker_type
   client_root_password = length(var.nomad_client_root_password) == 1 ? [for i in range(3): var.nomad_client_root_password[0]] : var.nomad_client_root_password
@@ -204,7 +205,7 @@ module nameServer0 {
   local_disk_type           = local.name_server_local_disk_type[0]
   udisk_type                = local.name_server_udisk_type[0]
   data_volume_size          = local.name_server_data_disk_size[0]
-  image_id                  = local.nomad_client_image_id[0]
+  image_id                  = local.nomad_client_namesvr_image_id[0]
   instance_count            = var.name_server_count[0]
   instance_type             = local.namesvr_instance_type[0]
   region                    = var.region
@@ -231,7 +232,7 @@ module nameServer1 {
   local_disk_type           = local.name_server_local_disk_type[1]
   udisk_type                = local.name_server_udisk_type[1]
   data_volume_size          = local.name_server_data_disk_size[1]
-  image_id                  = local.nomad_client_image_id[1]
+  image_id                  = local.nomad_client_namesvr_image_id[1]
   instance_count            = var.name_server_count[1]
   instance_type             = local.namesvr_instance_type[1]
   region                    = var.region
@@ -258,7 +259,7 @@ module nameServer2 {
   local_disk_type           = local.name_server_local_disk_type[2]
   udisk_type                = local.name_server_udisk_type[2]
   data_volume_size          = local.name_server_data_disk_size[2]
-  image_id                  = local.nomad_client_image_id[2]
+  image_id                  = local.nomad_client_namesvr_image_id[2]
   instance_count            = var.name_server_count[2]
   instance_type             = local.namesvr_instance_type[2]
   region                    = var.region
@@ -285,7 +286,7 @@ module broker0 {
   local_disk_type           = local.broker_local_disk_type[0]
   udisk_type                = local.broker_udisk_type[0]
   data_volume_size          = local.broker_data_disk_size[0]
-  image_id                  = local.nomad_client_image_id[0]
+  image_id                  = local.nomad_client_broker_image_id[0]
   instance_count            = var.broker_count[0]
   instance_type             = local.broker_instance_type[0]
   region                    = var.region
@@ -312,7 +313,7 @@ module broker1 {
   local_disk_type           = local.broker_local_disk_type[1]
   udisk_type                = local.broker_udisk_type[1]
   data_volume_size          = local.broker_data_disk_size[1]
-  image_id                  = local.nomad_client_image_id[1]
+  image_id                  = local.nomad_client_broker_image_id[1]
   instance_count            = var.broker_count[1]
   instance_type             = local.broker_instance_type[1]
   region                    = var.region
@@ -339,7 +340,7 @@ module broker2 {
   local_disk_type           = local.broker_local_disk_type[2]
   udisk_type                = local.broker_udisk_type[2]
   data_volume_size          = local.broker_data_disk_size[2]
-  image_id                  = local.nomad_client_image_id[2]
+  image_id                  = local.nomad_client_broker_image_id[2]
   instance_count            = var.broker_count[2]
   instance_type             = local.broker_instance_type[2]
   region                    = var.region

@@ -95,7 +95,11 @@ variable "allow_ip" {
 variable "consul_server_image_id" {
 }
 
-variable "nomad_client_image_id" {
+variable "nomad_client_broker_image_id" {
+  type = list(string)
+}
+
+variable "nomad_client_namesvr_image_id" {
   type = list(string)
 }
 

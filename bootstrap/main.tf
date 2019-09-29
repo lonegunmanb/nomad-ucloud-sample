@@ -51,7 +51,8 @@ data "template_file" "bootstrap_script" {
     consul_server_root_password     = var.consul_server_root_password
     consul_server_type              = var.consul_server_type
     nomad_client_broker_type        = local.nomad_client_broker_type
-    nomad_client_image_id           = local.nomad_client_image_id
+    nomad_client_broker_image_id    = local.nomad_client_broker_image_id
+    nomad_client_namesvr_image_id   = local.nomad_client_namesvr_image_id
     nomad_client_namesvr_type       = local.nomad_client_namesvr_type
     nomad_client_root_password      = local.nomad_client_root_password
     nomad_server_image_id           = local.nomad_server_image_id
