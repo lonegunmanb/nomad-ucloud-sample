@@ -18,3 +18,16 @@ variable "attachment_count" {
   type = number
   default = 0
 }
+variable "attachment_only" {
+  default = false
+}
+variable "legacy_lb_id" {
+  default = ""
+}
+variable "legacy_lb_private_ip" {
+  default = ""
+}
+variable "legacy_listener_id" {
+  type = list(string)
+  default = []
+}

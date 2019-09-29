@@ -2,6 +2,7 @@ variable "consul_server_root_password" {
 }
 
 variable "nomad_server_root_password" {
+  type = list(string)
 }
 
 variable "nomad_client_root_password" {
@@ -36,7 +37,47 @@ variable "consul_server_type" {
 }
 
 variable "nomad_server_type" {
-  default = "n-highcpu-1"
+  type = list(string)
+  default = ["n-highcpu-1"]
+}
+variable "nomad_server_image_id" {
+  type = list(string)
+}
+variable nomad_server_count {
+  type = list(number)
+}
+variable nomad_server_use_udisk {
+  type = list(bool)
+}
+variable nomad_server_local_disk_type {
+  type = list(string)
+}
+variable nomad_server_udisk_type {
+  type = list(string)
+}
+variable nomad_server_data_disk_size {
+  type = list(number)
+}
+variable nomad_server_charge_type {
+  type = list(string)
+  default = ["dynamic"]
+}
+variable "nomad_server_charge_duration" {
+  type = list(number)
+  default = [1]
+}
+
+locals {
+  nomad_server_root_password = length(var.nomad_server_root_password) == 1 ? [for i in range(3):var.nomad_server_root_password[0]] : var.nomad_server_root_password
+  nomad_server_type = length(var.nomad_server_type) == 1 ? [for i in range(3):var.nomad_server_type[0]] : var.nomad_server_type
+  nomad_server_image_id = length(var.nomad_server_image_id) == 1 ? [for i in range(3):var.nomad_server_image_id[0]] : var.nomad_server_image_id
+  nomad_server_count = length(var.nomad_server_count) == 1 ? [for i in range(3):var.nomad_server_count[0]] : var.nomad_server_count
+  nomad_server_use_udisk = length(var.nomad_server_use_udisk) == 1 ? [for i in range(3):var.nomad_server_use_udisk[0]] : var.nomad_server_use_udisk
+  nomad_server_local_disk_type = length(var.nomad_server_local_disk_type) == 1 ? [for i in range(3):var.nomad_server_local_disk_type[0]] : var.nomad_server_local_disk_type
+  nomad_server_udisk_type = length(var.nomad_server_udisk_type) == 1 ? [for i in range(3):var.nomad_server_udisk_type[0]] : var.nomad_server_udisk_type
+  nomad_server_data_disk_size = length(var.nomad_server_data_disk_size) == 1 ? [for i in range(3):var.nomad_server_data_disk_size[0]] : var.nomad_server_data_disk_size
+  nomad_server_charge_type = length(var.nomad_server_charge_type) == 1 ? [for i in range(3):var.nomad_server_charge_type[0]] : var.nomad_server_charge_type
+  nomad_server_charge_duration = length(var.nomad_server_charge_duration) == 1 ? [for i in range(3):var.nomad_server_charge_duration[0]] : var.nomad_server_charge_duration
 }
 
 variable "nomad_client_namesvr_type" {
@@ -52,9 +93,6 @@ variable "allow_ip" {
 }
 
 variable "consul_server_image_id" {
-}
-
-variable "nomad_server_image_id" {
 }
 
 variable "nomad_client_image_id" {
@@ -82,9 +120,7 @@ variable broker_count {
 variable name_server_count {
   type = list(number)
 }
-variable nomad_server_count {
-  type = number
-}
+
 variable name_server_local_disk_type {
   type = list(string)
 }
@@ -119,14 +155,7 @@ locals {
   name_server_use_udisk       = length(var.name_server_use_udisk) == 1 ? [for i in range(3):var.name_server_use_udisk[0]] : var.name_server_use_udisk
   broker_use_udisk            = length(var.broker_use_udisk) == 1 ? [for i in range(3):var.broker_use_udisk[0]] : var.broker_use_udisk
 }
-variable nomad_server_use_udisk {
-  type = bool
-}
-variable nomad_server_local_disk_type {}
-variable nomad_server_udisk_type {}
-variable nomad_server_data_disk_size {
-  type = number
-}
+
 variable consul_server_data_disk_size {
   type = number
 }
@@ -149,12 +178,7 @@ variable "consul_server_charge_type" {
 variable "consul_server_charge_duration" {
   default = 1
 }
-variable nomad_server_charge_type {
-  default = "dynamic"
-}
-variable "nomad_server_charge_duration" {
-  default = 1
-}
+
 variable client_charge_type {
   type = list(string)
   default = ["dynamic"]

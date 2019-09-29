@@ -43,7 +43,7 @@ variable name_server_count {
   type = list(number)
 }
 variable nomad_server_count {
-  type = number
+  type = list(number)
 }
 variable broker_local_disk_type {
   type = list(string)
@@ -77,34 +77,44 @@ variable name_server_data_disk_size {
   type = list(number)
 }
 locals {
-  nomad_client_image_id       = format("[%s]", join(", ", [for id in var.nomad_client_image_id: format("\"%s\"", id)]))
-  nomad_client_namesvr_type   = format("[%s]", join(", ", [for type in var.nomad_client_namesvr_type: format("\"%s\"", type)]))
-  nomad_client_broker_type    = format("[%s]", join(", ", [for type in var.nomad_client_broker_type: format("\"%s\"", type)]))
-  nomad_client_root_password  = format("[%s]", join(", ", [for pass in var.nomad_client_root_password: format("\"%s\"", pass)]))
-  broker_count                = format("[%s]", join(", ", [for c in var.broker_count: format("%d", c)]))
-  name_server_count           = format("[%s]", join(", ", [for c in var.name_server_count: format("%d", c)]))
-  broker_local_disk_type      = format("[%s]", join(", ", [for type in var.broker_local_disk_type: format("\"%s\"", type)]))
-  broker_udisk_type           = format("[%s]", join(", ", [for type in var.broker_udisk_type: format("\"%s\"", type)]))
-  broker_data_disk_size       = format("[%s]", join(", ", [for size in var.broker_data_disk_size: format("%d", size)]))
-  name_server_use_udisk       = format("[%s]", join(", ", [for t in var.name_server_use_udisk: format("%t", t)]))
-  name_server_local_disk_type = format("[%s]", join(", ", [for type in var.name_server_local_disk_type: format("\"%s\"", type)]))
-  name_server_udisk_type      = format("[%s]", join(", ", [for type in var.name_server_udisk_type: format("\"%s\"", type)]))
-  name_server_data_disk_size  = format("[%s]", join(", ", [for size in var.name_server_data_disk_size: format("%d", size)]))
-  broker_use_udisk            = format("[%s]", join(", ", [for t in var.broker_use_udisk: format("%t", t)]))
-  client_charge_type          = format("[%s]", join(", ", [for type in var.client_charge_type: format("\"%s\"", type)]))
-  client_charge_duration      = format("[%s]", join(", ", [for d in var.client_charge_duration: format("%d", d)]))
+  nomad_server_image_id        = format("[%s]", join(", ", [for id in var.nomad_server_image_id: format("\"%s\"", id)]))
+  nomad_server_root_password   = format("[%s]", join(", ", [for pass in var.nomad_server_root_password: format("\"%s\"", pass)]))
+  nomad_server_type            = format("[%s]", join(", ", [for type in var.nomad_server_type: format("\"%s\"", type)]))
+  nomad_server_use_udisk       = format("[%s]", join(", ", [for t in var.nomad_server_use_udisk: format("\"%t\"", t)]))
+  nomad_server_local_disk_type = format("[%s]", join(", ", [for type in var.nomad_server_local_disk_type: format("\"%s\"", type)]))
+  nomad_server_udisk_type      = format("[%s]", join(", ", [for type in var.nomad_server_udisk_type: format("\"%s\"", type)]))
+  nomad_server_data_disk_size  = format("[%s]", join(", ", [for size in var.nomad_server_data_disk_size: format("\"%d\"", size)]))
+  nomad_server_count           = format("[%s]", join(", ", [for count in var.nomad_server_count: format("\"%d\"", count)]))
+  nomad_server_charge_type     = format("[%s]", join(", ", [for type in var.nomad_server_charge_type: format("\"%d\"", type)]))
+  nomad_server_charge_duration = format("[%s]", join(", ", [for d in var.nomad_server_charge_duration: format("\"%d\"", d)]))
+  nomad_client_image_id        = format("[%s]", join(", ", [for id in var.nomad_client_image_id: format("\"%s\"", id)]))
+  nomad_client_namesvr_type    = format("[%s]", join(", ", [for type in var.nomad_client_namesvr_type: format("\"%s\"", type)]))
+  nomad_client_broker_type     = format("[%s]", join(", ", [for type in var.nomad_client_broker_type: format("\"%s\"", type)]))
+  nomad_client_root_password   = format("[%s]", join(", ", [for pass in var.nomad_client_root_password: format("\"%s\"", pass)]))
+  broker_count                 = format("[%s]", join(", ", [for c in var.broker_count: format("%d", c)]))
+  name_server_count            = format("[%s]", join(", ", [for c in var.name_server_count: format("%d", c)]))
+  broker_local_disk_type       = format("[%s]", join(", ", [for type in var.broker_local_disk_type: format("\"%s\"", type)]))
+  broker_udisk_type            = format("[%s]", join(", ", [for type in var.broker_udisk_type: format("\"%s\"", type)]))
+  broker_data_disk_size        = format("[%s]", join(", ", [for size in var.broker_data_disk_size: format("%d", size)]))
+  name_server_use_udisk        = format("[%s]", join(", ", [for t in var.name_server_use_udisk: format("%t", t)]))
+  name_server_local_disk_type  = format("[%s]", join(", ", [for type in var.name_server_local_disk_type: format("\"%s\"", type)]))
+  name_server_udisk_type       = format("[%s]", join(", ", [for type in var.name_server_udisk_type: format("\"%s\"", type)]))
+  name_server_data_disk_size   = format("[%s]", join(", ", [for size in var.name_server_data_disk_size: format("%d", size)]))
+  broker_use_udisk             = format("[%s]", join(", ", [for t in var.broker_use_udisk: format("%t", t)]))
+  client_charge_type           = format("[%s]", join(", ", [for type in var.client_charge_type: format("\"%s\"", type)]))
+  client_charge_duration       = format("[%s]", join(", ", [for d in var.client_charge_duration: format("%d", d)]))
 }
 variable nomad_server_image_id {}
 variable nomad_server_root_password {}
 variable nomad_server_type {}
 
 variable nomad_server_use_udisk {
-  type = bool
+  type = list(bool)
 }
 variable nomad_server_local_disk_type {}
 variable nomad_server_udisk_type {}
 variable nomad_server_data_disk_size {
-  type = number
+  type = list(number)
 }
 variable consul_server_data_disk_size {
   type = number
@@ -140,7 +150,7 @@ variable prometheus_port {}
 variable "consul_server_charge_type" {}
 variable "consul_server_charge_duration" {}
 variable nomad_server_charge_type {}
-variable "nomad_server_charge_duration" {}
+variable nomad_server_charge_duration {}
 variable env_name {}
 variable "legacy_vpc_id" {
   default = ""

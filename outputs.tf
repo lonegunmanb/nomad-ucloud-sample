@@ -39,7 +39,9 @@ module "consul_access_ipv6" {
 }
 
 locals {
-  nomad_server_ips  = var.env_name == "test" ? module.nomad_servers.public_ips : (var.env_name == "public" ? module.nomad_lb_ipv6.ipv6s : module.nomad_servers.private_ips)
+  nomad_server_public_ips = concat(module.nomad_servers0.public_ips, module.nomad_servers1.public_ips, module.nomad_servers2.public_ips)
+  nomad_server_ssh_ips = concat(module.nomad_servers0.ssh_ip, module.nomad_servers1.ssh_ip, module.nomad_servers2.ssh_ip)
+  nomad_server_ips  = var.env_name == "test" ? local.nomad_server_public_ips : (var.env_name == "public" ? module.nomad_lb_ipv6.ipv6s : local.nomad_server_public_ips)
   nomad_server_access_ip = length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : ""
   consul_server_ips = var.env_name == "test" ? module.consul_servers.public_ips : (var.env_name == "public" ? module.consul_access_ipv6.ipv6s : module.consul_servers.private_ips)
   consul_access_ip  = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
@@ -55,7 +57,7 @@ output "consul_lb_ip" {
 }
 
 output "nomad_servers_ips" {
-  value = module.nomad_servers.public_ips
+  value = local.nomad_server_public_ips
 }
 
 module nomad_lb_ipv6 {
@@ -63,7 +65,7 @@ module nomad_lb_ipv6 {
   disable = var.env_name != "public"
   api_server_url = var.ipv6_server_url
   region_id = var.region_id
-  resourceIds = [module.nomad_servers.lb_id]
+  resourceIds = [ucloud_lb.nomad_server_lb.id]
 }
 
 output "nomad_server_ip" {
@@ -123,5 +125,5 @@ output "brokersvr_ids" {
 }
 
 output "nomad_server_ssh_ips" {
-  value = module.nomad_servers.ssh_ip
+  value = local.nomad_server_ssh_ips
 }

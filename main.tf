@@ -79,32 +79,111 @@ module consul_servers {
   duration            = var.consul_server_charge_duration
 }
 
-module nomad_servers {
-  source              = "./nomad-server"
-  region              = var.region
-  az                  = local.az
-  cluster_id          = local.cluster_id
-  image_id            = var.nomad_server_image_id
-  instance_count      = var.nomad_server_count
-  instance_type       = var.nomad_server_type
-  root_password       = var.nomad_server_root_password
-  sg_id               = ucloud_security_group.consul_server_sg.id
-  vpc_id              = data.terraform_remote_state.network.outputs.mgrVpcId
-  subnet_id           = data.terraform_remote_state.network.outputs.mgrSubnetId
-  consul_server_ips   = module.consul_servers.private_ips
-  use_udisk           = var.nomad_server_use_udisk
-  local_disk_type     = var.nomad_server_local_disk_type
-  udisk_type          = var.nomad_server_udisk_type
-  data_volume_size    = var.nomad_server_data_disk_size
-  ipv6_server_url     = var.ipv6_server_url
-  region_id           = var.region_id
-  env_name            = var.env_name
-  project_id          = var.project_id
-  ucloud_api_base_url = var.ucloud_api_base_url
-  ucloud_pub_key      = var.ucloud_pub_key
-  ucloud_secret       = var.ucloud_secret
-  charge_type         = var.nomad_server_charge_type
-  duration            = var.nomad_server_charge_duration
+locals {
+  mgr_vpc_id    = data.terraform_remote_state.network.outputs.mgrVpcId
+  mgr_subnet_id = data.terraform_remote_state.network.outputs.mgrSubnetId
+}
+
+resource ucloud_lb nomad_server_lb {
+  name      = "nomadServerLb-${local.cluster_id}"
+  internal  = true
+  tag       = local.cluster_id
+  vpc_id    = local.mgr_vpc_id
+  subnet_id = local.mgr_subnet_id
+}
+
+resource ucloud_lb_listener nomad_server_lb_listener {
+  load_balancer_id = ucloud_lb.nomad_server_lb.id
+  protocol = "tcp"
+  name = "4600"
+  port = 4600
+}
+
+module nomad_servers0 {
+  source                      = "./nomad-server"
+  region                      = var.region
+  az                          = local.az[0]
+  cluster_id                  = local.cluster_id
+  image_id                    = local.nomad_server_image_id[0]
+  instance_count              = local.nomad_server_count[0]
+  instance_type               = local.nomad_server_type[0]
+  root_password               = local.nomad_server_root_password[0]
+  sg_id                       = ucloud_security_group.consul_server_sg.id
+  vpc_id                      = data.terraform_remote_state.network.outputs.mgrVpcId
+  subnet_id                   = data.terraform_remote_state.network.outputs.mgrSubnetId
+  consul_server_ips           = module.consul_servers.private_ips
+  use_udisk                   = local.nomad_server_use_udisk[0]
+  local_disk_type             = local.nomad_server_local_disk_type[0]
+  udisk_type                  = local.nomad_server_udisk_type[0]
+  data_volume_size            = local.nomad_server_data_disk_size[0]
+  ipv6_server_url             = var.ipv6_server_url
+  region_id                   = var.region_id
+  env_name                    = var.env_name
+  charge_type                 = local.nomad_server_charge_type[0]
+  duration                    = local.nomad_server_charge_duration[0]
+  group                       = "${local.az[0]}-0"
+  nomad_port                  = [4600]
+  nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
+  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
+}
+
+module nomad_servers1 {
+  source                      = "./nomad-server"
+  region                      = var.region
+  az                          = local.az[1]
+  cluster_id                  = local.cluster_id
+  image_id                    = local.nomad_server_image_id[1]
+  instance_count              = local.nomad_server_count[1]
+  instance_type               = local.nomad_server_type[1]
+  root_password               = local.nomad_server_root_password[1]
+  sg_id                       = ucloud_security_group.consul_server_sg.id
+  vpc_id                      = data.terraform_remote_state.network.outputs.mgrVpcId
+  subnet_id                   = data.terraform_remote_state.network.outputs.mgrSubnetId
+  consul_server_ips           = module.consul_servers.private_ips
+  use_udisk                   = local.nomad_server_use_udisk[1]
+  local_disk_type             = local.nomad_server_local_disk_type[1]
+  udisk_type                  = local.nomad_server_udisk_type[1]
+  data_volume_size            = local.nomad_server_data_disk_size[1]
+  ipv6_server_url             = var.ipv6_server_url
+  region_id                   = var.region_id
+  env_name                    = var.env_name
+  charge_type                 = local.nomad_server_charge_type[1]
+  duration                    = local.nomad_server_charge_duration[1]
+  group                       = "${local.az[1]}-1"
+  nomad_port                  = [4600]
+  nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
+  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
+}
+
+module nomad_servers2 {
+  source                      = "./nomad-server"
+  region                      = var.region
+  az                          = local.az[2]
+  cluster_id                  = local.cluster_id
+  image_id                    = local.nomad_server_image_id[2]
+  instance_count              = local.nomad_server_count[2]
+  instance_type               = local.nomad_server_type[2]
+  root_password               = local.nomad_server_root_password[2]
+  sg_id                       = ucloud_security_group.consul_server_sg.id
+  vpc_id                      = data.terraform_remote_state.network.outputs.mgrVpcId
+  subnet_id                   = data.terraform_remote_state.network.outputs.mgrSubnetId
+  consul_server_ips           = module.consul_servers.private_ips
+  use_udisk                   = local.nomad_server_use_udisk[2]
+  local_disk_type             = local.nomad_server_local_disk_type[2]
+  udisk_type                  = local.nomad_server_udisk_type[2]
+  data_volume_size            = local.nomad_server_data_disk_size[2]
+  ipv6_server_url             = var.ipv6_server_url
+  region_id                   = var.region_id
+  env_name                    = var.env_name
+  charge_type                 = local.nomad_server_charge_type[2]
+  duration                    = local.nomad_server_charge_duration[2]
+  group                       = "${local.az[2]}-2"
+  nomad_port                  = [4600]
+  nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
+  nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
+  nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
 }
 
 locals {

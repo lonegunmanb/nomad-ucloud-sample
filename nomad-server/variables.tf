@@ -1,10 +1,6 @@
 variable region {}
-variable ucloud_pub_key {}
-variable ucloud_secret {}
-variable project_id {}
-variable ucloud_api_base_url {}
 variable az {
-  type = list(string)
+  type = string
 }
 variable root_password {}
 variable sg_id {}
@@ -34,4 +30,19 @@ variable "duration" {
 }
 variable charge_type {
   default = "dynamic"
+}
+variable group {
+  type = string
+}
+variable nomad_server_lb_id {
+  type = string
+}
+variable nomad_server_lb_private_ip {
+  type = string
+}
+variable nomad_server_lb_listener_id {
+  type = list(string)
+}
+variable nomad_port {
+  type = list(number)
 }

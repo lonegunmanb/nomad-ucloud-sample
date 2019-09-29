@@ -1,16 +1,8 @@
-provider "ucloud" {
-  region      = var.region
-  public_key  = var.ucloud_pub_key
-  private_key = var.ucloud_secret
-  project_id  = var.project_id
-  base_url    = var.ucloud_api_base_url
-}
-
 resource "ucloud_instance" "nomad_servers" {
   count             = var.instance_count
-  name              = "nomad-server-${count.index}"
+  name              = "nomad-server-${var.group}-${count.index}"
   tag               = var.cluster_id
-  availability_zone = var.az[count.index % length(var.az)]
+  availability_zone = var.az
   image_id          = var.image_id
   instance_type     = var.instance_type
   root_password     = var.root_password
@@ -29,8 +21,8 @@ resource "ucloud_instance" "nomad_servers" {
 
 resource "ucloud_disk" "data_disk" {
   count             = var.use_udisk && var.data_volume_size > 0 ? var.instance_count : 0
-  name              = "nomad-server-data-${count.index}"
-  availability_zone = var.az[count.index % length(var.az)]
+  name              = "nomad-server-${var.group}-${count.index}"
+  availability_zone = var.az
   disk_type         = var.udisk_type
   disk_size         = var.data_volume_size
   charge_type       = var.charge_type
@@ -39,14 +31,14 @@ resource "ucloud_disk" "data_disk" {
 
 resource "ucloud_disk_attachment" "attachment" {
   count             = var.use_udisk && var.data_volume_size > 0 ? var.instance_count : 0
-  availability_zone = var.az[count.index % length(var.az)]
+  availability_zone = var.az
   disk_id           = ucloud_disk.data_disk.*.id[count.index]
   instance_id       = ucloud_instance.nomad_servers.*.id[count.index]
 }
 
 resource "ucloud_eip" "nomad_servers" {
   count         = var.env_name != "test" ? 0 : var.instance_count
-  name          = "nomad-server-${var.cluster_id}-${count.index}"
+  name          = "nomad-server-${var.group}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
@@ -88,7 +80,7 @@ data "template_file" "setup-script" {
   template   = file(local.setup-script-path)
   vars       = {
     region             = var.region
-    az                 = var.az[count.index % length(var.az)]
+    az                 = var.az
     node-name          = ucloud_instance.nomad_servers[count.index].id
     instance-count     = var.instance_count
     consul-server-ip-0 = var.consul_server_ips[0]
@@ -98,13 +90,17 @@ data "template_file" "setup-script" {
 }
 
 module "nomad_server_lb" {
-  source       = "../internal_lb"
-  instance_ids = ucloud_instance.nomad_servers.*.id
-  name         = "nomadServerLb-${var.cluster_id}"
-  ports        = [4646]
-  subnet_id    = var.subnet_id
-  tag          = var.cluster_id
-  vpc_id       = var.vpc_id
+  source               = "../internal_lb"
+  instance_ids         = ucloud_instance.nomad_servers.*.id
+  name                 = "nomadServerLb-${var.cluster_id}"
+  ports                = var.nomad_port
+  subnet_id            = var.subnet_id
+  tag                  = var.cluster_id
+  vpc_id               = var.vpc_id
+  attachment_only      = true
+  legacy_lb_id         = var.nomad_server_lb_id
+  legacy_listener_id   = var.nomad_server_lb_listener_id
+  legacy_lb_private_ip = var.nomad_server_lb_private_ip
 }
 
 resource "null_resource" "setup" {
