@@ -7,28 +7,41 @@ variable az {
   type = list(string)
 }
 locals {
-  instance_count = length(var.az)
+  instance_count = 3
 }
-variable root_password {}
+variable root_password {
+  type = list(string)
+}
 variable sg_id {}
 variable vpc_id {}
 variable subnet_id {}
-variable image_id {}
+variable image_id {
+  type = list(string)
+}
 variable cluster_id {}
-variable instance_type {}
+variable instance_type {
+  type = list(string)
+}
 variable env_name {}
 variable ipv6_server_url {}
 variable region_id {}
 variable use_udisk {
-  type = bool
+  type = list(bool)
 }
-variable local_disk_type {}
-variable udisk_type {}
-variable data_volume_size {}
+variable local_disk_type {
+  type = list(string)
+}
+variable udisk_type {
+  type = list(string)
+}
+variable data_volume_size {
+  type = list(number)
+}
 variable charge_type {
-  default = "dynamic"
+  type = list(string)
+  default = ["dynamic"]
 }
 variable duration {
-  type    = number
-  default = 1
+  type    = list(number)
+  default = [1]
 }

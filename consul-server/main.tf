@@ -14,39 +14,72 @@ resource "ucloud_instance" "consul_server" {
   count             = local.instance_count
   name              = "consul-server-${count.index}"
   tag               = var.cluster_id
-  availability_zone = var.az[count.index % length(var.az)]
-  image_id          = var.image_id
-  instance_type     = var.instance_type
-  root_password     = var.root_password
-  charge_type       = var.charge_type
-  duration          = var.duration
+  availability_zone = var.az[count.index]
+  image_id          = var.image_id[count.index]
+  instance_type     = var.instance_type[count.index]
+  root_password     = var.root_password[count.index]
+  charge_type       = var.charge_type[count.index]
+  duration          = var.duration[count.index]
   security_group    = var.sg_id
   vpc_id            = var.vpc_id
   subnet_id         = var.subnet_id
-  boot_disk_type    = var.local_disk_type
-  data_disk_type    = var.local_disk_type
-  data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
+  boot_disk_type    = var.local_disk_type[count.index]
+  data_disk_type    = var.local_disk_type[count.index]
+  data_disk_size    = var.use_udisk[count.index] ? 0 : var.data_volume_size[count.index]
   isolation_group   = ucloud_isolation_group.isolation_group.id
   provisioner "local-exec" {
     command = "sleep 10"
   }
 }
 
-resource "ucloud_disk" "data_disk" {
-  count             = var.use_udisk && var.data_volume_size > 0 ? local.instance_count : 0
-  name              = "consul-server-data-${count.index}"
-  availability_zone = var.az[count.index % length(var.az)]
-  disk_size         = var.use_udisk ? var.data_volume_size : 0
-  disk_type         = var.udisk_type
-  charge_type       = var.charge_type
-  duration          = var.duration
+resource "ucloud_disk" "data_disk0" {
+  count             = var.use_udisk[0] && var.data_volume_size[0] > 0 ? 1 : 0
+  name              = "consul-server-data-0"
+  availability_zone = var.az[0]
+  disk_size         = var.use_udisk[0] ? var.data_volume_size[0] : 0
+  disk_type         = var.udisk_type[0]
+  charge_type       = var.charge_type[0]
+  duration          = var.duration[0]
 }
 
-resource "ucloud_disk_attachment" "attachment" {
-  count             = var.use_udisk && var.data_volume_size > 0 ? local.instance_count : 0
-  availability_zone = var.az[count.index % length(var.az)]
-  disk_id           = ucloud_disk.data_disk.*.id[count.index]
-  instance_id       = ucloud_instance.consul_server.*.id[count.index]
+resource "ucloud_disk" "data_disk1" {
+  count             = var.use_udisk[1] && var.data_volume_size[1] > 0 ? 1 : 0
+  name              = "consul-server-data-1"
+  availability_zone = var.az[1]
+  disk_size         = var.use_udisk[1] ? var.data_volume_size[1] : 0
+  disk_type         = var.udisk_type[1]
+  charge_type       = var.charge_type[1]
+  duration          = var.duration[1]
+}
+
+resource "ucloud_disk" "data_disk2" {
+  count             = var.use_udisk[2] && var.data_volume_size[2] > 0 ? 1 : 0
+  name              = "consul-server-data-2"
+  availability_zone = var.az[2]
+  disk_size         = var.use_udisk[2] ? var.data_volume_size[2] : 0
+  disk_type         = var.udisk_type[2]
+  charge_type       = var.charge_type[2]
+  duration          = var.duration[2]
+}
+
+resource "ucloud_disk_attachment" "attachment0" {
+  count             = var.use_udisk[0] && var.data_volume_size[0] > 0 ? 1 : 0
+  availability_zone = var.az[0]
+  disk_id           = ucloud_disk.data_disk0.*.id[0]
+  instance_id       = ucloud_instance.consul_server.*.id[0]
+}
+
+resource "ucloud_disk_attachment" "attachment1" {
+  count             = var.use_udisk[1] && var.data_volume_size[1] > 0 ? 1 : 0
+  availability_zone = var.az[1]
+  disk_id           = ucloud_disk.data_disk1.*.id[0]
+  instance_id       = ucloud_instance.consul_server.*.id[1]
+}
+resource "ucloud_disk_attachment" "attachment2" {
+  count             = var.use_udisk[2] && var.data_volume_size[2] > 0 ? 1 : 0
+  availability_zone = var.az[2]
+  disk_id           = ucloud_disk.data_disk2.*.id[0]
+  instance_id       = ucloud_instance.consul_server.*.id[2]
 }
 
 resource "ucloud_eip" "consul_servers" {
@@ -54,8 +87,8 @@ resource "ucloud_eip" "consul_servers" {
   name          = "consul-server-${var.cluster_id}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
-  charge_type   = var.charge_type
-  duration      = var.duration
+  charge_type   = var.charge_type[count.index]
+  duration      = var.duration[count.index]
   bandwidth     = 200
   tag           = var.cluster_id
 }
@@ -110,13 +143,15 @@ resource "null_resource" "install_consul_server" {
   count      = local.instance_count
   depends_on = [
     ucloud_instance.consul_server,
-    ucloud_disk_attachment.attachment
+    ucloud_disk_attachment.attachment0,
+    ucloud_disk_attachment.attachment1,
+    ucloud_disk_attachment.attachment2
   ]
   provisioner "remote-exec" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.root_password
+      password = var.root_password[count.index]
       host     = local.server_ips[count.index]
     }
     inline = [
@@ -137,7 +172,7 @@ resource "null_resource" "ensoure_consul_ready" {
     connection {
       type     = "ssh"
       user     = "root"
-      password = var.root_password
+      password = var.root_password[count.index]
       host     = local.server_ips[count.index]
     }
     inline = [

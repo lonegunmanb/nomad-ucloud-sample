@@ -56,18 +56,18 @@ resource ucloud_security_group consul_server_sg {
 module consul_servers {
   source              = "./consul-server"
   region              = var.region
-  instance_type       = var.consul_server_type
-  image_id            = var.consul_server_image_id
+  instance_type       = local.consul_server_type
+  image_id            = local.consul_server_image_id
   az                  = local.az
   cluster_id          = local.cluster_id
   sg_id               = ucloud_security_group.consul_server_sg.id
-  root_password       = var.consul_server_root_password
+  root_password       = local.consul_server_root_password
   vpc_id              = data.terraform_remote_state.network.outputs.mgrVpcId
   subnet_id           = data.terraform_remote_state.network.outputs.mgrSubnetId
-  use_udisk           = var.consul_server_use_udisk
-  local_disk_type     = var.consul_server_local_disk_type
-  udisk_type          = var.consul_server_udisk_type
-  data_volume_size    = var.consul_server_data_disk_size
+  use_udisk           = local.consul_server_use_udisk
+  local_disk_type     = local.consul_server_local_disk_type
+  udisk_type          = local.consul_server_udisk_type
+  data_volume_size    = local.consul_server_data_disk_size
   ipv6_server_url     = var.ipv6_server_url
   region_id           = var.region_id
   env_name            = var.env_name
@@ -75,8 +75,8 @@ module consul_servers {
   ucloud_api_base_url = var.ucloud_api_base_url
   ucloud_pub_key      = var.ucloud_pub_key
   ucloud_secret       = var.ucloud_secret
-  charge_type         = var.consul_server_charge_type
-  duration            = var.consul_server_charge_duration
+  charge_type         = local.consul_server_charge_type
+  duration            = local.consul_server_charge_duration
 }
 
 locals {

@@ -23,9 +23,15 @@ variable az {
   type = list(string)
 }
 variable ipv6_api_url {}
-variable consul_server_image_id {}
-variable consul_server_root_password {}
-variable consul_server_type {}
+variable consul_server_image_id {
+  type = list(string)
+}
+variable consul_server_root_password {
+  type = list(string)
+}
+variable consul_server_type {
+  type = list(string)
+}
 variable nomad_client_broker_type {}
 variable nomad_client_broker_image_id {
   type = list(string)
@@ -80,6 +86,15 @@ variable name_server_data_disk_size {
   type = list(number)
 }
 locals {
+  consul_server_image_id        = format("[%s]", join(", ", [for id in var.consul_server_image_id: format("\"%s\"", id)]))
+  consul_server_root_password   = format("[%s]", join(", ", [for pass in var.consul_server_root_password: format("\"%s\"", pass)]))
+  consul_server_type            = format("[%s]", join(", ", [for type in var.consul_server_type: format("\"%s\"", type)]))
+  consul_server_data_disk_size  = format("[%s]", join(", ", [for size in var.consul_server_data_disk_size: format("\"%d\"", size)]))
+  consul_server_local_disk_type = format("[%s]", join(", ", [for type in var.consul_server_local_disk_type: format("\"%s\"", type)]))
+  consul_server_udisk_type      = format("[%s]", join(", ", [for type in var.consul_server_udisk_type: format("\"%s\"", type)]))
+  consul_server_use_udisk       = format("[%s]", join(", ", [for t in var.consul_server_use_udisk: format("\"%t\"", t)]))
+  consul_server_charge_type     = format("[%s]", join(", ", [for type in var.consul_server_charge_type: format("\"%s\"", type)]))
+  consul_server_charge_duration = format("[%s]", join(", ", [for d in var.consul_server_charge_duration: format("\"%d\"", d)]))
   nomad_server_image_id         = format("[%s]", join(", ", [for id in var.nomad_server_image_id: format("\"%s\"", id)]))
   nomad_server_root_password    = format("[%s]", join(", ", [for pass in var.nomad_server_root_password: format("\"%s\"", pass)]))
   nomad_server_type             = format("[%s]", join(", ", [for type in var.nomad_server_type: format("\"%s\"", type)]))
@@ -121,12 +136,16 @@ variable nomad_server_data_disk_size {
   type = list(number)
 }
 variable consul_server_data_disk_size {
-  type = number
+  type = list(number)
 }
-variable consul_server_local_disk_type {}
-variable consul_server_udisk_type {}
+variable consul_server_local_disk_type {
+  type = list(string)
+}
+variable consul_server_udisk_type {
+  type = list(string)
+}
 variable consul_server_use_udisk {
-  type = bool
+  type = list(bool)
 }
 variable controller_count {
   type = number
@@ -152,8 +171,12 @@ variable fabio_image_id {}
 variable prometheus_image_id {}
 variable namesvr_http_endpoint_port {}
 variable prometheus_port {}
-variable "consul_server_charge_type" {}
-variable "consul_server_charge_duration" {}
+variable "consul_server_charge_type" {
+  type = list(string)
+}
+variable "consul_server_charge_duration" {
+  type = list(number)
+}
 variable nomad_server_charge_type {}
 variable nomad_server_charge_duration {}
 variable env_name {}
