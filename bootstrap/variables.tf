@@ -2,6 +2,9 @@ variable branch {}
 variable consul_backend_root_password {}
 variable consul_backend_data_volume_size {}
 variable consul_backend_instance_type {}
+variable consul_backend_image_id {}
+variable consul_backend_charge_type {}
+variable consul_backend_charge_duration {}
 variable cluster_id {}
 variable project_dir {}
 variable terraform_project_url {}
