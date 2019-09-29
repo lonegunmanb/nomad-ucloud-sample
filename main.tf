@@ -92,11 +92,15 @@ resource ucloud_lb nomad_server_lb {
   subnet_id = local.mgr_subnet_id
 }
 
+locals {
+  nomad_port = 4646
+}
+
 resource ucloud_lb_listener nomad_server_lb_listener {
   load_balancer_id = ucloud_lb.nomad_server_lb.id
   protocol = "tcp"
-  name = "4600"
-  port = 4600
+  name = "nomad_4646"
+  port = local.nomad_port
 }
 
 module nomad_servers0 {
@@ -122,7 +126,7 @@ module nomad_servers0 {
   charge_type                 = local.nomad_server_charge_type[0]
   duration                    = local.nomad_server_charge_duration[0]
   group                       = "${local.az[0]}-0"
-  nomad_port                  = [4600]
+  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
   nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
@@ -151,7 +155,7 @@ module nomad_servers1 {
   charge_type                 = local.nomad_server_charge_type[1]
   duration                    = local.nomad_server_charge_duration[1]
   group                       = "${local.az[1]}-1"
-  nomad_port                  = [4600]
+  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
   nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
@@ -180,7 +184,7 @@ module nomad_servers2 {
   charge_type                 = local.nomad_server_charge_type[2]
   duration                    = local.nomad_server_charge_duration[2]
   group                       = "${local.az[2]}-2"
-  nomad_port                  = [4600]
+  nomad_port                  = [local.nomad_port]
   nomad_server_lb_id          = ucloud_lb.nomad_server_lb.id
   nomad_server_lb_listener_id = [ucloud_lb_listener.nomad_server_lb_listener.id]
   nomad_server_lb_private_ip  = ucloud_lb.nomad_server_lb.private_ip
