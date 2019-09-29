@@ -25,8 +25,9 @@ resource "kubernetes_secret" "ucloud_key" {
 
 data "template_file" "bootstrap_script" {
   template = file("${path.module}/bootstrap.sh.tplt")
-  vars     = {
+  vars = {
     consul_backend_root_password    = var.consul_backend_root_password
+    consul_backend_image_id         = var.consul_server_image_id[0]
     terraform_project_url           = var.terraform_project_url
     project_dir                     = var.project_dir
     branch                          = var.branch
