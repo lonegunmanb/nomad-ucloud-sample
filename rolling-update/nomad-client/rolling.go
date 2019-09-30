@@ -30,7 +30,15 @@ func taint(module string, group int) {
 
 func update() {
 	println("updating")
-	_, err := execCmd("terraform apply --auto-approve -input=false", "../../", os.Stdout, os.Stderr)
+	cmd := "terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json"
+	remoteVarExist := true
+	if _, err := os.Stat("/backend/remote.tfvars"); os.IsNotExist(err) {
+		remoteVarExist = false
+	}
+	if remoteVarExist {
+		cmd += " -var-file=/backend/remote.tfvars"
+	}
+	_, err := execCmd(cmd, "../../", os.Stdout, os.Stderr)
 	if err != nil {
 		panic(err)
 	}
