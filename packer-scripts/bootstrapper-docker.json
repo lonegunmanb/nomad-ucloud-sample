@@ -1,6 +1,6 @@
 {
   "variables": {
-    "terraform_version": "0.12.6",
+    "terraform_version": "0.12.9",
     "nomad_version": "0.9.4",
     "consul_version": "1.5.3",
     "ucloud_cli_version": "0.1.23",
@@ -18,7 +18,8 @@
     "docker_login_server": "",
     "docker_login_username": "",
     "docker_login_password": "",
-    "code_git_url": ""
+    "code_git_url": "",
+    "golang_version": "1.13.1"
   },
 
   "builders": [{
@@ -27,7 +28,10 @@
     "commit": true,
     "changes": [
       "ENTRYPOINT [\"/bin/bash\", \"-c\"]",
-      "CMD [\"sleep infinity\"]"
+      "CMD [\"sleep infinity\"]",
+      "ENV GOROOT /usr/local/go",
+      "ENV GOPATH /go",
+      "ENV PATH $GOPATH/bin:$GOROOT/bin:$PATH"
     ]
   }],
   "provisioners": [
@@ -36,7 +40,8 @@
       "scripts": [
         "../scripts/config-yum.sh",
         "../scripts/install-bootstrapper.sh",
-        "../scripts/build-terraform-plugin-cache.sh"
+        "../scripts/build-terraform-plugin-cache.sh",
+        "../scripts/install-golang.sh"
       ],
       "environment_vars": [
         "TERRAFORM_VERSION={{user `terraform_version`}}",
@@ -52,7 +57,8 @@
         "YUM_BASE={{user `yum_base`}}",
         "YUM_DOCKER={{user `yum_docker`}}",
         "UCLOUD_CLI_VERSION={{user `ucloud_cli_version`}}",
-        "CODE_GIT_URL={{user `code_git_url`}}"
+        "CODE_GIT_URL={{user `code_git_url`}}",
+        "GOLANG_VERSION={{user `golang_version`}}"
       ]
     }],
   "post-processors": [
