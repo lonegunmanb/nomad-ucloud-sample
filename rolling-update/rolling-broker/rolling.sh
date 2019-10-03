@@ -1,5 +1,5 @@
-password=$1
-group=$2
+group=$1
+password=$2
 cd ../nomad-client
 go get -d ./...
 #cat rolling.go

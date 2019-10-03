@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"flag"
-	_ "flag"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io"
@@ -44,11 +43,8 @@ func update() {
 	}
 }
 
-func setIneligible(ips string, password *string) {
-	scanner := bufio.NewScanner(strings.NewReader(ips))
-	for scanner.Scan() {
-		ip := scanner.Text()
-
+func setIneligible(ips []string, password *string) {
+	for _, ip := range ips {
 		output := remoteExecuteCmd([]string{
 			fmt.Sprintf("echo set node ineligiblty %s", ip),
 			"nomad node eligibility -self -disable",
@@ -56,10 +52,6 @@ func setIneligible(ips string, password *string) {
 			"nomad node drain -self -enable",
 		}, ip, *password)
 		println(output)
-	}
-	err := scanner.Err()
-	if err != nil {
-		panic(err)
 	}
 }
 
@@ -72,12 +64,25 @@ func readArgs() (*string, *string, *string, *int) {
 	return password, module, ipProperty, group
 }
 
-var ReadIp = func(name string, group int) string {
+var ReadIp = func(name string, group int) []string {
+	if name == "" {
+		return []string{}
+	}
 	output, err := execCmd(fmt.Sprintf("terraform output -json | jq -r '.%s.value[%d]|.[]'", name, group), "../../", nil, nil)
 	if err != nil {
 		panic(err)
 	}
-	return output
+	var ips []string
+	scanner := bufio.NewScanner(strings.NewReader(output))
+	for scanner.Scan() {
+		ip := scanner.Text()
+		ips = append(ips, ip)
+	}
+	err = scanner.Err()
+	if err != nil {
+		panic(err)
+	}
+	return ips
 }
 
 func execCmd(cmdStrings string, dir string, stdout io.Writer, stderr io.Writer) (string, error) {
