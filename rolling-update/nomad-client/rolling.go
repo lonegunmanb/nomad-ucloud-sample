@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"flag"
 	"fmt"
 	"golang.org/x/crypto/ssh"
@@ -45,13 +44,12 @@ func update() {
 
 func setIneligible(ips []string, password *string) {
 	for _, ip := range ips {
-		output := remoteExecuteCmd([]string{
+		remoteExecuteCmd([]string{
 			fmt.Sprintf("echo set node ineligiblty %s", ip),
 			"nomad node eligibility -self -disable",
 			fmt.Sprintf("echo drain node %s", ip),
 			"nomad node drain -self -enable",
 		}, ip, *password)
-		println(output)
 	}
 }
 
@@ -86,7 +84,6 @@ var ReadIp = func(name string, group int) []string {
 }
 
 func execCmd(cmdStrings string, dir string, stdout io.Writer, stderr io.Writer) (string, error) {
-	// cmd := exec.Command("/bin/bash", "-c", cmdStrings)
 	cmd := &exec.Cmd{
 		Path:   "/bin/bash",
 		Args:   []string{"/bin/bash", "-c", cmdStrings},
@@ -104,7 +101,7 @@ func execCmd(cmdStrings string, dir string, stdout io.Writer, stderr io.Writer) 
 	return "", cmd.Run()
 }
 
-func remoteExecuteCmd(cmd []string, hostname string, password string) string {
+func remoteExecuteCmd(cmd []string, hostname string, password string) {
 	conn, err := ssh.Dial("tcp", hostname+":22", &ssh.ClientConfig{
 		User: "root",
 		Auth: []ssh.AuthMethod{ssh.Password(password)},
@@ -118,8 +115,6 @@ func remoteExecuteCmd(cmd []string, hostname string, password string) string {
 	}
 	defer conn.Close()
 
-	var stdoutBuf bytes.Buffer
-
 	for _, command := range cmd {
 
 		session, err := conn.NewSession()
@@ -128,13 +123,12 @@ func remoteExecuteCmd(cmd []string, hostname string, password string) string {
 			panic(err)
 		}
 
-		session.Stdout = &stdoutBuf
+		session.Stdout = os.Stdout
+		session.Stderr = os.Stderr
 		err = session.Run(command)
 		if err != nil {
 			panic(err)
 		}
 		session.Close()
 	}
-
-	return hostname + ":\n" + stdoutBuf.String()
 }
