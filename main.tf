@@ -193,7 +193,8 @@ locals {
   nomad_client_namesvr_image_id = length(var.nomad_client_namesvr_image_id) == 1 ? [for i in range(3): var.nomad_client_namesvr_image_id[0]] : var.nomad_client_namesvr_image_id
   namesvr_instance_type = length(var.nomad_client_namesvr_type) == 1 ? [for i in range(3): var.nomad_client_namesvr_type[0]] : var.nomad_client_namesvr_type
   broker_instance_type = length(var.nomad_client_broker_type) == 1 ? [for i in range(3): var.nomad_client_broker_type[0]] : var.nomad_client_broker_type
-  client_root_password = length(var.nomad_client_root_password) == 1 ? [for i in range(3): var.nomad_client_root_password[0]] : var.nomad_client_root_password
+  client_broker_root_password = length(var.nomad_client_broker_root_password) == 1 ? [for i in range(3): var.nomad_client_broker_root_password[0]] : var.nomad_client_broker_root_password
+  client_namesvr_root_password = length(var.nomad_client_namesvr_root_password) == 1 ? [for i in range(3): var.nomad_client_namesvr_root_password[0]] : var.nomad_client_namesvr_root_password
 }
 
 module nameServer0 {
@@ -209,7 +210,7 @@ module nameServer0 {
   instance_count            = var.name_server_count[0]
   instance_type             = local.namesvr_instance_type[0]
   region                    = var.region
-  root_password             = local.client_root_password[0]
+  root_password             = local.client_namesvr_root_password[0]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -236,7 +237,7 @@ module nameServer1 {
   instance_count            = var.name_server_count[1]
   instance_type             = local.namesvr_instance_type[1]
   region                    = var.region
-  root_password             = local.client_root_password[1]
+  root_password             = local.client_namesvr_root_password[1]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -263,7 +264,7 @@ module nameServer2 {
   instance_count            = var.name_server_count[2]
   instance_type             = local.namesvr_instance_type[2]
   region                    = var.region
-  root_password             = local.client_root_password[2]
+  root_password             = local.client_namesvr_root_password[2]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -290,7 +291,7 @@ module broker0 {
   instance_count            = var.broker_count[0]
   instance_type             = local.broker_instance_type[0]
   region                    = var.region
-  root_password             = local.client_root_password[0]
+  root_password             = local.client_broker_root_password[0]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -317,7 +318,7 @@ module broker1 {
   instance_count            = var.broker_count[1]
   instance_type             = local.broker_instance_type[1]
   region                    = var.region
-  root_password             = local.client_root_password[1]
+  root_password             = local.client_broker_root_password[1]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -344,7 +345,7 @@ module broker2 {
   instance_count            = var.broker_count[2]
   instance_type             = local.broker_instance_type[2]
   region                    = var.region
-  root_password             = local.client_root_password[2]
+  root_password             = local.client_broker_root_password[2]
   sg_id                     = ucloud_security_group.consul_server_sg.id
   vpc_id                    = data.terraform_remote_state.network.outputs.clientVpcId
   subnet_id                 = data.terraform_remote_state.network.outputs.clientSubnetId
@@ -381,7 +382,7 @@ module "nameServerInternalLb" {
 
 locals {
   nameServerSshIp = concat(module.nameServer0.ssh_ip, module.nameServer1.ssh_ip, module.nameServer2.ssh_ip)
-  nameServerRootPasswords = concat([for i in range(var.name_server_count[0]):local.client_root_password[0]], [for i in range(var.name_server_count[1]):local.client_root_password[1]], [for i in range(var.name_server_count[2]):local.client_root_password[2]])
+  nameServerRootPasswords = concat([for i in range(var.name_server_count[0]):local.client_broker_root_password[0]], [for i in range(var.name_server_count[1]):local.client_broker_root_password[1]], [for i in range(var.name_server_count[2]):local.client_broker_root_password[2]])
 }
 
 resource "null_resource" "setup_loopback_for_internal_lb" {

@@ -6,7 +6,11 @@ variable "nomad_server_root_password" {
   type = list(string)
 }
 
-variable "nomad_client_root_password" {
+variable "nomad_client_broker_root_password" {
+  type = list(string)
+}
+
+variable "nomad_client_namesvr_root_password" {
   type = list(string)
 }
 

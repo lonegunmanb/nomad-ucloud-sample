@@ -57,7 +57,8 @@ data "template_file" "bootstrap_script" {
     nomad_client_broker_image_id    = local.nomad_client_broker_image_id
     nomad_client_namesvr_image_id   = local.nomad_client_namesvr_image_id
     nomad_client_namesvr_type       = local.nomad_client_namesvr_type
-    nomad_client_root_password      = local.nomad_client_root_password
+    nomad_client_broker_root_password      = local.nomad_client_broker_root_password
+    nomad_client_namesvr_root_password = local.nomad_client_namesvr_root_password
     nomad_server_image_id           = local.nomad_server_image_id
     nomad_server_root_password      = local.nomad_server_root_password
     nomad_server_type               = local.nomad_server_type
