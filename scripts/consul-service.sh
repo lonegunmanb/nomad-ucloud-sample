@@ -1,7 +1,7 @@
 yum install -y sed unzip vim
 cd /tmp
 CONSUL_VERSION=$CONSUL_VERSION
-wget -O consul.zip http://hashicorpfile.cn-bj.ufileos.com/consul_${CONSUL_VERSION}_linux_amd64.zip
+wget -O consul.zip ${FILE_SERVER}/consul_${CONSUL_VERSION}_linux_amd64.zip
 unzip consul.zip
 install consul /usr/local/bin/consul
 consul --version

@@ -11,7 +11,8 @@
     "region": "cn-bj2",
     "az": "cn-bj2-02",
     "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",
-    "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo"
+    "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo",
+    "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
   },
 
   "builders": [{
@@ -40,7 +41,8 @@
         "CONSUL_VERSION={{user `consul_version`}}",
         "NOMAD_VERSION={{user `nomad_version`}}",
         "YUM_BASE={{user `yum_base`}}",
-        "YUM_DOCKER={{user `yum_docker`}}"
+        "YUM_DOCKER={{user `yum_docker`}}",
+        "FILE_SERVER={{user `file_server`}}"
       ]
     }]
 }

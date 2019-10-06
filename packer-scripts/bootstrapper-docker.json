@@ -19,7 +19,8 @@
     "docker_login_username": "",
     "docker_login_password": "",
     "code_git_url": "",
-    "golang_version": "1.13.1"
+    "golang_version": "1.13.1",
+    "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
   },
 
   "builders": [{
@@ -58,7 +59,8 @@
         "YUM_DOCKER={{user `yum_docker`}}",
         "UCLOUD_CLI_VERSION={{user `ucloud_cli_version`}}",
         "CODE_GIT_URL={{user `code_git_url`}}",
-        "GOLANG_VERSION={{user `golang_version`}}"
+        "GOLANG_VERSION={{user `golang_version`}}",
+        "FILE_SERVER={{user `file_server`}}"
       ]
     }],
   "post-processors": [
