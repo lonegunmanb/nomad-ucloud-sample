@@ -35,6 +35,7 @@
         "../scripts/config-yum.sh",
         "../scripts/consul-service.sh",
         "../scripts/nomad-service.sh",
+        "../scripts/config-consul.sh",
         "../scripts/nomad-server.sh"
       ],
       "environment_vars": [
