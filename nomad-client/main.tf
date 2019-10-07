@@ -58,6 +58,7 @@ resource "ucloud_eip_association" "nomad_ip" {
 }
 
 locals {
+  render-consul-config-path = "${path.module}/../scripts/render-consul-config.sh"
   setup-script-path        = "${path.module}/setup.sh"
   reconfig-ssh-keys-script = file("${path.module}/reconfig_ssh_keys.sh")
 }
@@ -87,6 +88,21 @@ locals {
   server_ips = var.env_name == "test" ? ucloud_eip.nomad_clients.*.public_ip : (var.env_name == "public" ? [for map in data.external.ipv6.*.result: map["ip"]] : ucloud_instance.nomad_clients.*.private_ip)
 }
 
+data "template_file" "consul-config" {
+  depends_on = [
+    ucloud_instance.nomad_clients
+  ]
+  count = var.instance_count
+  template   = file(local.render-consul-config-path)
+  vars       = {
+    region             = var.region
+    node-name          = ucloud_instance.nomad_clients[count.index].id
+    consul-server-ip-0 = var.consul_server_private_ips[0]
+    consul-server-ip-1 = var.consul_server_private_ips[1]
+    consul-server-ip-2 = var.consul_server_private_ips[2]
+  }
+}
+
 data "template_file" "setup-script" {
   depends_on = [
     ucloud_instance.nomad_clients]
@@ -106,19 +122,34 @@ data "template_file" "setup-script" {
                         }
 EOF
     , "\n", "\\n")
-    consul-server-ip-0 = var.consul_server_private_ips[0]
-    consul-server-ip-1 = var.consul_server_private_ips[1]
-    consul-server-ip-2 = var.consul_server_private_ips[2]
+  }
+}
+
+resource "null_resource" "config_consul" {
+  count = var.instance_count
+  depends_on = [
+    ucloud_eip_association.nomad_ip,
+    ucloud_disk_attachment.disk_attachment,
+    ucloud_eip.nomad_clients,
+    data.external.ipv6
+  ]
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password
+      host     = local.server_ips[count.index]
+    }
+    inline = [
+      data.template_file.consul-config.*.rendered[count.index]
+    ]
   }
 }
 
 resource "null_resource" "setup" {
   count      = var.instance_count
   depends_on = [
-    ucloud_eip_association.nomad_ip,
-    ucloud_disk_attachment.disk_attachment,
-    ucloud_eip.nomad_clients,
-    data.external.ipv6
+    null_resource.config_consul
   ]
   provisioner "remote-exec" {
     connection {
