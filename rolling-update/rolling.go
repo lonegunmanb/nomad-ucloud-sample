@@ -23,7 +23,7 @@ func main() {
 func taint(module string, group int) {
 	taintCmd := fmt.Sprintf("sh taint_module.sh %s%d", module, group)
 	println(taintCmd)
-	_, _ = execCmd(taintCmd, "../../", os.Stdout, os.Stderr)
+	_, _ = execCmd(taintCmd, "../", os.Stdout, os.Stderr)
 }
 
 func update() {
@@ -36,7 +36,7 @@ func update() {
 	if remoteVarExist {
 		cmd += " -var-file=/backend/remote.tfvars"
 	}
-	_, err := execCmd(cmd, "../../", os.Stdout, os.Stderr)
+	_, err := execCmd(cmd, "../", os.Stdout, os.Stderr)
 	if err != nil {
 		panic(err)
 	}
@@ -66,7 +66,7 @@ var ReadIp = func(name string, group int) []string {
 	if name == "" {
 		return []string{}
 	}
-	output, err := execCmd(fmt.Sprintf("terraform output -json | jq -r '.%s.value[%d]|.[]'", name, group), "../../", nil, nil)
+	output, err := execCmd(fmt.Sprintf("terraform output -json | jq -r '.%s.value[%d]|.[]'", name, group), "../", nil, nil)
 	if err != nil {
 		panic(err)
 	}
