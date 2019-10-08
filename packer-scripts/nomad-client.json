@@ -45,7 +45,7 @@
         "../scripts/consul-service.sh",
         "../scripts/nomad-service.sh",
         "../scripts/install-docker.sh",
-        "../scripts/config-consul.sh",
+        "../scripts/config-consul-agent.sh",
         "../scripts/nomad-client.sh",
         "../scripts/build-terraform-plugin-cache.sh"
       ],
