@@ -105,16 +105,18 @@ locals {
   reconfig-ssh-keys-script = file("${path.module}/reconfig_ssh_keys.sh")
 }
 
-module ipv6 {
-  source         = "../ipv6"
-  api_server_url = var.ipv6_server_url
-  region_id      = var.region_id
-  resourceIds    = ucloud_instance.consul_server.*.id
-  disable        = var.env_name != "public"
+data "external" "ipv6" {
+  count = var.env_name != "public" ? 0 : 3
+  program = ["python", "${path.module}/ipv6.py"]
+  query = {
+    url = var.ipv6_server_url
+    resourceId = ucloud_instance.consul_server.*.id[count.index]
+    regionId = var.region_id
+  }
 }
 
 locals {
-  server_ips = var.env_name == "test" ? ucloud_eip.consul_servers.*.public_ip : (var.env_name == "public" ? module.ipv6.ipv6s : ucloud_instance.consul_server.*.private_ip)
+  server_ips = var.env_name == "test" ? ucloud_eip.consul_servers.*.public_ip : (var.env_name == "public" ? [for map in data.external.ipv6.*.result: map["ip"]] : ucloud_instance.consul_server.*.private_ip)
 }
 
 data "template_file" "consul-config" {
