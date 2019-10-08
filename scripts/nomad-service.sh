@@ -36,7 +36,7 @@ EOF
 for bin in cfssl cfssl-certinfo cfssljson
 do
   echo "Installing $bin..."
-  wget -O /tmp/${bin} https://pkg.cfssl.org/R1.2/${bin}_linux-amd64
+  wget -O /tmp/${bin} ${CFSSL_TOOL_SERVER}/${bin}_linux-amd64
   install /tmp/${bin} /usr/local/bin/${bin}
 done
 nomad -autocomplete-install

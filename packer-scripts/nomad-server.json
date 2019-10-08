@@ -12,7 +12,8 @@
     "az": "cn-bj2-02",
     "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",
     "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo",
-    "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
+    "file_server": "http://hashicorpfile.cn-bj.ufileos.com",
+    "cfssl_tool_server": "https://pkg.cfssl.org/R1.2"
   },
 
   "builders": [{
@@ -43,7 +44,8 @@
         "NOMAD_VERSION={{user `nomad_version`}}",
         "YUM_BASE={{user `yum_base`}}",
         "YUM_DOCKER={{user `yum_docker`}}",
-        "FILE_SERVER={{user `file_server`}}"
+        "FILE_SERVER={{user `file_server`}}",
+        "CFSSL_TOOL_SERVER={{user `cfssl_tool_server`}}"
       ]
     }]
 }
