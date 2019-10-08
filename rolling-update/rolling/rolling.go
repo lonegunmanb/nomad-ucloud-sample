@@ -12,18 +12,47 @@ import (
 	"strings"
 )
 
-func RollingUpdate(onLeaveNodeCmds []string) {
+const Dir = "../"
+
+func RollingUpdate(onLeaveNodeCmds []string, moduleResToTaint func(int) []string, resToTaint []string) {
 	password, module, ipProperty, group := ReadArgs()
 	ips := ReadIp(*ipProperty, *group)
 	OnLeave(ips, password, onLeaveNodeCmds)
-	Taint(*module, *group)
+	if moduleResToTaint == nil {
+		TaintEntireModule(*module, *group)
+	} else {
+		TaintResInModule(*group, moduleResToTaint)
+	}
+	if resToTaint != nil {
+		TaintResContainsName(resToTaint)
+	}
 	Update()
 }
 
-func Taint(module string, group int) {
-	taintCmd := fmt.Sprintf("sh taint_module.sh %s%d", module, group)
+func TaintResInModule(group int, resToTaint func(int) []string) {
+	for _, res := range resToTaint(group) {
+		taintCmd := fmt.Sprintf("terraform taint %s", res)
+		println(taintCmd)
+		_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
+	}
+}
+
+func TaintResContainsName(resources []string) {
+	for _, res := range resources {
+		taintCmd := fmt.Sprintf("sh taint_res.sh %s", res)
+		_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
+	}
+}
+
+func TaintEntireModule(module string, group int) {
+	var taintCmd string
+	if group != -1 {
+		taintCmd = fmt.Sprintf("sh taint_module.sh %s%d", module, group)
+	} else {
+		taintCmd = fmt.Sprintf("sh taint_module.sh %s", module)
+	}
 	println(taintCmd)
-	_, _ = ExecCmd(taintCmd, "../", os.Stdout, os.Stderr)
+	_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
 }
 
 func Update() {
@@ -34,7 +63,7 @@ func Update() {
 	if remoteVarExist {
 		cmd += fmt.Sprintf(" -var-file=%s", remoteVarFile)
 	}
-	_, err := ExecCmd(cmd, "../", os.Stdout, os.Stderr)
+	_, err := ExecCmd(cmd, Dir, os.Stdout, os.Stderr)
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +85,7 @@ func OnLeave(ips []string, password *string, cmds []string) {
 
 func ReadArgs() (*string, *string, *string, *int) {
 	password := flag.String("pass", "", "ssh password")
-	group := flag.Int("group", 0, "update group")
+	group := flag.Int("group", -1, "update group")
 	module := flag.String("module", "", "")
 	ipProperty := flag.String("ip-property", "", "")
 	flag.Parse()
@@ -67,7 +96,7 @@ var ReadIp = func(name string, group int) []string {
 	if name == "" {
 		return []string{}
 	}
-	output, err := ExecCmd(fmt.Sprintf("terraform output -json | jq -r '.%s.value[%d]|.[]'", name, group), "../", nil, nil)
+	output, err := ExecCmd(fmt.Sprintf("terraform output -json | jq -r '.%s.value[%d]|.[]'", name, group), Dir, nil, nil)
 	if err != nil {
 		panic(err)
 	}

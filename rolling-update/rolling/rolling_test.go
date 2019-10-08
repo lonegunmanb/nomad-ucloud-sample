@@ -33,7 +33,7 @@ func TestUpdateWithRemoteVar(t *testing.T) {
 	})
 }
 
-func TestTaintModule(t *testing.T) {
+func TestTaintModuleWithGroup(t *testing.T) {
 	module := "module"
 	group := 0
 	gostub.Stub(&rolling.ExecCmd, func(cmdString string, dir string, stdout io.Writer, stderr io.Writer) (string, error) {
@@ -41,5 +41,16 @@ func TestTaintModule(t *testing.T) {
 		assert.Equal(t, "../", dir)
 		return "", nil
 	})
-	rolling.Taint(module, group)
+	rolling.TaintEntireModule(module, group)
+}
+
+func TestTaintModuleWithoutGroup(t *testing.T) {
+	module := "module"
+	group := -1
+	gostub.Stub(&rolling.ExecCmd, func(cmdString string, dir string, stdout io.Writer, stderr io.Writer) (string, error) {
+		assert.Equal(t, cmdString, "sh taint_module.sh module")
+		assert.Equal(t, "../", dir)
+		return "", nil
+	})
+	rolling.TaintEntireModule(module, group)
 }

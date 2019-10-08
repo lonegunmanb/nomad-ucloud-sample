@@ -135,6 +135,7 @@ resource "null_resource" "config_consul" {
       host     = local.server_ips[count.index]
     }
     inline = [
+      file("${path.module}/../scripts/config-consul-agent.sh"),
       data.template_file.consul-config.*.rendered[count.index]
     ]
   }

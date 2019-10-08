@@ -100,6 +100,7 @@ resource "ucloud_eip_association" "consul_ip" {
 }
 
 locals {
+  config-consul-path       = "${path.module}/../scripts/render-consul-config.sh"
   setup-script-path        = "${path.module}/setup.sh"
   reconfig-ssh-keys-script = file("${path.module}/reconfig_ssh_keys.sh")
 }
@@ -114,6 +115,19 @@ module ipv6 {
 
 locals {
   server_ips = var.env_name == "test" ? ucloud_eip.consul_servers.*.public_ip : (var.env_name == "public" ? module.ipv6.ipv6s : ucloud_instance.consul_server.*.private_ip)
+}
+
+data "template_file" "consul-config" {
+  depends_on = [ucloud_instance.consul_server]
+  count      = local.instance_count
+  template   = file(local.config-consul-path)
+  vars       = {
+    region             = var.region
+    node-name          = ucloud_instance.consul_server[count.index].id
+    consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
+    consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
+    consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
+  }
 }
 
 data "template_file" "setup-script" {
@@ -139,13 +153,32 @@ module "consulLb" {
   vpc_id       = var.vpc_id
 }
 
-resource "null_resource" "install_consul_server" {
+resource "null_resource" "config_consul" {
   count      = local.instance_count
   depends_on = [
     ucloud_instance.consul_server,
     ucloud_disk_attachment.attachment0,
     ucloud_disk_attachment.attachment1,
     ucloud_disk_attachment.attachment2
+  ]
+  provisioner "remote-exec" {
+    connection {
+      type     = "ssh"
+      user     = "root"
+      password = var.root_password[count.index]
+      host     = local.server_ips[count.index]
+    }
+    inline = [
+      file("${path.module}/../scripts/consul-server.sh"),
+      data.template_file.consul-config[count.index].rendered,
+    ]
+  }
+}
+
+resource "null_resource" "install_consul_server" {
+  count      = local.instance_count
+  depends_on = [
+    null_resource.config_consul
   ]
   provisioner "remote-exec" {
     connection {
