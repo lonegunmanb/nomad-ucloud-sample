@@ -129,22 +129,6 @@ if [ ! -f "../system-job/terraform.tfvars" ]; then
 EOF
 fi
 
-if [ ! -f "../rolling-update/rolling-broker/terraform.tfvars" ]; then
-  cat>../rolling-update/rolling-broker/terraform.tfvars<<-EOF
-  nomad_cluster_id = "${cluster_id}"
-  root_password = "${nomad_client_root_password}"
-  mod = 0
-EOF
-fi
-
-if [ ! -f "../rolling-update/rolling-namesvr/terraform.tfvars" ]; then
-  cat>../rolling-update/rolling-namesvr/terraform.tfvars<<-EOF
-  nomad_cluster_id = "${cluster_id}"
-  root_password = "${nomad_client_root_password}"
-  mod = 0
-EOF
-fi
-
 cd ../network
 rm -f destroyed
 if [ ! -f "inited" ]; then
