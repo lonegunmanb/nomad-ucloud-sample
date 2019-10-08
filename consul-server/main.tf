@@ -159,6 +159,7 @@ resource "null_resource" "config_consul" {
   count      = local.instance_count
   depends_on = [
     ucloud_instance.consul_server,
+    data.external.ipv6,
     ucloud_disk_attachment.attachment0,
     ucloud_disk_attachment.attachment1,
     ucloud_disk_attachment.attachment2
