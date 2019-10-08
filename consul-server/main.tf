@@ -106,6 +106,7 @@ locals {
 }
 
 data "external" "ipv6" {
+  depends_on = [ucloud_instance.consul_server]
   count = var.env_name != "public" ? 0 : 3
   program = ["python", "${path.module}/ipv6.py"]
   query = {
