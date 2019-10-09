@@ -193,3 +193,4 @@ variable "legacy_vpc_id" {
 variable "legacy_subnet_id" {
   default = ""
 }
+variable "haproxy_image" {}

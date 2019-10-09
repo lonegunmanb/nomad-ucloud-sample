@@ -233,8 +233,14 @@ data "ucloud_lbs" "consulLb" {
   name_regex = "consulLb-${var.cluster_id}"
 }
 
+data "ucloud_lbs" "nomadServerLb" {
+  depends_on = [kubernetes_pod.bootstraper]
+  name_regex = "nomadServerLb-${var.cluster_id}"
+}
+
 locals {
-  lbId                       = data.ucloud_lbs.consulLb.lbs[0].id
+  consulLbId                 = data.ucloud_lbs.consulLb.lbs[0].id
+  nomadServerLbId            = data.ucloud_lbs.nomadServerLb.lbs[0].id
   allow_multiple_tasks_in_az = length(var.az) == length(distinct(var.az)) ? false : true
 }
 
@@ -242,8 +248,14 @@ module "consulLbIpv6" {
   source         = "../ipv6"
   api_server_url = var.ipv6_api_url
   region_id      = var.region_id
-  resourceIds    = [
-    local.lbId]
+  resourceIds    = [local.consulLbId]
+}
+
+module "nomadServerLbIpv6" {
+  source         = "../ipv6"
+  api_server_url = var.ipv6_api_url
+  region_id      = var.region_id
+  resourceIds    = [local.nomadServerLbId]
 }
 
 resource "kubernetes_config_map" "backend-script" {
@@ -259,6 +271,7 @@ resource "kubernetes_config_map" "backend-script" {
 
 locals {
   controller_pod_label = "rktmq-${var.cluster_id}"
+  haproxy_pod_label    = "haproxy-${var.cluster_id}"
 }
 
 resource "kubernetes_deployment" "controller" {
@@ -373,6 +386,83 @@ resource kubernetes_service ctrlService {
     port {
       port        = var.controller_svc_port
       target_port = var.controller_pod_port
+    }
+  }
+}
+
+data "template_file" "haproxy_cfg" {
+  template = file("${path.module}/haproxy.cfg")
+  vars = {
+    port = 4646
+    ip = module.nomadServerLbIpv6.ipv6s[0]
+    dest_port = 4646
+  }
+}
+
+resource "kubernetes_config_map" "haproxy_cfg" {
+  metadata {
+    name      = "haproxy-cfg-${var.cluster_id}"
+    namespace = var.k8s_namespace
+  }
+  data = {
+    "haproxy.cfg" = data.template_file.haproxy_cfg.rendered
+  }
+}
+
+
+resource "kubernetes_deployment" "haproxy" {
+  depends_on = [kubernetes_deployment.controller]
+  metadata {
+    namespace = var.k8s_namespace
+    name      = "haproxy-${var.cluster_id}"
+  }
+  spec {
+    replicas = 2
+
+    selector {
+      match_labels = {
+        app = local.haproxy_pod_label
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = local.haproxy_pod_label
+        }
+      }
+      spec {
+        container {
+          name  = "controller"
+          image = var.haproxy_image
+          volume_mount {
+            name       = "haproxycfg"
+            mount_path = "/usr/local/etc/haproxy"
+          }
+        }
+        volume {
+          name = "haproxycfg"
+          config_map {
+            name = kubernetes_config_map.haproxy_cfg.metadata[0].name
+          }
+        }
+      }
+    }
+  }
+}
+
+resource kubernetes_service nomadServerSvc {
+  metadata {
+    namespace = var.k8s_namespace
+    name      = "nomad-server-${var.cluster_id}"
+  }
+  spec {
+    selector = {
+      app = local.haproxy_pod_label
+    }
+    port {
+      port        = 4646
+      target_port = 4646
     }
   }
 }
