@@ -11,7 +11,10 @@
     "az": "cn-bj2-02",
     "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",
     "yum_docker": "https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo",
-    "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
+    "file_server": "http://hashicorpfile.cn-bj.ufileos.com",
+    "use_ssh_private_ip": "false",
+    "vpc_id": "",
+    "subnet_id": ""
   },
 
   "builders": [{
@@ -25,7 +28,10 @@
     "source_image_id":"{{user `image_id`}}",
     "ssh_username":"{{user `ssh_user`}}",
     "ssh_password": "{{user `ssh_password`}}",
-    "image_name": "consul-server-{{user `consul_version`}}"
+    "image_name": "consul-server-{{user `consul_version`}}",
+    "use_ssh_private_ip": "{{user `use_ssh_private_ip`}}",
+    "vpc_id": "{{user `vpc_id`}}",
+    "subnet_id": "{{user `subnet_id`}}"
   }],
   "provisioners": [
     {
