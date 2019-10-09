@@ -25,7 +25,8 @@
     "cfssl_tool_server": "https://pkg.cfssl.org/R1.2",
     "use_ssh_private_ip": "false",
     "vpc_id": "",
-    "subnet_id": ""
+    "subnet_id": "",
+    "base_url": ""
   },
 
   "builders": [{
@@ -42,7 +43,8 @@
     "image_name": "nomad-client-{{user `nomad_version`}}-consul-{{user `consul_version`}}",
     "use_ssh_private_ip": "{{user `use_ssh_private_ip`}}",
     "vpc_id": "{{user `vpc_id`}}",
-    "subnet_id": "{{user `subnet_id`}}"
+    "subnet_id": "{{user `subnet_id`}}",
+    "base_url": "{{user `base_url`}}"
   }],
   "provisioners": [
     {

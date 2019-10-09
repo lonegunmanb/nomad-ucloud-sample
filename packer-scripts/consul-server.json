@@ -14,7 +14,8 @@
     "file_server": "http://hashicorpfile.cn-bj.ufileos.com",
     "use_ssh_private_ip": "false",
     "vpc_id": "",
-    "subnet_id": ""
+    "subnet_id": "",
+    "base_url": ""
   },
 
   "builders": [{
@@ -31,7 +32,8 @@
     "image_name": "consul-server-{{user `consul_version`}}",
     "use_ssh_private_ip": "{{user `use_ssh_private_ip`}}",
     "vpc_id": "{{user `vpc_id`}}",
-    "subnet_id": "{{user `subnet_id`}}"
+    "subnet_id": "{{user `subnet_id`}}",
+    "base_url": "{{user `base_url`}}"
   }],
   "provisioners": [
     {
