@@ -42,7 +42,7 @@ locals {
   nomad_server_public_ips = concat(module.nomad_server0.public_ips, module.nomad_server1.public_ips, module.nomad_server2.public_ips)
   nomad_server_ssh_ips = concat(module.nomad_server0.ssh_ip, module.nomad_server1.ssh_ip, module.nomad_server2.ssh_ip)
   nomad_server_ips  = var.env_name == "test" ? local.nomad_server_public_ips : module.nomad_lb_ipv6.ipv6s
-  nomad_server_access_ip = var.env_name == "test" ? (length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : "") : (module.nomad_lb_ipv6.ipv6s[0])
+  nomad_server_access_ip = var.env_name == "test" ? (length(local.nomad_server_ips) > 0 ? local.nomad_server_ips[0] : "") : (length(module.nomad_lb_ipv6.ipv6s) > 0 ? module.nomad_lb_ipv6.ipv6s[0] : "")
   consul_server_ips = var.env_name == "test" ? module.consul_servers.public_ips : (var.env_name == "public" ? module.consul_access_ipv6.ipv6s : module.consul_servers.private_ips)
   consul_access_ip  = length(local.consul_server_ips) > 0 ? local.consul_server_ips[0] : ""
   consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
@@ -62,7 +62,7 @@ output "nomad_servers_ips" {
 
 module nomad_lb_ipv6 {
   source = "./ipv6"
-  disable = var.env_name != "public"
+  disable = var.env_name == "test"
   api_server_url = var.ipv6_server_url
   region_id = var.region_id
   resourceIds = [ucloud_lb.nomad_server_lb.id]
