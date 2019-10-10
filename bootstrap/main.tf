@@ -435,6 +435,9 @@ resource "kubernetes_deployment" "haproxy" {
         container {
           name  = "controller"
           image = var.haproxy_image
+          port {
+            container_port = 4646
+          }
           volume_mount {
             name       = "haproxycfg"
             mount_path = "/usr/local/etc/haproxy"
