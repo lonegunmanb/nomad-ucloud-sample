@@ -166,7 +166,7 @@ data null_data_source consul_finish {
 module "backend_lb" {
   source = "../internal_lb"
   instance_ids = module.consul_backend.uhost_ids
-  name = "consulLb-${var.tag}"
+  name = "consulBackendLb-${var.tag}"
   ports = [8500]
   vpc_id            = data.ucloud_vpcs.vpc.vpcs.*.id[0]
   subnet_id         = data.ucloud_subnets.subnet.subnets.*.id[0]

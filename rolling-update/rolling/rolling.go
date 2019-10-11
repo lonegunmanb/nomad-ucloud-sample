@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"github.com/ahmetb/go-linq"
 	"golang.org/x/crypto/ssh"
 	"io"
 	"net"
@@ -13,6 +14,35 @@ import (
 )
 
 const Dir = "../"
+
+type RemoteCleanupOnLeave interface {
+	OnLeave(ips []string, password *string, cmds []string)
+}
+
+type TaintPattern interface {
+	Match(res string) bool
+}
+
+type TaintModuleGroupPattern struct {
+	module string
+	group  int
+}
+
+func (t TaintModuleGroupPattern) Match(res string) bool {
+	return strings.HasPrefix(res, fmt.Sprintf("module.%s%d", t.module, t.group))
+}
+
+type TaintResInModuleGroupPattern struct {
+	module string
+	group  int
+	res    []string
+}
+
+func (t TaintResInModuleGroupPattern) Match(res string) bool {
+	return linq.From(t.res).AnyWith(func(resName interface{}) bool {
+		return strings.HasPrefix(resName.(string), fmt.Sprintf("%s.", t.module))
+	})
+}
 
 func RollingUpdate(onLeaveNodeCmds []string, moduleResToTaint func(int) []string, resToTaint []string) {
 	password, module, ipProperty, group := ReadArgs()

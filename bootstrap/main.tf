@@ -228,10 +228,16 @@ provider "ucloud" {
   base_url    = var.ucloud_api_base_url
 }
 
-data "ucloud_lbs" "consulLb" {
+data "ucloud_lbs" "consul_backend_Lb" {
   depends_on = [
     kubernetes_pod.bootstraper]
-  name_regex = "consulLb-${var.cluster_id}"
+  name_regex = "consulBackendLb-${var.cluster_id}"
+}
+
+data "ucloud_lbs" "consul_rktmq_lb" {
+  depends_on = [
+    kubernetes_pod.bootstraper]
+  name_regex = "consulServer-${var.cluster_id}"
 }
 
 data "ucloud_lbs" "nomadServerLb" {
@@ -245,17 +251,25 @@ data "ucloud_lbs" "nameServerLb" {
 }
 
 locals {
-  consulLbId                 = data.ucloud_lbs.consulLb.lbs[0].id
+  consulBackendLbId          = data.ucloud_lbs.consul_backend_Lb.lbs[0].id
+  consulRktmqLbId            = data.ucloud_lbs.consul_rktmq_lb.lbs[0].id
   nomadServerLbId            = data.ucloud_lbs.nomadServerLb.lbs[0].id
   allow_multiple_tasks_in_az = length(var.az) == length(distinct(var.az)) ? false : true
-  nameServerLbIp = data.ucloud_lbs.nameServerLb.lbs[0].private_ip
+  nameServerLbIp             = data.ucloud_lbs.nameServerLb.lbs[0].private_ip
 }
 
-module "consulLbIpv6" {
+module "consulBackendLbIpv6" {
   source         = "../ipv6"
   api_server_url = var.ipv6_api_url
   region_id      = var.region_id
-  resourceIds    = [local.consulLbId]
+  resourceIds    = [local.consulBackendLbId]
+}
+
+module "consulRktmqLbIpv6" {
+  source         = "../ipv6"
+  api_server_url = var.ipv6_api_url
+  region_id      = var.region_id
+  resourceIds    = [local.consulRktmqLbId]
 }
 
 module "nomadServerLbIpv6" {
@@ -271,8 +285,8 @@ resource "kubernetes_config_map" "backend-script" {
     namespace = var.k8s_namespace
   }
   data = {
-    "backend.tfvars" = "address = \"http://[${module.consulLbIpv6.ipv6s[0]}]:8500\""
-    "remote.tfvars"  = "remote_state_backend_url = \"http://[${module.consulLbIpv6.ipv6s[0]}]:8500\""
+    "backend.tfvars" = "address = \"http://[${module.consulBackendLbIpv6.ipv6s[0]}]:8500\""
+    "remote.tfvars"  = "remote_state_backend_url = \"http://[${module.consulBackendLbIpv6.ipv6s[0]}]:8500\""
   }
 }
 
@@ -309,7 +323,7 @@ resource "kubernetes_deployment" "controller" {
 
           env {
             name  = "TF_VAR_remote_state_backend_url"
-            value = "http://[${module.consulLbIpv6.ipv6s[0]}]:8500"
+            value = "http://[${module.consulBackendLbIpv6.ipv6s[0]}]:8500"
           }
           env {
             name  = "TF_VAR_nomad_cluster_id"
@@ -407,9 +421,12 @@ data "template_file" "haproxy_cfg" {
     nomad_ip = module.nomadServerLbIpv6.ipv6s[0]
     nomad_port = 4646
     dest_nomad_port = 4646
-    consul_ip = module.consulLbIpv6.ipv6s[0]
-    consul_port = 8500
-    dest_consul_port = 8500
+    consul_backend_ip = module.consulBackendLbIpv6.ipv6s[0]
+    consul_backend_port = 8500
+    dest_consul_backend_port = 8500
+    consul_rktmq_ip = module.consulRktmqLbIpv6.ipv6s[0]
+    consul_rktmq_port = 8501
+    dest_consul_rktmq_port = 8500
   }
 }
 
@@ -447,15 +464,19 @@ resource "kubernetes_deployment" "haproxy" {
       }
       spec {
         container {
-          name  = "controller"
+          name  = "haproxy"
           image = var.haproxy_image
           port {
             name = "nomad"
             container_port = 4646
           }
           port {
-            name = "consul"
+            name = "consul-backend"
             container_port = 8500
+          }
+          port {
+            name = "consul-rktmq"
+            container_port = 8501
           }
           volume_mount {
             name       = "haproxycfg"
@@ -488,9 +509,14 @@ resource kubernetes_service nomadServerSvc {
       target_port = 4646
     }
     port {
-      name = "consul"
+      name = "consul-backend"
       port = 8500
       target_port = 8500
+    }
+    port {
+      name = "consul-rktmq"
+      port = 8501
+      target_port = 8501
     }
   }
 }
