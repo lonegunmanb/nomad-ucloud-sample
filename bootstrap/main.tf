@@ -250,6 +250,13 @@ data "ucloud_lbs" "nameServerLb" {
   name_regex = "nameServerInternalLb-${var.cluster_id}"
 }
 
+module "nameServerLbIpv6" {
+  source         = "../ipv6"
+  api_server_url = var.ipv6_api_url
+  region_id      = var.region_id
+  resourceIds    = [data.ucloud_lbs.nameServerLb.lbs[0].id]
+}
+
 locals {
   consulBackendLbId          = data.ucloud_lbs.consul_backend_Lb.lbs[0].id
   consulRktmqLbId            = data.ucloud_lbs.consul_rktmq_lb.lbs[0].id
@@ -427,6 +434,8 @@ data "template_file" "haproxy_cfg" {
     consul_rktmq_ip = module.consulRktmqLbIpv6.ipv6s[0]
     consul_rktmq_port = 8501
     dest_consul_rktmq_port = 8500
+    prometheus_port = 9090
+    prometheus_ip = module.nameServerLbIpv6.ipv6s[0]
   }
 }
 
@@ -478,6 +487,10 @@ resource "kubernetes_deployment" "haproxy" {
             name = "consul-rktmq"
             container_port = 8501
           }
+          port {
+            name = "prometheus"
+            container_port = 9090
+          }
           volume_mount {
             name       = "haproxycfg"
             mount_path = "/usr/local/etc/haproxy"
@@ -494,10 +507,10 @@ resource "kubernetes_deployment" "haproxy" {
   }
 }
 
-resource kubernetes_service nomadServerSvc {
+resource kubernetes_service maintain {
   metadata {
     namespace = var.k8s_namespace
-    name      = "nomad-server-${var.cluster_id}"
+    name      = var.cluster_id
   }
   spec {
     selector = {
@@ -517,6 +530,11 @@ resource kubernetes_service nomadServerSvc {
       name = "consul-rktmq"
       port = 8501
       target_port = 8501
+    }
+    port {
+      name = "prometheus"
+      port = 9090
+      target_port = 9090
     }
   }
 }
