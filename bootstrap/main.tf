@@ -239,10 +239,16 @@ data "ucloud_lbs" "nomadServerLb" {
   name_regex = "nomadServerLb-${var.cluster_id}"
 }
 
+data "ucloud_lbs" "nameServerLb" {
+  depends_on = [kubernetes_pod.bootstraper]
+  name_regex = "nameServerInternalLb-${var.cluster_id}"
+}
+
 locals {
   consulLbId                 = data.ucloud_lbs.consulLb.lbs[0].id
   nomadServerLbId            = data.ucloud_lbs.nomadServerLb.lbs[0].id
   allow_multiple_tasks_in_az = length(var.az) == length(distinct(var.az)) ? false : true
+  nameServerLbIp = data.ucloud_lbs.nameServerLb.lbs[0].private_ip
 }
 
 module "consulLbIpv6" {
@@ -338,6 +344,10 @@ resource "kubernetes_deployment" "controller" {
                 key = "ucloud-secret"
               }
             }
+          }
+          env {
+            name = "NAMESVR_INDEX_IP"
+            value = local.nameServerLbIp
           }
           dynamic "env" {
             for_each = var.controller_env_map
