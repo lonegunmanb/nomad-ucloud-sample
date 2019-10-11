@@ -424,18 +424,19 @@ resource kubernetes_service ctrlService {
 
 data "template_file" "haproxy_cfg" {
   template = file("${path.module}/haproxy.cfg")
-  vars = {
-    nomad_ip = module.nomadServerLbIpv6.ipv6s[0]
-    nomad_port = 4646
-    dest_nomad_port = 4646
-    consul_backend_ip = module.consulBackendLbIpv6.ipv6s[0]
-    consul_backend_port = 8500
+  vars     = {
+    nomad_ip                 = module.nomadServerLbIpv6.ipv6s[0]
+    nomad_port               = 4646
+    dest_nomad_port          = 4646
+    consul_backend_ip        = module.consulBackendLbIpv6.ipv6s[0]
+    consul_backend_port      = 8500
     dest_consul_backend_port = 8500
-    consul_rktmq_ip = module.consulRktmqLbIpv6.ipv6s[0]
-    consul_rktmq_port = 8501
-    dest_consul_rktmq_port = 8500
-    prometheus_port = 9090
-    prometheus_ip = module.nameServerLbIpv6.ipv6s[0]
+    consul_rktmq_ip          = module.consulRktmqLbIpv6.ipv6s[0]
+    consul_rktmq_port        = 8501
+    dest_consul_rktmq_port   = 8500
+    prometheus_port          = 9090
+    prometheus_ip            = module.nameServerLbIpv6.ipv6s[0]
+    dest_prometheus_port     = 9090
   }
 }
 
