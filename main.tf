@@ -359,9 +359,22 @@ module broker2 {
   group                     = "${local.az[2]}-2"
 }
 
-module "nameServerid" {
+module "nameServerid0" {
   source = "./module_variables"
-  input  = concat(module.nameServer0.ids, module.nameServer1.ids, module.nameServer2.ids)//module.nameServer.ids
+  file_name = "nameServerid0"
+  input  = module.nameServer0.ids
+}
+
+module "nameServerid1" {
+  source = "./module_variables"
+  file_name = "nameServerid1"
+  input  = module.nameServer1.ids
+}
+
+module "nameServerid2" {
+  source = "./module_variables"
+  file_name = "nameServerid2"
+  input  = module.nameServer2.ids
 }
 
 locals {
@@ -369,15 +382,71 @@ locals {
   total_name_server_count = length(flatten([for i in var.name_server_count:range(i)]))
 }
 
-module "nameServerInternalLb" {
+resource ucloud_lb name_server_internal_lb {
+  name      = "nameServerInternalLb-${local.cluster_id}"
+  internal  = true
+  tag       = local.cluster_id
+  vpc_id    = data.terraform_remote_state.network.outputs.clientVpcId
+  subnet_id = data.terraform_remote_state.network.outputs.clientSubnetId
+}
+
+resource ucloud_lb_listener namesvr_index_listener {
+  load_balancer_id = ucloud_lb.name_server_internal_lb.id
+  protocol         = "tcp"
+  name             = var.namesvr_http_endpoint_port
+  port             = var.namesvr_http_endpoint_port
+}
+
+resource ucloud_lb_listener namesvr_prometheus_listener {
+  load_balancer_id = ucloud_lb.name_server_internal_lb.id
+  protocol         = "tcp"
+  name             = var.prometheus_port
+  port             = var.prometheus_port
+}
+
+module "nameServerInternalLb0" {
   source       = "./internal_lb"
-  instance_ids = module.nameServerid.output
-  attachment_count = local.total_name_server_count  * length(local.nameServerExposePots)
+  instance_ids = module.nameServerid0.output
+  attachment_count = var.name_server_count[0] * length(local.nameServerExposePots)
   name         = "nameServerInternalLb-${local.cluster_id}"
   ports        = local.nameServerExposePots
-  vpc_id       = data.terraform_remote_state.network.outputs.clientVpcId
-  subnet_id    = data.terraform_remote_state.network.outputs.clientSubnetId
+  vpc_id       = ""
+  subnet_id    = ""
   tag          = local.cluster_id
+  attachment_only = true
+  legacy_lb_id = ucloud_lb.name_server_internal_lb.id
+  legacy_listener_id = [ucloud_lb_listener.namesvr_index_listener.id, ucloud_lb_listener.namesvr_prometheus_listener.id]
+  legacy_lb_private_ip = ucloud_lb.name_server_internal_lb.private_ip
+}
+
+module "nameServerInternalLb1" {
+  source       = "./internal_lb"
+  instance_ids = module.nameServerid1.output
+  attachment_count = var.name_server_count[1] * length(local.nameServerExposePots)
+  name         = "nameServerInternalLb-${local.cluster_id}"
+  ports        = local.nameServerExposePots
+  vpc_id       = ""
+  subnet_id    = ""
+  tag          = local.cluster_id
+  attachment_only = true
+  legacy_lb_id = ucloud_lb.name_server_internal_lb.id
+  legacy_listener_id = [ucloud_lb_listener.namesvr_index_listener.id, ucloud_lb_listener.namesvr_prometheus_listener.id]
+  legacy_lb_private_ip = ucloud_lb.name_server_internal_lb.private_ip
+}
+
+module "nameServerInternalLb2" {
+  source       = "./internal_lb"
+  instance_ids = module.nameServerid2.output
+  attachment_count = var.name_server_count[2] * length(local.nameServerExposePots)
+  name         = "nameServerInternalLb-${local.cluster_id}"
+  ports        = local.nameServerExposePots
+  vpc_id       = ""
+  subnet_id    = ""
+  tag          = local.cluster_id
+  attachment_only = true
+  legacy_lb_id = ucloud_lb.name_server_internal_lb.id
+  legacy_listener_id = [ucloud_lb_listener.namesvr_index_listener.id, ucloud_lb_listener.namesvr_prometheus_listener.id]
+  legacy_lb_private_ip = ucloud_lb.name_server_internal_lb.private_ip
 }
 
 locals {
@@ -399,7 +468,7 @@ resource "null_resource" "setup_loopback_for_internal_lb" {
         host     = local.nameServerSshIp[count.index]
       }
     inline = [
-      module.nameServerInternalLb.setup_loopback_script
+      module.nameServerInternalLb0.setup_loopback_script
     ]
   }
 }

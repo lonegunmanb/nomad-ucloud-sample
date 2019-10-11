@@ -20,6 +20,7 @@ variable "attachment_count" {
 }
 variable "attachment_only" {
   default = false
+  type = bool
 }
 variable "legacy_lb_id" {
   default = ""
