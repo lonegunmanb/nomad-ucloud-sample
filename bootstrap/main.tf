@@ -404,9 +404,12 @@ resource kubernetes_service ctrlService {
 data "template_file" "haproxy_cfg" {
   template = file("${path.module}/haproxy.cfg")
   vars = {
-    port = 4646
-    ip = module.nomadServerLbIpv6.ipv6s[0]
-    dest_port = 4646
+    nomad_ip = module.nomadServerLbIpv6.ipv6s[0]
+    nomad_port = 4646
+    dest_nomad_port = 4646
+    consul_ip = module.consulLbIpv6.ipv6s[0]
+    consul_port = 8500
+    dest_consul_port = 8500
   }
 }
 
@@ -449,6 +452,9 @@ resource "kubernetes_deployment" "haproxy" {
           port {
             container_port = 4646
           }
+          port {
+            container_port = 8500
+          }
           volume_mount {
             name       = "haproxycfg"
             mount_path = "/usr/local/etc/haproxy"
@@ -477,6 +483,10 @@ resource kubernetes_service nomadServerSvc {
     port {
       port        = 4646
       target_port = 4646
+    }
+    port {
+      port = 8500
+      target_port = 8500
     }
   }
 }
