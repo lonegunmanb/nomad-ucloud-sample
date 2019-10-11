@@ -73,7 +73,7 @@ output "nomad_server_ip" {
 }
 
 output "nomad_server_access_url" {
-  value = length(local.nomad_server_access_ip) > 15 ? "http://[${local.nomad_server_access_ip}]:4646" : "http://${local.nomad_server_access_ip}:4646"
+  value = local.nomad_server_access_ip == null ? "" : length(local.nomad_server_access_ip) > 15 ? "http://[${local.nomad_server_access_ip}]:4646" : "http://${local.nomad_server_access_ip}:4646"
 }
 
 output "nomad_broker_ssh_ips" {
