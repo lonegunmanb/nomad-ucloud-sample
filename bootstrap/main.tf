@@ -450,9 +450,11 @@ resource "kubernetes_deployment" "haproxy" {
           name  = "controller"
           image = var.haproxy_image
           port {
+            name = "nomad"
             container_port = 4646
           }
           port {
+            name = "consul"
             container_port = 8500
           }
           volume_mount {
@@ -481,10 +483,12 @@ resource kubernetes_service nomadServerSvc {
       app = local.haproxy_pod_label
     }
     port {
+      name = "nomad"
       port        = 4646
       target_port = 4646
     }
     port {
+      name = "consul"
       port = 8500
       target_port = 8500
     }
