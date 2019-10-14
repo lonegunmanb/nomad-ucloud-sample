@@ -26,7 +26,7 @@ job "${job-name}" {
     service {
       name = "nameSvrIndex-${cluster-id}"
       port = "tcp"
-      tags = ["urlprefix-/${cluster-id}"]
+      tags = ["urlprefix-/rocketmq/${cluster-id}"]
       check {
         type = "tcp"
         port = "tcp"
