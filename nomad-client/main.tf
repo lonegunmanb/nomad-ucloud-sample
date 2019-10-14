@@ -18,6 +18,9 @@ resource "ucloud_instance" "nomad_clients" {
   provisioner "local-exec" {
     command = "sleep 10"
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ucloud_disk" "data_disk" {
@@ -28,6 +31,9 @@ resource "ucloud_disk" "data_disk" {
   disk_size         = var.data_volume_size
   charge_type       = var.charge_type
   duration          = var.duration
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ucloud_disk_attachment" "disk_attachment" {
@@ -35,6 +41,9 @@ resource "ucloud_disk_attachment" "disk_attachment" {
   availability_zone = var.az
   disk_id           = ucloud_disk.data_disk.*.id[count.index]
   instance_id       = ucloud_instance.nomad_clients.*.id[count.index]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ucloud_eip" "nomad_clients" {
@@ -46,6 +55,9 @@ resource "ucloud_eip" "nomad_clients" {
   duration      = var.duration
   bandwidth     = 200
   tag           = var.cluster_id
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "ucloud_eip_association" "nomad_ip" {
@@ -55,6 +67,9 @@ resource "ucloud_eip_association" "nomad_ip" {
   count       = var.env_name == "private" ? 0 : var.instance_count
   eip_id      = ucloud_eip.nomad_clients.*.id[count.index]
   resource_id = ucloud_instance.nomad_clients.*.id[count.index]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 locals {
@@ -145,6 +160,9 @@ resource "null_resource" "config_consul" {
       data.template_file.consul-config.*.rendered[count.index]
     ]
   }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "null_resource" "setup" {
@@ -163,6 +181,9 @@ resource "null_resource" "setup" {
       data.template_file.setup-script[count.index].rendered,
       local.reconfig-ssh-keys-script,
     ]
+  }
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
