@@ -119,4 +119,10 @@ job "console-${cluster-id}" {
       //    }
     }
   }
+  reschedule {
+    delay          = "30s"
+    delay_function = "exponential"
+    max_delay      = "120s"
+    unlimited      = true
+  }
 }
