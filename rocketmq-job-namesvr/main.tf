@@ -111,5 +111,5 @@ module "console" {
   terraform-image     = var.terraform-image
   load_balancer_id    = var.internal_use ? "" : ucloud_lb.rocketMQLoadBalancer.*.id[0]
   consoleListenerId   = var.internal_use ? "" : ucloud_lb_listener.consoleListener.*.id[0]
-  openWebConsole      = !var.internal_use
+  openWebConsole      = true
 }
