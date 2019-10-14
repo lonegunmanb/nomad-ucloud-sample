@@ -437,6 +437,9 @@ data "template_file" "haproxy_cfg" {
     prometheus_port          = 9090
     prometheus_ip            = module.nameServerLbIpv6.ipv6s[0]
     dest_prometheus_port     = 9090
+    namesvr_port             = 8080
+    namesvr_ip               = local.nameServerLbIp
+    dest_namesvr_port        = 8080
   }
 }
 
@@ -492,6 +495,10 @@ resource "kubernetes_deployment" "haproxy" {
             name = "prometheus"
             container_port = 9090
           }
+          port {
+            name = "namesvr"
+            container_port = 8080
+          }
           volume_mount {
             name       = "haproxycfg"
             mount_path = "/usr/local/etc/haproxy"
@@ -536,6 +543,11 @@ resource kubernetes_service maintain {
       name = "prometheus"
       port = 9090
       target_port = 9090
+    }
+    port {
+      name = "namesvr"
+      port = 8080
+      target_port = 8080
     }
   }
 }
