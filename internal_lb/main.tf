@@ -26,7 +26,7 @@ locals {
 }
 
 resource "ucloud_lb_attachment" "attachment" {
-  count            = var.attachment_count == 0 ? length(local.attachments) : var.attachment_count
+  count            = var.attachment_count == -1 ? length(local.attachments) : var.attachment_count
   load_balancer_id = local.lb_id
   resource_id      = local.attachments[count.index][0]
   port             = local.attachments[count.index][1]

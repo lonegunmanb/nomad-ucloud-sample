@@ -16,7 +16,7 @@ variable "device" {
 }
 variable "attachment_count" {
   type = number
-  default = 0
+  default = -1
 }
 variable "attachment_only" {
   default = false
