@@ -37,7 +37,6 @@ job "${job-name}" {
       //to use volume on host, we use root user inside container
       user = "0"
       config {
-        privileged = true
         image = "${broker-image}"
         command = "./mqbroker"
         args = [
