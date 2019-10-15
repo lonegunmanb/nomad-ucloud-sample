@@ -1,5 +1,11 @@
 mkfs.xfs /dev/vdb
 mount /dev/vdb /data
+
+groupadd -g 3000 rocketmq
+useradd -u 3000 -g 3000 -m -s /bin/bash rocketmq
+chown :rocketmq /data
+chmod g+rw /data
+
 echo 'mount /dev/vdb /data'>>/etc/rc.d/rc.local
 sed -i 's/SERVICE_DESCRIPTION/Consul Client/g' /etc/systemd/system/consul.service
 sed -i 's/REGION/${region}/g' /etc/nomad.d/client.hcl
