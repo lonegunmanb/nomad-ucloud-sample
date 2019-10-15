@@ -1,6 +1,10 @@
 job "console-${cluster-id}" {
   datacenters = ["${region}"]
   region = "${region}"
+  constraint {
+    attribute = "$${node.class}"
+    value = "${node-class}"
+  }
   group "console" {
     task "console" {
       driver = "docker"

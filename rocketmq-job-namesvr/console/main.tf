@@ -36,6 +36,7 @@ data "template_file" "console-job" {
     ucloud_api_base_url = var.ucloud_api_base_url
     load_balancer_id    = var.load_balancer_id
     consoleListenerId   = var.consoleListenerId
+    node-class          = "nameServer"
   }
 }
 
