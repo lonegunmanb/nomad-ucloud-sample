@@ -121,6 +121,7 @@ resource "ucloud_lb_attachment" "attachment" {
   listener_id      = var.nomad_server_4646_listener_id
 }
 
+//DO NOT MERGE THIS null_resource WITH setup, ROLLING UPDATE DEPENDENT ON THIS NAME
 resource "null_resource" "config_consul" {
   count      = var.instance_count
   depends_on = [

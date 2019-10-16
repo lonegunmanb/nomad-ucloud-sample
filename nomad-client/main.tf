@@ -133,6 +133,7 @@ EOF
   }
 }
 
+//DO NOT MERGE THIS null_resource WITH setup, ROLLING UPDATE DEPENDENT ON THIS NAME
 resource "null_resource" "config_consul" {
   count = var.instance_count
   depends_on = [
