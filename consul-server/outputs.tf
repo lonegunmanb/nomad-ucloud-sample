@@ -7,11 +7,11 @@ output "private_ips" {
 }
 
 output "lb_ip" {
-  value = module.consulLb.lb_ip
+  value = ucloud_lb.intenalLb.private_ip
 }
 
 output "lb_id" {
-  value = module.consulLb.lb_id
+  value = ucloud_lb.intenalLb.id
 }
 
 output "ssh_ip" {

@@ -91,14 +91,7 @@ data "external" "ipv6" {
     regionId   = var.region_id
   }
 }
-//data "external" "ipv6" {
-//  depends_on = [ucloud_instance.nomad_clients, ucloud_eip.nomad_clients]
-//  count = length(ucloud_instance.nomad_clients.*.id)
-//  program = ["python", "${path.module}/public_ip.py"]
-//  query = {
-//    ip = ucloud_eip.nomad_clients.*.public_ip[count.index]
-//  }
-//}
+
 locals {
   server_ips = var.env_name == "test" ? ucloud_eip.nomad_clients.*.public_ip : (var.env_name == "public" ? [for map in data.external.ipv6.*.result: map["ip"]] : ucloud_instance.nomad_clients.*.private_ip)
 }

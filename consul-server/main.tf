@@ -146,14 +146,35 @@ data "template_file" "setup-script" {
   }
 }
 
-module "consulLb" {
-  source       = "../internal_lb"
-  tag          = var.cluster_id
-  instance_ids = ucloud_instance.consul_server.*.id
-  name         = "consulServer-${var.cluster_id}"
-  ports        = [8500]
-  subnet_id    = var.subnet_id
-  vpc_id       = var.vpc_id
+resource ucloud_lb intenalLb {
+  name      = "consulServer-${var.cluster_id}"
+  internal  = true
+  tag       = var.cluster_id
+  vpc_id    = var.vpc_id
+  subnet_id = var.subnet_id
+}
+
+resource ucloud_lb_listener listener {
+  load_balancer_id = ucloud_lb.intenalLb.id
+  protocol         = "tcp"
+  name             = "8500"
+  port             = 8500
+}
+
+resource "ucloud_lb_attachment" "consul_attachment" {
+  count            = local.instance_count
+  listener_id      = ucloud_lb_listener.listener.id
+  load_balancer_id = ucloud_lb.intenalLb.id
+  resource_id      = ucloud_instance.consul_server.*.id[count.index]
+  port             = 8500
+}
+
+data "template_file" "add-loopback-script" {
+  template = file("${path.module}/add-loopback.sh.tplt")
+  vars     = {
+    vip    = ucloud_lb.intenalLb.private_ip
+    device = "lo:1"
+  }
 }
 
 resource "null_resource" "config_consul" {
@@ -193,7 +214,7 @@ resource "null_resource" "install_consul_server" {
     }
     inline = [
       data.template_file.setup-script[count.index].rendered,
-      module.consulLb.setup_loopback_script,
+      data.template_file.add-loopback-script.rendered,
       local.reconfig-ssh-keys-script,
     ]
   }
