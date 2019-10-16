@@ -53,6 +53,28 @@ resource ucloud_security_group consul_server_sg {
   }
 }
 
+resource "ucloud_eip" "egress_ip" {
+  count         = var.env_name == "private" ? 0 : 1
+  name          = "cluster-egress-${local.cluster_id}"
+  internet_type = "bgp"
+  charge_mode   = "traffic"
+  charge_type   = "year"
+  duration      = 1
+  bandwidth     = 200
+  tag           = local.cluster_id
+}
+
+resource "ucloud_nat_gateway" "nat" {
+  count             = var.env_name == "private" ? 0 : 1
+  name              = "cluster-egress-${local.cluster_id}"
+  eip_id            = ucloud_eip.egress_ip.*.id[0]
+  enable_white_list = false
+  security_group    = ucloud_security_group.consul_server_sg.id
+  subnet_ids        = [
+    data.terraform_remote_state.network.outputs.clientSubnetId]
+  vpc_id            = data.terraform_remote_state.network.outputs.clientVpcId
+}
+
 module consul_servers {
   source              = "./consul-server"
   region              = var.region

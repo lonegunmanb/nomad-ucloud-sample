@@ -47,7 +47,7 @@ resource "ucloud_disk_attachment" "disk_attachment" {
 }
 
 resource "ucloud_eip" "nomad_clients" {
-  count         = var.env_name == "private" ? 0 : var.instance_count
+  count         = var.env_name == "test" ? var.instance_count : 0
   name          = "nomad-client-${var.cluster_id}-${var.class}-${var.group}-${count.index}"
   internet_type = "bgp"
   charge_mode   = "traffic"
@@ -64,7 +64,7 @@ resource "ucloud_eip_association" "nomad_ip" {
   depends_on  = [
     ucloud_instance.nomad_clients,
     ucloud_eip.nomad_clients]
-  count       = var.env_name == "private" ? 0 : var.instance_count
+  count       = var.env_name == "test" ? var.instance_count : 0
   eip_id      = ucloud_eip.nomad_clients.*.id[count.index]
   resource_id = ucloud_instance.nomad_clients.*.id[count.index]
   lifecycle {
