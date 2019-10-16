@@ -262,7 +262,7 @@ locals {
   consulRktmqLbId            = data.ucloud_lbs.consul_rktmq_lb.lbs[0].id
   nomadServerLbId            = data.ucloud_lbs.nomadServerLb.lbs[0].id
   allow_multiple_tasks_in_az = length(var.az) == length(distinct(var.az)) ? false : true
-  nameServerLbIp             = data.ucloud_lbs.nameServerLb.lbs[0].private_ip
+  nameServerLbIp             = var.env_name == "public" ? module.nameServerLbIpv6.ipv6s[0] : data.ucloud_lbs.nameServerLb.lbs[0].private_ip
 }
 
 module "consulBackendLbIpv6" {
