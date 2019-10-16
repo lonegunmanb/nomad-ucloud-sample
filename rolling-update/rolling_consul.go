@@ -2,22 +2,47 @@ package main
 
 import (
 	. "./rolling"
-	"fmt"
 )
 
-func main() {
-	RollingUpdate([]string{
-		"consul leave",
-	}, func(group int) []string {
-		return []string{
-			resWithModule(fmt.Sprintf("ucloud_instance.consul_server[%d]", group)),
-			resWithModule(fmt.Sprintf("null_resource.install_consul_server[%d]", group)),
-		}
-	}, []string{
-		"config_consul",
-	})
+type ConsulTaint struct {
+	TaintResInModuleGroupPattern
+	TaintResByName
 }
 
-func resWithModule(res string) string {
-	return fmt.Sprintf("module.consul_servers.%s", res)
+func (c ConsulTaint) Match(res string) bool {
+	return c.TaintResInModuleGroupPattern.Match(res) || c.TaintResByName.Match(res)
+}
+
+type ConsulUpdate struct {
+	NodeDrain
+	ConsulTaint
+}
+
+func main() {
+	a := ReadArgs()
+	ExecuteTaint(ConsulUpdate{
+		NodeDrain: NodeDrain{
+			Cmds: []string{
+				"consul leave",
+			},
+			IpProperty: *a.IpProperty,
+			Group:      *a.Group,
+			Password:   *a.Password,
+		},
+		ConsulTaint: ConsulTaint{
+			TaintResInModuleGroupPattern: TaintResInModuleGroupPattern{
+				Module: *a.Module,
+				Group:  *a.Group,
+				Res: []string{
+					"ucloud_instance.consul_server",
+					"null_resource.install_consul_server",
+				},
+			},
+			TaintResByName: TaintResByName{
+				Res: []string{
+					"config_consul",
+				},
+			},
+		},
+	})
 }

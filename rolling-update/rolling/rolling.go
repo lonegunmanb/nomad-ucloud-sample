@@ -15,111 +15,127 @@ import (
 
 const Dir = "../"
 
+var DryRun = false
+
 type RemoteCleanupOnLeave interface {
-	OnLeave(ips []string, password *string, cmds []string)
+	OnLeave()
 }
 
-type TaintPattern interface {
+type NodeDrain struct {
+	Cmds       []string
+	IpProperty string
+	Group      int
+	Password   string
+}
+
+func (n NodeDrain) OnLeave() {
+	ips := ReadIp(n.IpProperty, n.Group)
+	for _, ip := range ips {
+		RemoteExecuteCmd(n.Cmds, ip, n.Password)
+	}
+}
+
+type Taint interface {
 	Match(res string) bool
 }
 
 type TaintModuleGroupPattern struct {
-	module string
-	group  int
+	Module string
+	Group  int
 }
 
 func (t TaintModuleGroupPattern) Match(res string) bool {
-	return strings.HasPrefix(res, fmt.Sprintf("module.%s%d", t.module, t.group))
+	return inModuleGroup(res, t.Module, t.Group)
+}
+
+func inModuleGroup(res string, module string, group int) bool {
+	return strings.HasPrefix(res, fmt.Sprintf("module.%s%d", module, group))
+}
+
+func inModule(res string, module string) bool {
+	return strings.HasPrefix(res, fmt.Sprintf("module.%s", module))
 }
 
 type TaintResInModuleGroupPattern struct {
-	module string
-	group  int
-	res    []string
+	Module string
+	Group  int
+	Res    []string
 }
 
 func (t TaintResInModuleGroupPattern) Match(res string) bool {
-	return linq.From(t.res).AnyWith(func(resName interface{}) bool {
-		return strings.HasPrefix(resName.(string), fmt.Sprintf("%s.", t.module))
+	return linq.From(t.Res).AnyWith(func(resName interface{}) bool {
+		return inModule(res, t.Module) && contains(res, fmt.Sprintf("%s[%d]", resName.(string), t.Group))
 	})
 }
 
-func RollingUpdate(onLeaveNodeCmds []string, moduleResToTaint func(int) []string, resToTaint []string) {
-	password, module, ipProperty, group := ReadArgs()
-	ips := ReadIp(*ipProperty, *group)
-	OnLeave(ips, password, onLeaveNodeCmds)
-	if moduleResToTaint == nil {
-		TaintEntireModule(*module, *group)
-	} else {
-		TaintResInModule(*group, moduleResToTaint)
-	}
-	if resToTaint != nil {
-		TaintResContainsName(resToTaint)
-	}
-	Update()
+func contains(res string, resName string) bool {
+	return strings.Contains(res, resName)
 }
 
-func TaintResInModule(group int, resToTaint func(int) []string) {
-	for _, res := range resToTaint(group) {
-		taintCmd := fmt.Sprintf("terraform taint %s", res)
-		println(taintCmd)
-		_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
-	}
+type TaintResByName struct {
+	Res []string
 }
 
-func TaintResContainsName(resources []string) {
-	for _, res := range resources {
-		taintCmd := fmt.Sprintf("sh taint_res.sh %s", res)
-		_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
-	}
+func (t TaintResByName) Match(res string) bool {
+	return linq.From(t.Res).AnyWith(func(r interface{}) bool {
+		return contains(res, fmt.Sprintf("%s", r.(string)))
+	})
 }
 
-func TaintEntireModule(module string, group int) {
-	var taintCmd string
-	if group != -1 {
-		taintCmd = fmt.Sprintf("sh taint_module.sh %s%d", module, group)
-	} else {
-		taintCmd = fmt.Sprintf("sh taint_module.sh %s", module)
-	}
-	println(taintCmd)
-	_, _ = ExecCmd(taintCmd, Dir, os.Stdout, os.Stderr)
-}
-
-func Update() {
-	println("updating")
-	cmd := "terraform apply --auto-approve -input=false -var-file=terraform.tfvars.json"
-	remoteVarFile := "/backend/remote.tfvars"
-	remoteVarExist := FileExist(remoteVarFile)
-	if remoteVarExist {
-		cmd += fmt.Sprintf(" -var-file=%s", remoteVarFile)
-	}
-	_, err := ExecCmd(cmd, Dir, os.Stdout, os.Stderr)
+func GetAllRes() []string {
+	output, err := ExecCmd("terraform show | grep '#' | tr -d ':'  | tr -d '#' | tr -d ' '", Dir, nil, nil)
 	if err != nil {
 		panic(err)
 	}
-}
-
-var FileExist = func(path string) bool {
-	remoteVarExist := true
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		remoteVarExist = false
+	var res []string
+	scanner := bufio.NewScanner(strings.NewReader(output))
+	for scanner.Scan() {
+		r := scanner.Text()
+		res = append(res, r)
 	}
-	return remoteVarExist
+	err = scanner.Err()
+	if err != nil {
+		panic(err)
+	}
+	return res
 }
 
-func OnLeave(ips []string, password *string, cmds []string) {
-	for _, ip := range ips {
-		RemoteExecuteCmd(cmds, ip, *password)
+func ExecuteTaint(taintPolicy Taint) {
+	if onLeave, ok := taintPolicy.(RemoteCleanupOnLeave); ok && !DryRun {
+		onLeave.OnLeave()
+	}
+	res := GetAllRes()
+	for _, r := range res {
+		if taintPolicy.Match(r) {
+			println(fmt.Sprintf("terraform taint %s", r))
+			if !DryRun {
+				_, _ = ExecCmd(fmt.Sprintf("terraform taint %s", r), Dir, os.Stdout, os.Stderr)
+			}
+		}
 	}
 }
 
-func ReadArgs() (*string, *string, *string, *int) {
-	password := flag.String("pass", "", "ssh password")
-	group := flag.Int("group", -1, "update group")
+type Arg struct {
+	Password   *string
+	Group      *int
+	Module     *string
+	IpProperty *string
+}
+
+func ReadArgs() Arg {
+	password := flag.String("pass", "", "ssh Password")
+	group := flag.Int("group", -1, "update Group")
 	module := flag.String("module", "", "")
 	ipProperty := flag.String("ip-property", "", "")
+	dryRun := flag.Bool("dry", false, "")
 	flag.Parse()
-	return password, module, ipProperty, group
+	DryRun = *dryRun
+	return Arg{
+		Password:   password,
+		Group:      group,
+		Module:     module,
+		IpProperty: ipProperty,
+	}
 }
 
 var ReadIp = func(name string, group int) []string {
