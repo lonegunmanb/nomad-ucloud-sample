@@ -27,7 +27,7 @@ retry_join = ["CONSUL_SERVER1_IP", "CONSUL_SERVER2_IP", "CONSUL_SERVER3_IP"]
 ```
 
 Consul的组网除了使用Ip，还可以通过[Cloud Auto Join](https://www.consul.io/docs/agent/cloud-auto-join.html)
-笔者向Hashicorp提交了UCloud的Cloud Join实现，该[PR](https://github.com/hashicorp/go-discover/pull/126)目前仍未review，如果成功合并，那么就可以通过[这种方式](https://github.com/lonegunmanb/go-discover/blob/ucloud/README.md#L85-L86)配置，借助vpc_id、subnet_id和tag自动发现consul服务，并且组网。
+笔者向Hashicorp提交了UCloud的Cloud Join实现，该[PR](https://github.com/hashicorp/go-discover/pull/126)目前仍未review，如果成功合并，那么就可以通过[这种方式](https://github.com/lonegunmanb/go-discover/blob/ucloud/README.md)配置，借助vpc_id、subnet_id和tag自动发现consul服务，并且组网。
 
 Nomad集群部署在UCloud上，UCloud VPC结构如下：
 ![](http://hashicorpfile.cn-bj.ufileos.com/network.jpg)
