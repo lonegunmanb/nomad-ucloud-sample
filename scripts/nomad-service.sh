@@ -1,7 +1,7 @@
 echo "Installing Nomad..."
 NOMAD_VERSION=$NOMAD_VERSION
 cd /tmp/
-wget  -O nomad.zip ${FILE_SERVER}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+wget -nv -O nomad.zip ${FILE_SERVER}/nomad_${NOMAD_VERSION}_linux_amd64.zip
 unzip nomad.zip
 install nomad /usr/local/bin/nomad
 mkdir -p /etc/nomad.d
