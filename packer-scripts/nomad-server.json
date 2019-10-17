@@ -7,7 +7,7 @@
     "ucloud_project_id": "",
     "image_id": "uimage-dpdgyw",
     "consul_version": "1.6.1",
-    "nomad_version": "0.9.5",
+    "nomad_version": "0.9.6",
     "region": "cn-bj2",
     "az": "cn-bj2-02",
     "yum_base": "http://mirrors.163.com/.help/CentOS7-Base-163.repo",

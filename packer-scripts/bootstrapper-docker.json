@@ -1,7 +1,7 @@
 {
   "variables": {
     "terraform_version": "0.12.10",
-    "nomad_version": "0.9.5",
+    "nomad_version": "0.9.6",
     "consul_version": "1.6.1",
     "ucloud_cli_version": "0.1.26",
     "tf_plugin_consul_version": "2.5.0",
