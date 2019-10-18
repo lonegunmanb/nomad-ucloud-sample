@@ -42,7 +42,7 @@ terraform workspace new mynamesvr
 * allow_multiple_tasks_in_az:该变量为true时，Nomad可能会把3个NameServer调度到同一个可用区里；如果为false，则必须跨3可用区运行；如果您只有一个可用区，可以设置为true
 
 然后执行terraform apply，脚本会创建一组RocketMQ NameServer容器，一个Web控制面板，一个公网ULB，以及对应的后端转发，您会在输出中看到nameSvrLbIp的值。
-假设我们用上述配置文件执行后，看到的IP是120.100.0.1,tcp连接120.100.0.1:9876，可以访问NameServer；或者通过http://120.100.0.1:8080/console-mynamesvr访问Web控制台。
+假设我们用上述配置文件执行后，看到的IP是120.100.0.1,tcp连接120.100.0.1:9876，可以访问NameServer；或者通过http://120.100.0.1:8080/console-mynamesvr 访问Web控制台。
 
 然后让我们跳转到rocketmq-job-broker目录下，一样：
 ```shell script
@@ -94,7 +94,7 @@ sendMessageThreadPoolNums=16
 
 ## 服务发现
 
-Nomad与Kubernetes相比，架构上简化了许多，最明显的区别是Nomad本身不提供任何集群网络功能，只是简单的容器和任务的调度。不同于K8S每一个Pod都可以有独立的IP和DNS Name以及K8S Service可以对外暴露服务，这就导致Nomad中的容器只能使用宿主机IP与端口对外提供服务，使我们无法在配置文件中使用固定的IP与端口来组网。
+Nomad与Kubernetes相比，架构上简化了许多，最明显的区别是Nomad本身不提供任何集群网络功能，只是简单的容器和任务的调度，不同于K8S每一个Pod都可以有独立的IP和DNS Name以及K8S Service可以对外暴露服务。这就导致Nomad中的容器只能使用宿主机IP与端口对外提供服务，使我们无法在配置文件中使用固定的IP与端口来组网。
 
 另外集群中的机器可能会发生故障导致容器漂移，漂移后的宿主机IP与端口号都会发生变化。我们需要一种稳定的方式，帮助Broker彼此连接，以及连接到NameServer。
 
