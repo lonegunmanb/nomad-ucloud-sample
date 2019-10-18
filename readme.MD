@@ -26,3 +26,4 @@
 * [Packer详解](/packer-scripts/readme.MD)
 * [Nomad集群网络简介](nomad.MD)
 * [构建test模式Nomad集群](provision_test.MD)
+* [test与public模式下的RocketMQ](rocketmq.MD)
