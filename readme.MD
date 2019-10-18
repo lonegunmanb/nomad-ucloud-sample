@@ -27,3 +27,4 @@
 * [Nomad集群网络简介](nomad.MD)
 * [构建test模式Nomad集群](provision_test.MD)
 * [test与public模式下的RocketMQ](rocketmq.MD)
+* [test/public/private下RocketMQ提供服务的方式](rocketmq_env.MD)
