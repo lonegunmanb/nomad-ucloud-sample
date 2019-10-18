@@ -7,6 +7,12 @@
 
 上图是一个典型的Nomad集群部署架构。Nomad本身可以直接通过IP和端口组建集群，但我们推荐使用Consul作为注册中心，这样我们就可以在Nomad上使用许多基于Consul提供的功能。
 
+## Cluster ID
+
+本项目支持在任意Region部署任意多彼此独立的集群，每个集群都要有一个独一无二的Cluster ID，这个Cluster ID会被赋值给所有资源所属的业务组，并且创建的资源名称中会带有Cluster ID。由于本项目代码中有一部分完全依赖按名字查询资源ID，所以不通集群之间Cluster ID必须不同，同一Region下不允许出现多个集群共用同一Cluster ID的现象。
+
+## Nomad网络结构
+
 根据实际情况，我们采用跨3可用区部署的方式来获得高可用性，实际部署时Nomad集群如下：
 ![](http://hashicorpfile.cn-bj.ufileos.com/nomad_public.jpg)
 

@@ -48,7 +48,7 @@ resource ucloud_security_group consul_server_sg {
   rules {
     port_range = "20000-32000"
     protocol   = "tcp"
-    cidr_block = var.allow_ip
+    cidr_block = "0.0.0.0/0"
     policy     = var.env_name == "private" ? "drop" : "accept"
   }
 }
