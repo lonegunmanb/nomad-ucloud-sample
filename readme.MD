@@ -34,6 +34,7 @@
 
 建议按照以下阅读顺序阅读实践
 
+* [项目结构](dirs.MD)
 * [Packer详解](/packer-scripts/readme.MD)
 * [Nomad集群网络简介](nomad.MD)
 * [构建test模式Nomad集群](provision_test.MD)
