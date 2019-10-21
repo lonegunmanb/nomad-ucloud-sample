@@ -18,7 +18,7 @@ RocketMQ提供了一种基于HTTP Endpoint的访问NameServer的[方式](https:/
 
 现在的问题就变成了如何提供一个HTTP服务，对外已http://${domain}:8080/rocketmq/${nameserver_address}的形式发布NameServer地址。
 
-我们之前提到过，为了能够组网，我们使用了Consul Connect作为Service Mesh方案，所以无论是NameServer还是Broker，都会在Consul上注册一个对应的服务，注册信息有容器运行的宿主机IP，以及使用的端口号。如何把这些信息通过HTTP暴露出来呢？我们可以构造一段很简单的go代码，侦听http请求，并返回一个静态字符串，这个静态字符串，是我们在启动任务时，通过consul_template渲染出来的，我们可以看一下rocketmq-job-namesvr/namesvr/namesvr-job.hcl中相关代码段：
+我们之前提到过，为了能够组网，我们使用了Consul Connect作为Service Mesh方案，所以无论是NameServer还是Broker，都会在Consul上注册一个对应的服务，注册信息有容器运行的宿主机IP，以及使用的端口号。如何把这些信息通过HTTP暴露出来呢？我们可以构造一段很简单的go代码，侦听http请求，并返回一个静态字符串，这个静态字符串，是我们在启动任务时，通过consul_template渲染出来的，我们可以看一下rocketmq-job-namesvr/namesvr/namesvr-job.hcl中[相关代码段](rocketmq-job-namesvr/namesvr/namesvr-job.hcl#L39-L51)：
 ```go
 package main
 import (
@@ -40,12 +40,14 @@ func main(){
 
 但是这个容器本身也面临和NameServer一样的问题，它也只能是使用宿主机IP，并对外暴露一个动态端口，如何能够给用户提供一个稳定的url？
 
-我们在这里使用了[fabio](https://github.com/fabiolb/fabio)，这是一个搭配Consul工作的云原声http(s)/tcp负载均衡器。我们只要把执行go run的容器本身也在Consul上注册一个服务，并且附上一个特定的[tag](rocketmq-job-namesvr/namesvr/namesvr-job.hcl#L29)，fabio就会添加一条路由记录。例如，如果我们注册服务时附加的tag是：
+## 基于Service Tag的Fabio转发
+
+我们在这里使用了[fabio](https://github.com/fabiolb/fabio)，这是一个搭配Consul工作的云原生http(s)/tcp负载均衡器。我们只要把执行go run的容器本身也在Consul上注册一个服务，并且附上一个特定的[tag](rocketmq-job-namesvr/namesvr/namesvr-job.hcl#L29)，fabio就会添加一条路由记录。例如，如果我们注册服务时附加的tag是：
 ```text
 urlprefix-/foo
 ```
 
-那么我们可以通过访问http://${url_to_fabio_svc}/foo 这个地址来访问这个服务。通过这种方式，用户只要能访问fabio容器，附上正确的路径，就可以被中转到go run容器上。用户如何访问fabio容器呢？
+那么我们可以通过访问http://${fabio_svc}/foo 这个地址来访问这个服务。通过这种方式，用户只要能访问fabio容器，附上正确的路径，就可以被中转到go run容器上。用户如何访问fabio容器呢？
 
 我们在这里使用了[Nomad System Job](https://www.nomadproject.io/docs/schedulers.html), 一个System类型的Job类似K8S的DaemonSet，Nomad会在每一个符合Job中定义的约束的Client节点上启动相同的Job。我们在system-job目录下定义了这样的System Job，会在所有的NameServer类型宿主机上都启动一个fabio容器，并且侦听8080端口，同时我们在创建Nomad集群时，申请了一个内网ULB，把所有的NameServer宿主机都添加到后端，这样通过访问这个内网ULB，我们就可以触达fabio容器，进而访问到对应的go run容器。
 
@@ -65,3 +67,8 @@ urlprefix-/foo
 创建的过程与之前一样，也是执行terraform init后apply，本文不再赘述。
 
 我们在System Job中除了定义了fabio任务以外，还定义了一个prometheus服务，它通过Consul发现了所有Nomad Server以及Nomad Client节点，然后收集Nomad集群的各项metric并以prometheus的标准输出，本文不再赘述。
+
+## 小结
+简单小结一下，test与public模式下，一个公网ULB通过9876端口向用户提供了3个Broker的公网EIP和对应的宿主机端口号，而在private模式下，用户通过http get，透过统一的内网ULB -> NameServer宿主机上的fabio容器 -> go run运行的NameServer索引服务，获取了3台NameServer的内网IP与宿主机端口，进而获取3台Broker的内网IP与宿主机端口。
+
+另外private部署模式的这种HTTP Endpoint方式，经过验证Java SDK是[直接支持](https://rocketmq.apache.org/docs/best-practice-namesvr/)的，而Golang的[Native SDK](https://github.com/apache/rocketmq-client-go/tree/native)是不支持的，但是我们可以自己通过一个独立的goroutine轮询HTTP Endpoint来实现这个功能。
