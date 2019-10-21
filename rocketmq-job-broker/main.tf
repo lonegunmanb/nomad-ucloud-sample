@@ -11,20 +11,20 @@ provider "ucloud" {
 }
 
 resource "ucloud_eip" "broker_eip" {
-  count = var.internal_use ? 0 : 3
+  count         = var.internal_use ? 0 : 3
   internet_type = "bgp"
-  name = "broker-${local.broker_clusterId}-${count.index}"
-  charge_mode = "traffic"
-  charge_type = "dynamic"
-  tag = var.nomad_cluster_id
-  bandwidth = var.broker_size * var.base_bandwidth
+  name          = "broker-${local.broker_clusterId}-${count.index}"
+  charge_mode   = "traffic"
+  charge_type   = "dynamic"
+  tag           = var.nomad_cluster_id
+  bandwidth     = min(var.broker_size * var.base_bandwidth, 200)
 }
 //because we create ucloud_eip_association inside nomad job, so before we destroy eip, we must unbind eip first, by ucloud cli
 resource "null_resource" "eip_destroy_helper" {
-  count = var.internal_use ? 0 : 3
+  count      = var.internal_use ? 0 : 3
   depends_on = [ucloud_eip.broker_eip]
   provisioner "local-exec" {
-    when = "destroy"
+    when    = "destroy"
     command = "ucloud eip unbind --eip-id=${ucloud_eip.broker_eip.*.id[count.index]} --region=${local.region} --project-id=${local.projectId} --public-key=${var.ucloud_pubkey} --private-key=${var.ucloud_secret} --base-url=${var.ucloud_api_base_url}"
   }
 }
@@ -37,8 +37,8 @@ provider "consul" {
 resource "consul_keys" "eip_public_ip" {
   count = var.internal_use ? 0 : 3
   key {
-    path = "brokerEip/${local.broker_clusterId}/eip/${count.index}"
-    value = ucloud_eip.broker_eip.*.public_ip[count.index]
+    path   = "brokerEip/${local.broker_clusterId}/eip/${count.index}"
+    value  = ucloud_eip.broker_eip.*.public_ip[count.index]
     delete = true
   }
 }
@@ -46,8 +46,8 @@ resource "consul_keys" "eip_public_ip" {
 resource "consul_keys" "eip_id" {
   count = var.internal_use ? 0 : 3
   key {
-    path  = "brokerEip/${local.broker_clusterId}/eipId/${count.index}"
-    value = ucloud_eip.broker_eip.*.id[count.index]
+    path   = "brokerEip/${local.broker_clusterId}/eipId/${count.index}"
+    value  = ucloud_eip.broker_eip.*.id[count.index]
     delete = true
   }
 }
@@ -55,8 +55,8 @@ resource "consul_keys" "eip_id" {
 resource "consul_keys" "broker_state" {
   count = 3
   key {
-    path  = "brokerEip/${local.broker_clusterId}/eip_association/${count.index}"
-    value = ""
+    path   = "brokerEip/${local.broker_clusterId}/eip_association/${count.index}"
+    value  = ""
     delete = true
   }
 }
@@ -94,6 +94,9 @@ data "template_file" "broker-job" {
 }
 
 resource "nomad_job" "broker" {
-  depends_on = [consul_keys.eip_id, consul_keys.eip_public_ip]
-  jobspec = data.template_file.broker-job.rendered
+  depends_on = [
+    consul_keys.eip_id,
+    consul_keys.eip_public_ip
+  ]
+  jobspec    = data.template_file.broker-job.rendered
 }
