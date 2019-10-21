@@ -102,7 +102,7 @@ EOF
       template {
         //due to rocketmq set MAX_POSSIBLE_HEAP to MAX_POSSIBLE_RAM / 4, we set half memory to heap, half to direct memory
                 //memory im MB * 1024 * 1024 / 2 = memory * 524288
-        data = "MAX_POSSIBLE_HEAP=\"{{ multiply ${memory} 930000}}\""
+        data = "MAX_POSSIBLE_HEAP=\"{{ multiply ${memory} 524288}}\""
         destination = "local/conf/heapLimit.cfg"
         env = true
       }
