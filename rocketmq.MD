@@ -131,3 +131,7 @@ flushDiskType=ASYNC_FLUSH
 在这里namdsrvAddr与dLegerPeers是通过[Consul Template](https://github.com/hashicorp/consul-template)渲染的，在Nomad启动容器时，会把任务对应的Consul Connect Proxy端口渲染进配置文件，使得Broker通过Sidecar来互相连接。
 
 一个入门级的Consul Connect + Nomad的例子在[这里](https://www.consul.io/docs/connect/platform/nomad.html)，最新版本的Nomad中引入了[更加简化的写法](https://www.nomadproject.io/docs/job-specification/proxy.html)，但本项目编写时还无法使用简化写法。
+
+## 小结
+
+由于Nomad缺乏像K8S那样强大的网络功能，无法给每个Pod分配一个稳定的访问地址（StatefulSet/DNS），所以我们必须为NameServer/Broker服务配置对应的Consul Connect Sidecar进程，彼此之间通过Sidecar连接，这样即使发生故障转移，容器漂移，对没有发生故障的容器来说网络拓扑结构看起来也没有变化。

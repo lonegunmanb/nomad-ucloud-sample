@@ -8,6 +8,68 @@
 
 rocketmq-job-namesvr/main.tf中我们声明了一个公网ULB，并且把ULB ID传入rocketmq-job-namesvr-namesvr-namesvr-job.hcl；启动RocketMQ容器的同时，我们会启动一个带有terraform运行时环境的容器，并且动态渲染一个terraform代码文件，执行后会把容器所在的宿主机IP以及获得的动态端口号添加到ULB后端，这样我们就可以对外暴露一个稳定的公网IP和端口；即使容器发生了漂移，在新的宿主机上启动后，也会再次执行同样的terraform代码，而terraform的幂等性保障了无论是在同一台宿主机上被反复启动，还是随着漂移在不同的机器上被启动，始终只会保证ULB后端对接了NameServer当前的服务地址。
 
+public模式下的broker无论是向NameServer注册自己，还是对外暴露服务，使用的都是一个[公网弹性IP](rocketmq-job-broker/main.tf#L13)（实际上申请了3个，每个Broker一个），通过[Nomad任务定义中的template](rocketmq-job-broker/broker-job.hcl.tplt#84)将公网弹性IP渲染到Broker的配置文件中。为了使得consul_template渲染时可以读取到这个弹性IP，我们在提交这个Nomad任务之前，先申请好IP，并且在集群的Consul上[以Key/Value的形式记录了IP的值](rocketmq-job-broker/main.tf#L37-L53)：
+```hcl
+resource "consul_keys" "eip_public_ip" {
+  count = var.internal_use ? 0 : 3
+  key {
+    path   = "brokerEip/${local.broker_clusterId}/eip/${count.index}"
+    value  = ucloud_eip.broker_eip.*.public_ip[count.index]
+    delete = true
+  }
+}
+
+resource "consul_keys" "eip_id" {
+  count = var.internal_use ? 0 : 3
+  key {
+    path   = "brokerEip/${local.broker_clusterId}/eipId/${count.index}"
+    value  = ucloud_eip.broker_eip.*.id[count.index]
+    delete = true
+  }
+}
+```
+
+注意这里的delete要显式设置为true，否则在删除集群时不会连带删除Consul中的KV信息。
+
+申请好的弹性IP通过渲染配置文件的方式被渲染进了Broker的配置文件，接下来要把这个弹性IP[绑定到容器所在的宿主机](rocketmq-job-broker/broker-job.hcl.tplt#154-#183)：
+```hcl
+template {
+        data = <<EOF
+            variable ucloud_pub_key {}
+            variable ucloud_secret {}
+            variable project_id {}
+            variable region {}
+            variable ucloud_api_base_url {}
+
+            terraform {
+              backend "consul" {
+                address = "{{with service "consul"}}{{with index . 0}}{{.Address}}:8500{{end}}{{end}}"
+                scheme = "http"
+                path = "brokerEip/${cluster-id}/eip_association/{{ env "NOMAD_ALLOC_INDEX" }}"
+              }
+            }
+
+            provider "ucloud" {
+              public_key = var.ucloud_pub_key
+              private_key = var.ucloud_secret
+              project_id = var.project_id
+              region = var.region
+              base_url = var.ucloud_api_base_url
+            }
+
+            resource "ucloud_eip_association" "association-{{ env "NOMAD_ALLOC_INDEX" }}" {
+              count = ${eip-count}
+              {{$allocId := env "NOMAD_ALLOC_INDEX"}}
+              eip_id      = "{{key (printf "brokerEip/${cluster-id}/eipId/%s" $allocId)}}"
+              resource_id = "{{env "node.unique.name"}}"
+            }
+            EOF
+        destination = "local/tf/main.tf"
+        change_mode = "noop"
+      }
+```
+我们实际上做的就是，在启动Broker容器的同时，在同一台宿主机上启动一个含有Terraform运行时环境的容器，同样通过consul_template渲染一个Terraform代码文件，把通过Consul KV读取到的弹性IP信息渲染进去，然后执行，这个Terraform容器就会把分配到的弹性IP绑定到宿主机上。即使Broker发生了漂移，在新的宿主机上启动后，这个伴生的Terraform仍然会把同一个弹性IP绑定到新的宿主机上。所以Broker暴露的端口在容器漂移后会发生改变，而绑定的公网IP则不会。
+
 ## private模式
 
 private模式意在管理网部署一个与public模式一样的多租户RocketMQ集群，但管理网不允许使用公网IP，所以我们必须寻找其他方法。

@@ -1,5 +1,5 @@
 ## 阅读之前
-本文档假设读者拥有一定的Terraform知识，在阅读之前，您应当熟悉以下知识：
+在阅读之前，您应当熟悉以下Terraform知识：
 * [terrafor init](https://www.terraform.io/docs/commands/init.html)
 * [terraform apply](https://www.terraform.io/docs/commands/apply.html)
 * [terraform destroy](https://www.terraform.io/docs/commands/destroy.html)
@@ -10,7 +10,18 @@
 * [terraform module](https://www.terraform.io/docs/modules/index.html)
 * [terraform state](https://www.terraform.io/docs/state/index.html)
 
-您最好也拥有最基础的Docker知识，能够了解如何构造、启动容器，并与之互动。
+您最好了解以下Consul知识（或者可以在随后的阅读中根据需要去了解）：
+* [consul glossary](https://www.consul.io/docs/glossary.html)
+* [consul connect](https://www.consul.io/docs/connect/index.html)
+* [consul connect on nomad](https://www.consul.io/docs/connect/platform/nomad.html)
+
+您最好了解以下Nomad知识（或者可以在随后的阅读中根据需要去了解）：
+* [nomad](https://www.nomadproject.io/guides/install/production/reference-architecture.html)
+* [nomad scheduler](https://www.nomadproject.io/docs/schedulers.html)
+
+我们大量使用了Consul Template，这是一个结合go模版功能，可以把来自Consul的信息渲染到预设模版中，实现动态服务发现的工具，结合Nomad Template，可以发挥强大的功能：
+* [consul template](https://github.com/hashicorp/consul-template)
+* [nomad template](https://www.nomadproject.io/docs/job-specification/template.html)
 
 ## 部署模式
 
