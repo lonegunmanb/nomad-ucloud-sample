@@ -27,5 +27,4 @@ telemetry {
 }
 
 EOF
-sync
 echo "done"

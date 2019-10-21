@@ -36,4 +36,3 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 EOF
-sync

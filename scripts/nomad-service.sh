@@ -40,4 +40,3 @@ do
   install /tmp/${bin} /usr/local/bin/${bin}
 done
 nomad -autocomplete-install
-sync

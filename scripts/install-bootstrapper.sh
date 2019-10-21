@@ -27,4 +27,3 @@ if [ ! -z ${CODE_GIT_URL} ]; then
   cd /code
   git clone ${CODE_GIT_URL}
 fi
-sync

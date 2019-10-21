@@ -16,4 +16,3 @@ else
 fi
 
 systemctl enable docker
-sync

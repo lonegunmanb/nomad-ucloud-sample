@@ -13,4 +13,3 @@ yum install -y wget
 echo "yum upgrade"
 yum upgrade -y
 yum install -y yum-utils device-mapper-persistent-data lvm2
-sync

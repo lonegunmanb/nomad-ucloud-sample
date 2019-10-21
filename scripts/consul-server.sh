@@ -20,6 +20,4 @@ cat>/etc/consul.d/consul.json<<-EOF
     "client_addr": "0.0.0.0"
 }
 EOF
-echo "syncing"
-sync
 echo "done"

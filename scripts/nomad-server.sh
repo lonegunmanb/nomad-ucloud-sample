@@ -19,6 +19,4 @@ telemetry {
   publish_node_metrics = true
 }
 EOF
-
-sync
 echo "done"
