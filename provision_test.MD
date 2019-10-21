@@ -9,7 +9,7 @@
 consul agent -dev
 ```
 
-就可以在http://localhost:8500上获得可用的consul backend服务。
+就可以在http://localhost:8500 上获得可用的consul backend服务。
 
 ## 构建网络
 
