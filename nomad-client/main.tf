@@ -1,3 +1,8 @@
+resource "ucloud_isolation_group" "nomad_clients_isolation_group" {
+  count = floor((var.instance_count - 1) / 7) + 1
+  name = "${var.class}-${var.group}-${count.index}"
+}
+
 resource "ucloud_instance" "nomad_clients" {
   count             = var.instance_count
   name              = "nomad-client-${var.class}-${var.group}-${count.index}"
@@ -15,6 +20,7 @@ resource "ucloud_instance" "nomad_clients" {
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
   remark            = var.az
+  isolation_group   = ucloud_isolation_group.nomad_clients_isolation_group.*.id[floor(count.index / 7)]
   provisioner "local-exec" {
     command = "sleep 10"
   }
