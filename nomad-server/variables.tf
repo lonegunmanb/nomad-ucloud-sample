@@ -43,3 +43,6 @@ variable nomad_server_lb_private_ip {
 variable nomad_server_4646_listener_id {
   type = string
 }
+variable isolation_group_id {
+  type = string
+}

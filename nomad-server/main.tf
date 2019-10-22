@@ -14,6 +14,7 @@ resource "ucloud_instance" "nomad_servers" {
   boot_disk_type    = var.local_disk_type
   data_disk_type    = var.local_disk_type
   data_disk_size    = var.use_udisk ? 0 : var.data_volume_size
+  isolation_group   = var.isolation_group_id
   provisioner "local-exec" {
     command = "sleep 10"
   }
