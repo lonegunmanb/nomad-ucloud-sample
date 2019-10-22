@@ -220,7 +220,7 @@ resource "null_resource" "install_consul_server" {
   }
 }
 
-resource "null_resource" "ensoure_consul_ready" {
+resource "null_resource" "ensure_consul_ready" {
   count      = local.instance_count
   depends_on = [
     ucloud_instance.consul_server,
