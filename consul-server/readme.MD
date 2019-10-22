@@ -12,6 +12,14 @@ Consul Server的数量固定为3（目前不可改变）。
 
 首先我们创建一个[硬件隔离组](https://www.ucloud.cn/yun/110085.html)，它可以保障我们的三台Consul服务器落在不同的物理机上（对于跨3可用区部署的情况无需如此，但对于单可用区部署，物理隔离尤其重要）
 
+创建主机的代码里，我们定义了一个比较奇怪的provisioner:
+```hcl
+provisioner "local-exec" {
+    command = "sleep 10"
+  }
+```
+这是因为如果我们数据盘使用的是UDisk，Terraform在创建完主机后会立即创建UDisk以及与主机的attachment，这时uhost主机也刚刚开机。uhost在刚开机时如果立即挂载udisk，会有很大概率导致启动失败，陷入无限等待，导致Terraform无法ssh完成初始化，进而使得整个Terraform执行失败。所以我们在创建主机之后，定义一个provisioner，使得Terraform相关线程sleep 10秒，再尝试创建后续的attachment，可以避免上述问题的发生。
+
 代码中创建完consul_server主机后，我们并没有按照常规，使用Terraform的count创建ucloud_disk和ucloud_disk_attachment数组，而是分为三组独立的资源声明。这是因为当我们把Consul Server/Nomad Server/Nomad Client资源都分成三组之后，三组资源可以彼此不影响地独立更新。例如，我们的集群一开始使用的是UDisk，结果我们运行一段时间后发现需要改成使用本地盘（或者反过来），我们就可以单独更新第一个可用区的所有资源（同时集群还有两个可用区的资源可用，整体可用性不受大的影响），然后单独更新第二个可用区，然后第三个。由于主机是否使用UDisk是由配置的参数决定的，所以我们必须分成三组独立的资源声明。
 
 我们定义了一个local：server_ips，它就是我们准备ssh到主机上用的ip。根据部署模式的不同，它的值也不同：
