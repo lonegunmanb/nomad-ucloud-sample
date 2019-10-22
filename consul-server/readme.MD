@@ -1,10 +1,14 @@
 # Nomad集群中的Consul集群
 
+![](http://hashicorpfile.cn-bj.ufileos.com/nomad_public.jpg)
+
 本项目创建的Nomad集群中，有3台Consul服务器，它们的作用有二：
 * 提供服务发现功能，帮助Nomad组网、RocketMQ基于Consul Connect组网、基于fabio暴露RocketMQ Http Endpoint
 * 提供KV存储服务，保存Broker在public模式下所使用的弹性IP信息及tfstate
 
 Consul Server的数量固定为3（目前不可改变）。
+
+在consul-server/variables.tf中，有一个参数需要说明：var.use_udisk，该参数定义主机是否使用udisk作为数据盘。如果该值为false，则使用本地盘作为数据盘。
 
 首先我们创建一个[硬件隔离组](https://www.ucloud.cn/yun/110085.html)，它可以保障我们的三台Consul服务器落在不同的物理机上（对于跨3可用区部署的情况无需如此，但对于单可用区部署，物理隔离尤其重要）
 

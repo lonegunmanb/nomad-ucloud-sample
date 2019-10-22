@@ -41,3 +41,4 @@
 * [test与public模式下的RocketMQ](rocketmq.MD)
 * [test/public/private下RocketMQ提供服务的方式](rocketmq_env.MD)
 * [consul-server](consul-server/readme.MD)
+* [nomad-server](nomad-server/readme.MD)
