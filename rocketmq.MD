@@ -68,7 +68,7 @@ terraform workspace new broker0
 参数基本与NameServer的一致，除了要传入Nomad Cluster ID外，还要传入之前创建的NameServer Cluster ID，执行terraform apply后创建成功。由于Broker启动、组网后会把自身信息写入NameServer，所以创建Broker的脚本不会有返回值。
 测试完成后，在销毁Nomad Cluster前，我们也要记得按照顺序，先跳转到rocketmq-job-broker目录下执行terraform destroy，然后是rocketmq-job-namesvr下destroy，把额外申请的公网ULB、弹性IP等资源释放后，再销毁Nomad集群，否则会造成资源的泄漏。
 
-以上是如何创建一个测试用集群的过程。如果我们手动在云主机上创建一组RocketMQ集群，我们那主要是要构建这样一个Broker Config文件：
+以上是如何创建一个测试用集群的过程。如果我们手动在云主机上创建一组RocketMQ集群，我们就要构建类似这样一个Broker Config文件：
 
 ```text
 brokerClusterName = RaftCluster
@@ -90,7 +90,7 @@ sendMessageThreadPoolNums=16
 * dLegerGroup：Broker Group ID
 * dLegerPeers：三台Broker的IP和端口
 
-可惜，这种手动配置的方式我们无法直接使用。
+可惜，这种手动配置的方式我们无法直接使用，原因是因为Nomad不提集群网络功能功能。
 
 ## 服务发现
 
@@ -128,7 +128,7 @@ sendMessageThreadPoolNums=16
 clientCloseSocketIfTimeout=true
 flushDiskType=ASYNC_FLUSH
 ```
-在这里namdsrvAddr与dLegerPeers是通过[Consul Template](https://github.com/hashicorp/consul-template)渲染的，在Nomad启动容器时，会把任务对应的Consul Connect Proxy端口渲染进配置文件，使得Broker通过Sidecar来互相连接。
+在这里namesrvAddr与dLegerPeers是通过[Consul Template](https://github.com/hashicorp/consul-template)渲染的，在Nomad启动容器时，会把任务对应的Consul Connect Proxy端口渲染进配置文件，使得Broker通过Sidecar来互相连接。
 
 一个入门级的Consul Connect + Nomad的例子在[这里](https://www.consul.io/docs/connect/platform/nomad.html)，最新版本的Nomad中引入了[更加简化的写法](https://www.nomadproject.io/docs/job-specification/proxy.html)，但本项目编写时还无法使用简化写法。
 
