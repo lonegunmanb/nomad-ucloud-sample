@@ -102,7 +102,6 @@ resource "ucloud_eip_association" "consul_ip" {
 locals {
   config-consul-path       = "${path.module}/../scripts/render-consul-config.sh"
   setup-script-path        = "${path.module}/setup.sh"
-  reconfig-ssh-keys-script = file("${path.module}/reconfig_ssh_keys.sh")
 }
 
 data "external" "ipv6" {
@@ -124,19 +123,6 @@ data "template_file" "consul-config" {
   depends_on = [ucloud_instance.consul_server]
   count      = local.instance_count
   template   = file(local.config-consul-path)
-  vars       = {
-    region             = var.region
-    node-name          = ucloud_instance.consul_server[count.index].id
-    consul-server-ip-0 = ucloud_instance.consul_server[0].private_ip
-    consul-server-ip-1 = ucloud_instance.consul_server[1].private_ip
-    consul-server-ip-2 = ucloud_instance.consul_server[2].private_ip
-  }
-}
-
-data "template_file" "setup-script" {
-  depends_on = [ucloud_instance.consul_server]
-  count      = local.instance_count
-  template   = file(local.setup-script-path)
   vars       = {
     region             = var.region
     node-name          = ucloud_instance.consul_server[count.index].id
@@ -213,9 +199,9 @@ resource "null_resource" "install_consul_server" {
       host     = local.server_ips[count.index]
     }
     inline = [
-      data.template_file.setup-script[count.index].rendered,
+      file(local.setup-script-path),
       data.template_file.add-loopback-script.rendered,
-      local.reconfig-ssh-keys-script,
+      file("${path.module}/reconfig_ssh_keys.sh"),
     ]
   }
 }
