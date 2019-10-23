@@ -42,6 +42,8 @@ Consul Server自身需要使用自身3台服务器的IP地址，所以无法写�
 另外，由于所有的Consul Server、Nomad Server、Nomad Client都是通过在配置文件中配置3台Consul Server的IP来组网的，所以当我们删除重建某一台Consul Server之后，我们必须确保所有服务器配置中Consul Server IP也会被更新。
 我们在解释Consul Server模块时提到过，名为"config_consul"的null_resource绝对不可以改名，这是因为所有的Consul Server/Nomad Server/Nomad Client模块中，都是用名为"config_consul"的null_resource来配置Consul Server IP的。在这里我们除了要taint掉Consul Server模块里某台主机及其相关资源之外，还要把整个集群里名为"config_consul"的null_resource都taint掉，强迫Terraform把所有服务器的Consul配置刷新到最新版本。
 
+## 如何标注目标资源
+
 terraform提供了一个命令：[show](https://www.terraform.io/docs/commands/show.html),它可以输出当前目录下对应的tfsate描述的资源，利用它以及一些grep，我们就可以筛选出某个模块内的所有资源。
 
 如果我们在根目录下执行完terraform apply后，执行以下命令：
@@ -70,7 +72,7 @@ root# terraform show | grep '#'
 # module.nameServer2.data.template_file.consul-config[2]:
 ......
 ```
-我们大概会看到类似这样的输出。通过对字符串进行匹配，就可以筛选出目标资源。
+我们大概会看到类似这样的输出。通过对字符串进行匹配，就可以筛选出目标资源进行标注。
 
 ## 基于go语言的taint helper
 
@@ -116,3 +118,30 @@ func ExecuteTaint(taintPolicy Taint) {
 其次执行terraform show，并把资源名称解析成一个string slice，交给接口去match，如果match的，就通过命令行taint。
 
 在相关资源都被taint之后，在shell脚本的最后执行terraform apply，就会把被taint的资源删除、重建了。
+
+## 例子
+
+假设我们原来的tfvars文件里是：
+```json
+{
+  ...
+  "nomad_client_broker_image_id": ["uimage-a4xefk1d","uimage-a4xefk1d","uimage-a4xefk1d"],
+  ...
+}
+```
+我们想把镜像升级到uimage-w54t12k3，那么我们先把tfvars改成：
+```json
+{
+  ...
+  "nomad_client_broker_image_id": ["uimage-w54t12k3","uimage-a4xefk1d","uimage-a4xefk1d"],
+  ...
+}
+```
+跳转到rolling-update/rolling-broker下执行：
+```shell script
+sh rolling.sh 0 youroriginpassword
+```
+
+等待执行完成后，您会发现第一组broker服务器都被更新到了最新的镜像版本，当然，原来运行在第一组服务器上的任务都会被重新调度到新机器上执行，rocketmq broker会从它的两个伙伴那里重新同步数据。
+
+我们我们还没有工具去监控某一组服务器上的broker是否都已经追上了数据同步进度，简单起见，早期两组服务器更新之间应有一段时间的间隔，防止数据尚未同步完成就把所有服务器都更新了，导致数据丢失。
