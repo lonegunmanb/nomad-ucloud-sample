@@ -96,7 +96,7 @@ func main(){
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 ```
-代码中的Fprintf里的部分，就是一段consul_template模版代码，查询Consul中NameServer的信息，拼接成一个静态字符串。
+代码中的Fprintf里的部分，就是一段consul_template模版代码，查询Consul中NameServer的信息(我们的name server都会在consul上注册一个名为nameServer${cluster-id}的服务，在模版里用$svc := service "nameServer${cluster-id}"就可以查询出服务可用终结点的ip和端口)，拼接成一个静态字符串。
 
 我们启动的任务，就是在容器中利用go run命令编译执行这段代码，如果我们这时用http get访问这个容器的8080端口，就可以得到对应的NameServer地址，并且consul_template+nomad的搭配会确保，如果它所依赖的Consul服务注册信息发生了变化，比如某个NameServer容器发生了漂移，那么Nomad会重新渲染这段代码，并且重启这个容器，确保我们总是能够得到最新的NameServer地址。
 

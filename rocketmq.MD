@@ -128,9 +128,70 @@ sendMessageThreadPoolNums=16
 clientCloseSocketIfTimeout=true
 flushDiskType=ASYNC_FLUSH
 ```
-在这里namesrvAddr与dLegerPeers是通过[Consul Template](https://github.com/hashicorp/consul-template)渲染的，在Nomad启动容器时，会把任务对应的Consul Connect Proxy端口渲染进配置文件，使得Broker通过Sidecar来互相连接。
+在这里namesrvAddr与dLegerPeers是通过[Consul Template](https://github.com/hashicorp/consul-template)渲染的，在Nomad启动容器时，会把任务对应的Consul Connect Proxy端口渲染进配置文件，使得Broker通过Sidecar来互相连接。模版中使用了一些[Nomad变量](https://www.nomadproject.io/docs/runtime/interpolation.html)
 
 一个入门级的Consul Connect + Nomad的例子在[这里](https://www.consul.io/docs/connect/platform/nomad.html)，最新版本的Nomad中引入了[更加简化的写法](https://www.nomadproject.io/docs/job-specification/proxy.html)，但本项目编写时还无法使用简化写法。
+
+## 构造brokerIP1的逻辑
+这里的brokerIP1就是broker向name server注册自己时用的IP，这里我们的模版是：
+```text
+{{$internal := env "NOMAD_META_internal"}}
+{{if ne $internal ""}}
+  brokerIP1={{env "meta.hostIp"}}
+{{else}}
+  {{$allocId := env "NOMAD_ALLOC_INDEX"}}
+  brokerIP1={{key (printf "brokerEip/${cluster-id}/eip/%s" $allocId)}}
+{{end}}
+```
+我们在启动一个broker集群的Nomad任务时，会根据env_name(test/public/private)设置任务的元数据"internal"，如果是private部署，这个值就是"true"，否则是空字符串。
+模版如果发现该值不是空字符串，那么注册的IP就是自身的内网IP（meta.hostIp是通过Terraform创建一台Nomad Client时渲染到Client配置文件里的，它的值就是机器的内网IP），否则就是通过Consul KV读取属于自己的弹性IP。
+
+## 构造dLegerPeers的逻辑
+
+rocketmq通过dLeger模式组网的方式是，把三个broker的ip和端口以这样的形式拼起来：
+```text
+dLegerPeers=n0-172.18.0.12:40911;n1-172.18.0.13:40912;n2-172.18.0.14:40913
+```
+然后根据自身配置的dLegerSelfId的值来判断broker该侦听的ip与端口，比如：
+```text
+dLegerSelfId=n0
+```
+如果配置文件中dLegerSelfId是n0，那么broker启动后会尝试侦听172.18.0.12:40911这个地址。
+
+我们下面把模版中dLegerPeers的部分格式化后详细讲解一下（这段比较复杂）：
+```text
+//循环计数0-2
+{{range $i := loop ((env "NOMAD_META_brokerCount")|parseInt)}}
+    //NOMAD_ALLOC_INDEX变量代表当前这个容器在3个broker中的序号，从0开始
+    {{$index := (env "NOMAD_ALLOC_INDEX")|parseInt}}
+        //不是第一个元素的话，拼接一个;
+        {{if ne $i 0}};{{end}}
+        //n0-/n1-/n2-
+        n{{$i}}-
+        //如果这个broker不是自己，那么拼接localhost上对应的Sidecar的端口
+        {{if ne $i $index}}
+            localhost:{{env (printf "NOMAD_PORT_outboundProxy_dledger%d" $i)}}
+        {{else}}
+        //否则拼接容器自身所在宿主机IP和属于dledger的端口
+            {{env "NOMAD_ADDR_dledger"}}
+        {{end}}
+{{end}}
+```
+
+因为broker根据dLegerSelfId来决定自己侦听dLegerPeers中的哪一段地址，所以如果三个地址都是Sidecar的地址会导致broker试图侦听属于Sidecar的端口（这会造成端口冲突），所以当判定这一段是自己的时候，一定要用分配给broker dleger的宿主机IP和端口。
+
+## 数据存储的设置
+我们在配置文件中有这样的配置：
+```text
+storePathRootDir=/data
+storePathCommitLog=/data/commitlog
+```
+每一台Nomad Client启动时，都会把数据盘（本地盘或者是UDisk）挂载到/data，broker容器启动时，Nomad会为它分配一个[专属文件夹](https://www.nomadproject.io/docs/runtime/environment.html#task-directories)。我们已经配置Nomad Client，把这些专属文件夹都分配在数据盘下，启动broker容器时，会把这个专属文件夹下的data文件夹挂载到容器的/data路径下，这样就能确保broker的数据都是写入宿主的数据盘。
+
+Nomad Client有GC机制，会把Complete/Failed的任务的专属文件夹[GC](https://github.com/hashicorp/nomad/pull/2081)掉。所以如果用户决定删除自己的RocketMQ集群，相关Nomad任务停止一段时间后，GC会把磁盘上Broker写入的文件逐渐删除，释放空间。
+
+## clientCloseSocketIfTimeout
+因为broker之间，以及broker和name server之间都是通过Sidecar连接的，所以如果一个容器发生了漂移，其他的容器是无法感知到地址发生了变化的。如果clientCloseSocketIfTimeout=false，那么容器发生漂移后，其他容器到死亡容器的tcp连接实际上还存在，只是处于半开状态，这时容器不会尝试重建连接，也就无法和新启动的容器建立连接。所以在这里我们必须设置clientCloseSocketIfTimeout=true
 
 ## 小结
 
