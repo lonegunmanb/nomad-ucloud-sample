@@ -68,7 +68,9 @@ terraform workspace new broker0
 参数基本与NameServer的一致，除了要传入Nomad Cluster ID外，还要传入之前创建的NameServer Cluster ID，执行terraform apply后创建成功。由于Broker启动、组网后会把自身信息写入NameServer，所以创建Broker的脚本不会有返回值。
 测试完成后，在销毁Nomad Cluster前，我们也要记得按照顺序，先跳转到rocketmq-job-broker目录下执行terraform destroy，然后是rocketmq-job-namesvr下destroy，把额外申请的公网ULB、弹性IP等资源释放后，再销毁Nomad集群，否则会造成资源的泄漏。
 
-以上是如何创建一个测试用集群的过程。如果我们手动在云主机上创建一组RocketMQ集群，我们就要构建类似这样一个Broker Config文件：
+## 参数文件模版
+
+构造一个运行于Nomad上的RocketMQ集群，核心关键在于如何构造配置文件。如果我们手动在云主机上创建一组RocketMQ集群，我们就要构建类似这样一个Broker Config文件：
 
 ```text
 brokerClusterName = RaftCluster
