@@ -14,10 +14,22 @@ ui = true
 connect {
   enabled = true
 }
+telemetry {
+  prometheus_retention_time = "10s"
+}
 EOF
 cat>/etc/consul.d/consul.json<<-EOF
 {
     "client_addr": "0.0.0.0"
+}
+EOF
+cat>/etc/consul.d/consul_service.json<<-EOF
+{
+  "service": {
+    "name": "consul_http",
+    "port": 8500,
+    "tags": ["cluster-CLUSTER", "http"]
+  }
 }
 EOF
 echo "done"

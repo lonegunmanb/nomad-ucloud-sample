@@ -9,6 +9,7 @@ sed -i 's/AZ/${az}/g' /etc/nomad.d/client.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/nomad.d/client.hcl
 sed -i 's/CLASS/${node-class}/g' /etc/nomad.d/client.hcl
 sed -i 's/META/${node-meta}/g' /etc/nomad.d/client.hcl
+sed -i 's/CLUSTER/${cluster}/g' /etc/nomad.d/client.hcl
 sed -i 's/SERVICE_DESCRIPTION/Nomad Client/g' /etc/systemd/system/nomad.service
 systemctl enable consul
 systemctl start consul

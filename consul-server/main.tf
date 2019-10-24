@@ -186,6 +186,13 @@ resource "null_resource" "config_consul" {
   }
 }
 
+data "template_file" "setup" {
+  template = file(local.setup-script-path)
+  vars     = {
+    cluster = var.cluster_id
+  }
+}
+
 resource "null_resource" "install_consul_server" {
   count      = local.instance_count
   depends_on = [
@@ -199,7 +206,7 @@ resource "null_resource" "install_consul_server" {
       host     = local.server_ips[count.index]
     }
     inline = [
-      file(local.setup-script-path),
+      data.template_file.setup.rendered,
       data.template_file.add-loopback-script.rendered,
       file("${path.module}/reconfig_ssh_keys.sh"),
     ]

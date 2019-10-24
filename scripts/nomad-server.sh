@@ -11,6 +11,9 @@ server {
   job_gc_threshold = "1h"
   deployment_gc_threshold = "10m"
 }
+consul {
+  tags = ["cluster-CLUSTER"]
+}
 telemetry {
   collection_interval = "1s"
   disable_hostname = true

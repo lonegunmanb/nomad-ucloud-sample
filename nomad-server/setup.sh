@@ -6,6 +6,7 @@ mkdir --parents /data/nomad
 sed -i 's/REGION/${region}/g' /etc/nomad.d/server.hcl
 sed -i 's/DATACENTER/${region}/g' /etc/nomad.d/server.hcl
 sed -i 's/NODENAME/${node-name}/g' /etc/nomad.d/server.hcl
+sed -i 's/CLUSTER/${cluster}/g' /etc/nomad.d/server.hcl
 sed -i 's/SERVICE_DESCRIPTION/Nomad Server/g' /etc/systemd/system/nomad.service
 systemctl enable consul
 systemctl start consul

@@ -15,6 +15,9 @@ client {
   }
   META
 }
+consul {
+  tags = ["cluster-CLUSTER"]
+}
 telemetry {
   collection_interval = "1s"
   disable_hostname = true

@@ -136,6 +136,7 @@ data "template_file" "setup-script" {
                         }
 EOF
     , "\n", "\\n")
+    cluster           = var.cluster_id
   }
 }
 

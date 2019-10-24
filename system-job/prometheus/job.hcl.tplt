@@ -38,6 +38,14 @@ scrape_configs:
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
+  - job_name: 'consul_metrics'
+    consul_sd_configs:
+    - server: '{{ env "NOMAD_IP_prometheus_ui" }}:8500'
+      services: ['consul_http']
+    scrape_interval: 5s
+    metrics_path: "/v1/agent/metrics"
+    params:
+      format: ['prometheus']
 EOH
       }
       driver = "docker"
