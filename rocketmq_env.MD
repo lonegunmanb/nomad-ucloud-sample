@@ -109,9 +109,25 @@ func main(){
 urlprefix-/foo
 ```
 
-那么我们可以通过访问http://${fabio_svc}/foo 这个地址来访问这个服务。通过这种方式，用户只要能访问fabio容器，附上正确的路径，就可以被中转到go run容器上。用户如何访问fabio容器呢？
+那么我们可以通过访问http://${fabio_svc}/foo 这个地址来访问这个服务。通过这种方式，用户只要能访问fabio容器，附上正确的路径，就可以被中转到go run容器上。
+```hcl
+service {
+   name = "nameSvrIndex-${cluster-id}"
+   port = "tcp"
+   tags = ["urlprefix-/rocketmq/${cluster-id}"]
+   check {
+     type = "tcp"
+     port = "tcp"
+     interval = "10s"
+     timeout = "2s"
+   }
+}
+```
+注意，这里的check必不可少，fabio为了要自动摘除不健康的后端，所以只会把请求路由给健康检查正常的服务。
 
-我们在这里使用了[Nomad System Job](https://www.nomadproject.io/docs/schedulers.html), 一个System类型的Job类似K8S的DaemonSet，Nomad会在每一个符合Job中定义的约束的Client节点上启动相同的Job。我们在system-job目录下定义了这样的System Job，会在所有的NameServer类型宿主机上都启动一个fabio容器，并且侦听8080端口，同时我们在创建Nomad集群时，申请了一个内网ULB，把所有的NameServer宿主机都添加到后端，这样通过访问这个内网ULB，我们就可以触达fabio容器，进而访问到对应的go run容器。
+用户如何访问fabio容器呢？
+
+我们在这里使用了[Nomad System Job](https://www.nomadproject.io/docs/schedulers.html#system), 一个System类型的Job类似K8S的DaemonSet，Nomad会在每一个符合Job中定义的约束的Client节点上启动相同的Job。我们在system-job目录下定义了这样的System Job，会在所有的NameServer类型宿主机上都启动一个fabio容器，并且侦听8080端口，同时我们在创建Nomad集群时，申请了一个内网ULB，把所有的NameServer宿主机都添加到后端，这样通过访问这个内网ULB，我们就可以触达fabio容器，进而访问到对应的go run容器。
 
 ![](http://hashicorpfile.cn-bj.ufileos.com/fabio.jpg)
 
