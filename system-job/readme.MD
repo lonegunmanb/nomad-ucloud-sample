@@ -41,7 +41,7 @@ EOF
 ### 配置Nomad输出Prometheus
 
 [配置Nomad输出Prometheus数据很简单](https://www.nomadproject.io/guides/operations/monitoring-and-alerting/prometheus-metrics.html#step-1-enable-telemetry-on-nomad-servers-and-clients)
-我们在[scripts目录下的nomad-client.sh](../scripts/nomad-client.sh#21)和[nomad-server.sh](../scripts/nomad-server.sh#17)都有一样的配置：
+我们在[scripts目录下的nomad-client.sh](../scripts/nomad-client.sh#L21)和[nomad-server.sh](../scripts/nomad-server.sh#L17)都有一样的配置：
 ```text
 telemetry {
   collection_interval = "1s"
