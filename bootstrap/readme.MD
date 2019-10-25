@@ -14,7 +14,7 @@
 
 我们在bootstrap目录下构建了另一组Terraform代码，用来在KUN上创建一组资源，并透过这组资源达成上述目标。
 
-![](http://hashicorpfile.cn-bj.ufileos.com/backend%20%26%26%20kun.jpg)
+![](http://hashicorpfile.cn-bj.ufileos.com/backend%20%26%26%20kun.png)
 
 ## 需要持久化的数据
 创建一个Nomad集群，有两种数据非常重要，不可以丢失。第一种就是产生的tfstate。
