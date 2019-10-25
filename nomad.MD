@@ -40,6 +40,8 @@ Nomad集群部署在UCloud上，UCloud VPC结构如下：
 
 我们会创建两个VPC与对应的子网，并且打通这两个VPC。我们在client vpc上声明一个Nat网关，配置一个公网IP，这样Nomad Client中的容器就可以通过Nat网关访问到公有云API。
 
+为什么是两个VPC？考虑到未来用户可能会要求通过内网访问消息队列，那时我们可以把Nomad Client所在的VPC（也就是RocketMQ容器所在的VPC）与客户VPC打通，这样就可以内网访问了，同时Consul Server/Nomad Server控制面在另一个VPC里，与客户VPC保持隔离。
+
 部署private模式时，由于我们不能创建、销毁VPC，并且无法发访问外网，只能使用管理员预设的VPC，所以网络结构如下：
 ![](http://hashicorpfile.cn-bj.ufileos.com/private_network.jpg)
 

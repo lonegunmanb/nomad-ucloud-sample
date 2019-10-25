@@ -1,17 +1,20 @@
 if [ ! -d "project" ]; then
   mkdir project
 fi
-
+# if container contians code at /code, copy code to /project
 if [ -d "/code/${project_dir}" ]; then
   cp -R /code/${project_dir} /project/${project_dir}
 fi
 
+# or, git clone code
 cd /project
 if [ ! -d "${project_dir}" ]; then
   git clone ${terraform_project_url}
 fi
 cd ${project_dir}
 git checkout ${branch}
+
+# render all tfvars file
 cd control-network
 if [ ! -f "terraform.tfvars" ]; then
   cat>terraform.tfvars<<-EOF
@@ -46,7 +49,7 @@ if [ ! -f "inited" ]; then
   terraform apply --auto-approve -input=false
   touch inited
 fi
-#give consul some time to be stablized
+# give consul some time to be stablized
 sleep 10
 if [ ! -d "/backend" ]; then
   mkdir /backend
@@ -129,6 +132,7 @@ if [ ! -f "../system-job/terraform.tfvars" ]; then
 EOF
 fi
 
+# create network module
 cd ../network
 rm -f destroyed
 if [ ! -f "inited" ]; then
@@ -138,6 +142,8 @@ if [ ! -f "inited" ]; then
   terraform apply --auto-approve -input=false
   touch inited
 fi
+
+# create nomad cluster
 cd ..
 rm -f destroyed
 if [ ! -f "inited" ]; then
@@ -147,6 +153,7 @@ if [ ! -f "inited" ]; then
   touch inited
 fi
 
+# create system job
 cd system-job
 rm -f destroyed
 if [ ! -f "inited" ]; then
@@ -156,5 +163,6 @@ if [ ! -f "inited" ]; then
   touch inited
 fi
 
+# block forever, prevent pod exit
 echo "Finished"
 tail -f /dev/null
