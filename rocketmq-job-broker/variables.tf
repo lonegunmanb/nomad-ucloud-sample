@@ -11,8 +11,12 @@ locals {
   vpc_id = data.terraform_remote_state.nomad.outputs.clientVpcId
   subnet_id = data.terraform_remote_state.nomad.outputs.clientSubnetId
 }
-variable rocketmq_docker_image {}
-variable rocketmq_version {}
+variable rocketmq_docker_image {
+  default = "uhub.service.ucloud.cn/lonegunmanb/rocketmq"
+}
+variable rocketmq_version {
+  default = "4.5.1"
+}
 variable allow_multiple_tasks_in_az {}
 variable namesvr_clusterId {}
 variable nomad_cluster_id {}
@@ -21,7 +25,9 @@ variable remote_state_backend_url {}
 variable ucloud_pubkey {}
 variable ucloud_secret {}
 variable ucloud_api_base_url {}
-variable terraform-image {}
+variable terraform-image {
+  default = "uhub.service.ucloud.cn/lonegunmanb/terraform:0.12.10"
+}
 variable broker_size {
   type = number
   default = 1
