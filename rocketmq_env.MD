@@ -70,6 +70,16 @@ template {
 ```
 我们实际上做的就是，在启动Broker容器的同时，在同一台宿主机上启动一个含有Terraform运行时环境的容器，同样通过consul_template渲染一个Terraform代码文件，把通过Consul KV读取到的弹性IP信息渲染进去，然后执行，这个Terraform容器就会把分配到的弹性IP绑定到宿主机上。即使Broker发生了漂移，在新的宿主机上启动后，这个伴生的Terraform仍然会把同一个弹性IP绑定到新的宿主机上。所以Broker暴露的端口在容器漂移后会发生改变，而绑定的公网IP则不会。
 
+## Terraform运行时环境镜像
+
+我们在[rocketmq-job-namesvr/terraform-dockerfile/Dockerfile](rocketmq-job-namesvr/terraform-dockerfile/Dockerfile)中定义了这个含有Terraform运行时环境的镜像，值得注意的是，我们在代码的最后有这样一行：
+```dockerfile
+&& echo plugin_cache_dir = \"/plugin\" >> ~/.terraformrc
+```
+在这里我们设置了[plugin_cache_dir](https://www.terraform.io/docs/configuration/providers.html#provider-plugin-cache)，因为Terraform运行时会通过公网下载所需要的Terraform插件，而我们的部署环境很可能是无法连接公网的，所以我们在通过Packer构建Nomad Client镜像时，就把所需要的Terraform插件都下载到/plugin目录下，启动Terraform容器时，我们把宿主机的/plugin挂载到容器的/plugin目录下，并且在构建容器镜像时就指定使用该目录作为plugin_cache_dir，这样就可以完全脱离公网工作。
+
+构建这个镜像很简单，只需要传入对应的VERSION参数指定Terraform版本即可。
+
 ## private模式
 
 private模式意在管理网部署一个与public模式一样的多租户RocketMQ集群，但管理网不允许使用公网IP，所以我们必须寻找其他方法。

@@ -23,7 +23,14 @@ Terraform中[tfstate](https://www.terraform.io/docs/state/index.html)极其重�
 
 还有就是创建集群所使用的参数文件。当然我们可以从tfstate文件来解析出集群当前的配置、规模等数据，但是由于tfstate是json格式的，并且tfstate含有资源所有的属性，所以还是妥善保存tfvars文件比较方便。
 
-## 如何保存Backend
+## 创建顺序
+1. 创建bootstrapper pod和对应的pvc
+2. 由bootstrapper pod创建Consul Backend（tfstate保存在pvc上）
+3. 由bootstrapper pod创建Nomad集群和System Job（tfstate保存在Consul Backend里）
+4. 创建KUN上的API Server Service和Deployment，通过环境变量注入之前创建的Nomad集群和Consul Backend访问地址
+5. 创建一组haproxy pod和对应的service，暴露Nomad集群控制面、监控信号以及RocketMQ NameServer Index服务
+
+## 如何保存Backend集群本身的State
 
 简单起见，我们通过使用之前用Packer构建的Consul镜像先搭建一个Consul集群，使用它的KV功能作为Backend。但是如何保存这个Consul集群的tfstate？如果我们在跳板机上创建这组Consul集群，那么tfstate就保留在跳板机的硬盘上，如果跳板机硬盘发生故障呢？
 
