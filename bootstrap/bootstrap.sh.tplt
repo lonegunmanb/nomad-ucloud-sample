@@ -3,7 +3,9 @@ if [ ! -d "project" ]; then
 fi
 # if container contians code at /code, copy code to /project
 if [ -d "/code/${project_dir}" ]; then
-  cp -R /code/${project_dir} /project/${project_dir}
+  if [ ! -d "/project/${project_dir}" ]; then
+    cp -R /code/${project_dir} /project/${project_dir}
+  fi
 fi
 
 # or, git clone code

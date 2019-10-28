@@ -10,7 +10,7 @@
     "nomad_version": "0.10.0",
     "region": "cn-bj2",
     "az": "cn-bj2-02",
-    "tf_plugin_consul_version": "2.5.0",
+    "tf_plugin_consul_version": "2.6.0",
     "tf_plugin_nomad_version": "1.4.2",
     "tf_plugin_null_version": "2.1.2",
     "tf_plugin_template_version": "2.1.2",
