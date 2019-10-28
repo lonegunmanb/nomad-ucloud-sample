@@ -1,9 +1,9 @@
 {
   "variables": {
-    "terraform_version": "0.12.10",
-    "nomad_version": "0.9.6",
+    "terraform_version": "0.12.12",
+    "nomad_version": "0.10.0",
     "consul_version": "1.6.1",
-    "ucloud_cli_version": "0.1.26",
+    "ucloud_cli_version": "0.1.27",
     "tf_plugin_consul_version": "2.5.0",
     "tf_plugin_nomad_version": "1.4.2",
     "tf_plugin_null_version": "2.1.2",
@@ -19,7 +19,7 @@
     "docker_login_username": "",
     "docker_login_password": "",
     "code_git_url": "",
-    "golang_version": "1.13.1",
+    "golang_version": "1.13.3",
     "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
   },
 
