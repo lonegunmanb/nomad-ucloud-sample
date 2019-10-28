@@ -17,7 +17,7 @@ func main() {
 		NodeDrain: NodeDrain{
 			Cmds: []string{
 				"nomad node eligibility -self -disable",
-				"nomad node drain -self -enable",
+				"nomad node drain -self -enable -force",
 			},
 			Password:   *a.Password,
 			Group:      *a.Group,
