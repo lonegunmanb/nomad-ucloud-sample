@@ -1,0 +1,11 @@
+kubectl -n $1 delete service nomad-ctrl-service-$2
+kubectl -n $1 delete deployment rkq-controller-$2
+kubectl -n $1 delete pod bootstrapper-$2
+kubectl -n $1 delete pvc rktmq-bootstrap-code-volume-$2
+kubectl -n $1 delete configmap backend-script-$2
+kubectl -n $1 delete configmap bootstrap-script-$2
+kubectl -n $1 delete secret ucloud-key-$2
+kubectl -n $1 delete secret controller-image-repo-secret-$2
+kubectl -n $1 delete service $2
+kubectl -n $1 delete configmap haproxy-cfg-$2
+kubectl -n $1 delete deployment haproxy-$2
