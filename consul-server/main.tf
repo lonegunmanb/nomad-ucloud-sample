@@ -12,7 +12,7 @@ resource ucloud_isolation_group isolation_group {
 
 resource "ucloud_instance" "consul_server" {
   count             = local.instance_count
-  name              = "consul-server-${count.index}"
+  name              = "${format("%04d", count.index)}-consul-server-${var.cluster_id}"
   tag               = var.cluster_id
   availability_zone = var.az[count.index]
   image_id          = var.image_id[count.index]
@@ -34,7 +34,7 @@ resource "ucloud_instance" "consul_server" {
 
 resource "ucloud_disk" "data_disk0" {
   count             = var.use_udisk[0] && var.data_volume_size[0] > 0 ? 1 : 0
-  name              = "consul-server-data-0"
+  name              = "0-consul-server-${var.cluster_id}-data"
   availability_zone = var.az[0]
   disk_size         = var.use_udisk[0] ? var.data_volume_size[0] : 0
   disk_type         = var.udisk_type[0]
@@ -44,7 +44,7 @@ resource "ucloud_disk" "data_disk0" {
 
 resource "ucloud_disk" "data_disk1" {
   count             = var.use_udisk[1] && var.data_volume_size[1] > 0 ? 1 : 0
-  name              = "consul-server-data-1"
+  name              = "1-consul-server-${var.cluster_id}-data"
   availability_zone = var.az[1]
   disk_size         = var.use_udisk[1] ? var.data_volume_size[1] : 0
   disk_type         = var.udisk_type[1]
@@ -54,7 +54,7 @@ resource "ucloud_disk" "data_disk1" {
 
 resource "ucloud_disk" "data_disk2" {
   count             = var.use_udisk[2] && var.data_volume_size[2] > 0 ? 1 : 0
-  name              = "consul-server-data-2"
+  name              = "2-consul-server-${var.cluster_id}-data"
   availability_zone = var.az[2]
   disk_size         = var.use_udisk[2] ? var.data_volume_size[2] : 0
   disk_type         = var.udisk_type[2]
@@ -84,7 +84,7 @@ resource "ucloud_disk_attachment" "attachment2" {
 
 resource "ucloud_eip" "consul_servers" {
   count         = var.env_name != "test" ? 0 : local.instance_count
-  name          = "consul-server-${var.cluster_id}-${count.index}"
+  name          = "${count.index}-consul-server-${var.cluster_id}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type[count.index]

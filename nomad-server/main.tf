@@ -1,6 +1,6 @@
 resource "ucloud_instance" "nomad_servers" {
   count             = var.instance_count
-  name              = "nomad-server-${var.group}-${count.index}"
+  name              = "${format("%04d", count.index)}-nomad-server-${var.cluster_id}-${var.group}"
   tag               = var.cluster_id
   availability_zone = var.az
   image_id          = var.image_id
@@ -22,7 +22,7 @@ resource "ucloud_instance" "nomad_servers" {
 
 resource "ucloud_disk" "data_disk" {
   count             = var.use_udisk && var.data_volume_size > 0 ? var.instance_count : 0
-  name              = "nomad-server-${var.group}-${count.index}"
+  name              = "${format("%04d", count.index)}-nomad-server-${var.cluster_id}-${var.group}"
   availability_zone = var.az
   disk_type         = var.udisk_type
   disk_size         = var.data_volume_size
@@ -39,7 +39,7 @@ resource "ucloud_disk_attachment" "attachment" {
 
 resource "ucloud_eip" "nomad_servers" {
   count         = var.env_name != "test" ? 0 : var.instance_count
-  name          = "nomad-server-${var.group}-${count.index}"
+  name          = "${format("%04d", count.index)}nomad-server-${var.cluster_id}-${var.group}"
   internet_type = "bgp"
   charge_mode   = "traffic"
   charge_type   = var.charge_type
