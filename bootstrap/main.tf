@@ -367,6 +367,10 @@ resource "kubernetes_deployment" "controller" {
             }
           }
           env {
+            name = "TF_VAR_internal_use"
+            value = var.env_name == "private" ? "true" : "false"
+          }
+          env {
             name = "NAMESVR_INDEX_IP"
             value = local.nameServerLbIp
           }
