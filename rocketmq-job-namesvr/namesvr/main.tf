@@ -30,6 +30,8 @@ locals {
 }
 
 variable "golang-image" {}
+variable "cpu" {}
+variable "memory" {}
 data "template_file" "namesvr-job" {
   template = file(local.job-hcl)
   vars     = {
@@ -52,6 +54,8 @@ data "template_file" "namesvr-job" {
     terraform-image      = var.terraform-image
     golang-image         = var.golang-image
     attachment-count     = var.internal_use ? 0 : 1
+    cpu                  = var.cpu
+    memory               = var.memory
   }
 }
 

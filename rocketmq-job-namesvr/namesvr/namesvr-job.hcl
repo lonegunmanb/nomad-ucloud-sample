@@ -81,8 +81,8 @@ job "${job-name}" {
         args = []
       }
       resources {
-        cpu = 1000
-        memory = 2048
+        cpu = ${cpu}
+        memory = ${memory}
         network {
           port "tcp" {}
         }

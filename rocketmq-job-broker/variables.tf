@@ -28,10 +28,7 @@ variable ucloud_api_base_url {}
 variable terraform-image {
   default = "uhub.service.ucloud.cn/lonegunmanb/terraform:0.12.10"
 }
-variable broker_size {
-  type = number
-  default = 1
-}
+
 variable internal_use {
   type = bool
 }
@@ -40,10 +37,10 @@ variable "base_bandwidth" {
   default = 50
 }
 
-variable "base_cpu" {
-  default = 1500
+variable "cpu" {
+  default = 4000
 }
 
-variable "base_memory" {
+variable "memory" {
   default = 4096
 }

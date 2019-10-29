@@ -195,6 +195,88 @@ Nomad Client有GC机制，会把Complete/Failed的任务的专属文件夹[GC](h
 ## clientCloseSocketIfTimeout
 因为broker之间，以及broker和name server之间都是通过Sidecar连接的，所以如果一个容器发生了漂移，其他的容器是无法感知到地址发生了变化的。如果clientCloseSocketIfTimeout=false，那么容器发生漂移后，其他容器到死亡容器的tcp连接实际上还存在，只是处于半开状态，这时容器不会尝试重建连接，也就无法和新启动的容器建立连接。所以在这里我们必须设置clientCloseSocketIfTimeout=true
 
+## 如何让Job部署在正确的机器上
+在我们的集群里，只有RocketMQ Broker对磁盘有比较高的要求，为所有的任务准备相同宿主机无疑是一种浪费，我们只需要为Broker类型宿主机配置高配磁盘即可，那么我们是如何确保不同类型的任务被调度到对应的机器上呢？
+
+我们使用了Nomad的[任务约束](https://www.nomadproject.io/docs/job-specification/constraint.html)。
+
+首先我们在构建Nomad Client镜像时Nomad配置模版中有[Node Class项](scripts/nomad-client.sh#L10)，该变量在Terraform创建主机时会被填充为传入的class(broker/nameServer)，在Nomad启动后可以通过constraint进行约束
+
+[rocketmq-job-namesvr](rocketmq-job-namesvr/namesvr/namesvr-job.hcl#L4-L7)：
+```hcl
+job "${job-name}" {
+  datacenters = ["${region}"]
+  region = "${region}"
+  constraint {
+    attribute = "$${node.class}"
+    value = "${node-class}"
+  }
+....
+
+group "namesvr" {
+    count = ${count}
+    spread {
+      attribute = "$${meta.az}"
+    }
+    constraint {
+      attribute = "$${meta.az}"
+      operator = "distinct_property"
+      value = "${task-limit-per-az}"
+    }
+```
+
+[rocketmq-job-broker](rocketmq-job-broker/broker-job.hcl.tplt#L4-L7)：
+```hcl
+job "${job-name}" {
+  datacenters = ["${region}"]
+  region = "${region}"
+  constraint {
+    attribute = "$${node.class}"
+    value = "${node-class}"
+  }
+  group "broker" {
+    count = 3
+    spread {
+      attribute = "$${meta.az}"
+    }
+    constraint {
+      attribute = "$${meta.az}"
+      operator = "distinct_property"
+      value = "${task-limit-per-az}"
+    }
+```
+
+另外我们看到，我们针对datacenter和region也做了约束（Nomad的datacenter与Consul的datacenter意义不同，Consul的[datacenter](https://www.consul.io/docs/glossary.html#datacenter)可以理解为Nomad的[region](https://www.nomadproject.io/docs/internals/architecture.html)）。
+本项目不假设做跨地域的联邦部署，所以上述nomad任务模版中的region实际上是可用区，通过约束我们把任务约束在指定可用区执行（即使3个可用区完全一样我们代码也一样处理）。
+
+配置代码中的[spread设置](https://www.nomadproject.io/docs/job-specification/spread.html)定义了任务选择宿主机时的分布策略。
+[Terraform在启动机器时把机器所属可用区写入了机器meta信息的az项](nomad-client/main.tf#L133)，并且指示Nomad集群把任务按照机器的az打散。spread下面我们又定义了一个operator为distinct_property的限制，当启动rocketmq-job时给定的allow_multiple_tasks_in_az是false时，这个值是1，代表每个az最多含有一个任务（强制任务必须分布在3可用区），否则这个值是3，就是尽量分布，但也允许一个az含有3个任务。
+
+在allow_multiple_tasks_in_az为false时，如果某可用区整体不可用，那么原先属于该可用区的任务将保持pending状态；如果allow_multiple_tasks_in_az为true，在某可用区整体不可用时，原先属于该可用区的任务将会被调度到其他可用区启动，即使故障可用区恢复工作后，这些迁移出去的可用区也不会自动迁移回来。
+
+如果您只有一个可用区可供部署，allow_multiple_tasks_in_az务必为true。
+
+## 任务资源需求
+
+我们需要定义任务所需的[资源](https://www.nomadproject.io/docs/job-specification/resources.html#resources-parameters)（默认值100Mhz CPU和300M内存对Java应用来说太低）
+默认NameServer容器使用1000Mhz CPU，2048M内存（由变量namesvr_cpu和namesvr_memory确定）
+默认Broker容器使用4000Mhz CPU,4096M内存（由变量cpu和memory确定）
+
+我们在构建Nomad Client镜像时配置了Nomad[保留资源](scripts/nomad-client.sh#L12-L15)
+```hcl
+reserved {
+    cpu = 100
+    memory = 1024
+}
+```
+我们为Nomad服务保留了100Mhz的CPU和1G的内存。
+
+另外无论是NameServer还是Broker，都需要Sidecar以及一些Terraform容器协助，这些协助容器本身也需要消耗一定的资源。
+
+Nomad只会把任务调度到有足够资源的机器上，如果所有符合任务约束的机器资源都不足，那么Job状态会保持在Pending，直到有资源被释放出来，或是集群获得了新机器。
+
+Nomad目前对CPU的约束是软约束，在系统实际有富裕CPU时，允许任务使用超额CPU。内存是硬约束，一旦超过限制会被杀死重启。
+
 ## 小结
 
 由于Nomad缺乏像K8S那样强大的网络功能，无法给每个Pod分配一个稳定的访问地址（StatefulSet/DNS），所以我们必须为NameServer/Broker服务配置对应的Consul Connect Sidecar进程，彼此之间通过Sidecar连接，这样即使发生故障转移，容器漂移，对没有发生故障的容器来说网络拓扑结构看起来也没有变化。

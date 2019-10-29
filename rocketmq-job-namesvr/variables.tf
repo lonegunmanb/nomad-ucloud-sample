@@ -24,3 +24,10 @@ locals {
   consul_access_ip  = data.terraform_remote_state.nomad.outputs.consul_access_ip
   consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
 }
+
+variable "namesvr_cpu" {
+  default = 1000
+}
+variable "namesvr_memory" {
+  default = 2048
+}

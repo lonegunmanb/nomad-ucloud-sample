@@ -96,6 +96,8 @@ module "namesvr" {
   nameServerListenerId       = var.internal_use ? "" : ucloud_lb_listener.nameServerListener.*.id[0]
   golang-image               = var.golang-image
   internal_use               = var.internal_use
+  cpu                        = var.namesvr_cpu
+  memory                     = var.namesvr_memory
 }
 
 module "console" {

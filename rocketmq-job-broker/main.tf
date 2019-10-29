@@ -17,7 +17,7 @@ resource "ucloud_eip" "broker_eip" {
   charge_mode   = "traffic"
   charge_type   = "dynamic"
   tag           = var.nomad_cluster_id
-  bandwidth     = min(var.broker_size * var.base_bandwidth, 200)
+  bandwidth     = min(var.base_bandwidth, 200)
 }
 //because we create ucloud_eip_association inside nomad job, so before we destroy eip, we must unbind eip first, by ucloud cli
 resource "null_resource" "eip_destroy_helper" {
@@ -76,8 +76,8 @@ data "template_file" "broker-job" {
     namesvr_clusterId   = var.namesvr_clusterId
     region              = local.region
     broker-image        = "${var.rocketmq_docker_image}:${var.rocketmq_version}"
-    cpu                 = var.broker_size * var.base_cpu
-    memory              = var.broker_size * var.base_memory
+    cpu                 = var.cpu
+    memory              = var.memory
     rockermq-version    = var.rocketmq_version
     brokersvc-name      = local.brokersvc-name
     node-class          = "broker"
