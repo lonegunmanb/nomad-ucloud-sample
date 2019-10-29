@@ -108,9 +108,7 @@ func ExecuteTaint(taintPolicy Taint) {
 	for _, r := range res {
 		if taintPolicy.Match(r) {
 			println(fmt.Sprintf("terraform taint %s", r))
-			if !DryRun {
-				_, _ = ExecCmd(fmt.Sprintf("terraform taint %s", r), Dir, os.Stdout, os.Stderr)
-			}
+			_, _ = ExecCmd(fmt.Sprintf("terraform taint %s", r), Dir, os.Stdout, os.Stderr)
 		}
 	}
 }
