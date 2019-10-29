@@ -145,3 +145,13 @@ sh rolling.sh 0 youroriginpassword
 等待执行完成后，您会发现第一组broker服务器都被更新到了最新的镜像版本，当然，原来运行在第一组服务器上的任务都会被重新调度到新机器上执行，rocketmq broker会从它的两个伙伴那里重新同步数据。
 
 我们我们还没有工具去监控某一组服务器上的broker是否都已经追上了数据同步进度，简单起见，早期两组服务器更新之间应有一段时间的间隔，防止数据尚未同步完成就把所有服务器都更新了，导致数据丢失。
+
+## 清除被淘汰的机器信息
+
+当我们用rolling-update更新了某组机器后，原先的机器会被删除，在Nomad的控制台上我们会看到死去的机器：
+![](http://hashicorpfile.cn-bj.ufileos.com/dead_node.png)
+
+我们可以利用[Nomad GC](https://www.nomadproject.io/api/system.html#sample-request)，向Nomad的访问地址发起一个这样的Http PUT调用。
+![](http://hashicorpfile.cn-bj.ufileos.com/after_gc.png)
+
+需要注意的是，GC同时也会触发Nomad Client上开始清理状态为Complete或是Dead的Job，这意味着Nomad Client会开始删除已经不用的RocketMQ Broker Commit Log。
