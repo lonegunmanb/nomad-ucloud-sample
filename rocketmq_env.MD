@@ -158,6 +158,9 @@ service {
 
 我们在System Job中除了定义了fabio任务以外，还定义了一个prometheus服务，它通过Consul发现了所有Nomad Server以及Nomad Client节点，然后收集Nomad集群的各项metric并以prometheus的标准输出，本文不再赘述。
 
+## 在private模式下部署RocketMQ
+无论是rocketmq-job-namesvr还是rocketmq-job-broker，都有一个参数internal_use，在private模式下部署RocketMQ Nomad Job时，该变量应使用true，这样就不会试图申请公网IP、公网ULB，Broker也会把宿主机的IPv4 Private IP注册为Broker IP。
+
 ## 小结
 简单小结一下，test与public模式下，一个公网ULB通过9876端口向用户提供了3个Broker的公网EIP和对应的宿主机端口号，而在private模式下，用户通过http get，透过统一的内网ULB -> NameServer宿主机上的fabio容器 -> go run运行的NameServer索引服务，获取了3台NameServer的内网IP与宿主机端口，进而获取3台Broker的内网IP与宿主机端口。
 
