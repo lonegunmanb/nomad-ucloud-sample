@@ -34,7 +34,6 @@ variable broker_size {
 }
 variable internal_use {
   type = bool
-  default = false
 }
 
 variable "base_bandwidth" {

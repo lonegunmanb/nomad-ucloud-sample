@@ -19,7 +19,6 @@ variable remote_state_backend_url {}
 variable allow_multiple_tasks_in_az {}
 variable internal_use {
   type = bool
-  default = false
 }
 locals {
   consul_access_ip  = data.terraform_remote_state.nomad.outputs.consul_access_ip
