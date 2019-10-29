@@ -82,3 +82,7 @@ Bootstapper Pod开始创建Nomad集群的同时，我们会创建名为controlle
 ## Haproxy
 
 main.tf的最后定义了名为haproxy的Deployment以及相应的Service。我们在用户网为Consul Server/Nomad Server以及NameServer都配置了内网ULB，而这些ULB从管理网无法直接访问；我们在KUN上创建了一些Haproxy Pod代理了这些内网ULB，并通过KUN Service暴露出去，这样管理网甚至办公网都可以访问到集群控制面。
+
+## 特别注意
+
+private模式部署时，console.ucloudadmin.com环境中只有管理员预先分配的VPC与Subnet的内网IP是管理网可达的，所以在创建该集群network时务必通过[legacy_vpc_id与legacy_subnet_id变量](../network/variables.tf#L11-L12)传入管理员指定的VPC与Subnet ID

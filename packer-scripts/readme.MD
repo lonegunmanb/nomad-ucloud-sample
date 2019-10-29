@@ -102,3 +102,9 @@ scripts/install-docker.sh帮助我们从yum源或是我们提供的rpm包安装d
 scripts/build-terraform-plugin-cache.sh下载、配置了这些插件，插件会被下载到/plugin下，并通过挂载卷的形式挂载到terraform容器里。packer-scripts/nomad-client.json里的一系列tf_plugin_*变量指定了镜像的版本号。
 [Hashicorp官方镜像仓库](https://releases.hashicorp.com/)
 我们需要下载的是对应的linux_amd64版本，在这里为了方便起见，我们都先解压缩后上传到了ufile上，所以请确保ufile里保存的是经过解压缩的二进制文件。
+
+### ufile文件服务
+
+我们的Packer脚本假设构建镜像时所需要的外部文件都被放在了ufile或是其他文件服务上，这个文件服务的地址由Packer脚本中的file_server变量确定；如果需要代理才能访问ufile，或是使用了自己的ufile bucket，在参数文件中覆盖该变量的值即可。
+
+构建nomad-client时用到了cfssl工具，它们的下载地址由cfssl_tool_server变量确定，默认值是https://pkg.cfssl.org/R1.2 ，为了在没有公网的环境下也可以工作，我们已经把对应的文件也放在了ufile的hashicorpfile这个bucket下，可以把cfssl_tool_server变量设置成ufile的内网访问地址即可构建。

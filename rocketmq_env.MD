@@ -86,6 +86,8 @@ private模式意在管理网部署一个与public模式一样的多租户RocketM
 
 目前private模式是部署在console.ucloudadmin.com环境中，该环境提供了一个与UCloud公有云几乎一样的环境，该环境主机的内网IP是管理网可达的。由于Broker的信息是注册到NameServer上的，所以问题的关键就变成了如何让管理网用户能够访问到NameServer容器。
 
+<strong>需要注意的是，该环境下只有管理员预先分配的VPC与Subnet的内网IP是管理网可达的，所以在创建该集群network时务必通过[legacy_vpc_id与legacy_subnet_id变量](network/variables.tf#L11-L12)传入管理员指定的VPC与Subnet ID</strong>
+
 RocketMQ提供了一种基于HTTP Endpoint的访问NameServer的[方式](https://rocketmq.apache.org/docs/best-practice-namesvr/)，简单来说，RocketMQ Java SDK在穷尽所有方法都找不到NameServer配置的情况下，默认会通过http get访问http://jmenv.tbsite.net:8080/rocketmq/nsaddr 这个地址，如果该地址能够返回一组合法的NameServer服务地址，那么Java SDK就会使用这组地址，并且每2分钟重新访问一次，确保自己保存的NameServer地址是最新的。这种方式同时也是RocketMQ官方推荐在生产环境使用的方式。在这个url中，jmenv.tbsite.net和nsaddr这两部分是可以通过rocketmq.namesrv.domain和rocketmq.namesrv.domain.subgroup这两个Java配置项设置的，启动Java进程前指定JAVA_OPT，就可以设置这两个配置项。
 
 现在的问题就变成了如何提供一个HTTP服务，对外已http://${domain}:8080/rocketmq/${nameserver_address}的形式发布NameServer地址。
