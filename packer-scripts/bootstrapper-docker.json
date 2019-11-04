@@ -19,7 +19,7 @@
     "docker_login_username": "",
     "docker_login_password": "",
     "code_git_url": "",
-    "golang_version": "1.13.3",
+    "golang_version": "1.13.4",
     "file_server": "http://hashicorpfile.cn-bj.ufileos.com"
   },
 
