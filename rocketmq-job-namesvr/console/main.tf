@@ -1,7 +1,7 @@
 variable namesvc_name {}
 variable clusterId {}
 variable region {}
-variable nomad_ip {}
+variable nomad_server_address {}
 variable ucloud_pub_key {}
 variable ucloud_secret {}
 variable projectId {}
@@ -18,7 +18,7 @@ locals {
 }
 
 provider "nomad" {
-  address = "http://${var.nomad_ip}:4646"
+  address = var.nomad_server_address
   region  = var.region
 }
 

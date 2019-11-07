@@ -21,8 +21,7 @@ variable internal_use {
   type = bool
 }
 locals {
-  consul_access_ip  = data.terraform_remote_state.nomad.outputs.consul_access_ip
-  consul_access_url = length(local.consul_access_ip) > 15 ? "http://[${local.consul_access_ip}]:8500" : "http://${local.consul_access_ip}:8500"
+  consul_access_url = var.consul_access_url
 }
 
 variable "namesvr_cpu" {
@@ -31,3 +30,10 @@ variable "namesvr_cpu" {
 variable "namesvr_memory" {
   default = 2048
 }
+variable "az" {}
+variable "region" {}
+variable "project_id" {}
+variable "nomad_server_address" {}
+variable "vpcId" {}
+variable "subnetId" {}
+variable "consul_access_url" {}

@@ -297,13 +297,37 @@ resource "kubernetes_config_map" "backend-script" {
   }
 }
 
+data "ucloud_vpcs" "client_vpc" {
+  depends_on = [kubernetes_pod.bootstraper]
+  count = var.legacy_vpc_id == "" ? 1 : 0
+  name_regex = "nomadClientVpc-${var.cluster_id}"
+}
+
+data "ucloud_subnets" "client_subnet" {
+  depends_on = [kubernetes_pod.bootstraper]
+  count = var.legacy_vpc_id == "" ? 1 : 0
+  name_regex = "nomadClientSubnet-${var.cluster_id}"
+}
+
 locals {
+  client_vpc_id = var.legacy_vpc_id == "" ? data.ucloud_vpcs.client_vpc[0].vpcs[0].id : var.legacy_vpc_id
+  client_subnet_id = var.legacy_subnet_id == "" ? data.ucloud_subnets.client_subnet[0].subnets[0].id : var.legacy_subnet_id
+}
+
+locals {
+  nomad_access_url = "http://[${module.nomadServerLbIpv6.ipv6s[0]}]:4646"
+  consulRktmq_access_url = "http://[${module.consulRktmqLbIpv6.ipv6s[0]}]:8500"
   controller_pod_label = "rktmq-${var.cluster_id}"
   haproxy_pod_label    = "haproxy-${var.cluster_id}"
+  quotedAz = [for a in var.az: "\"${a}\""]
 }
 
 resource "kubernetes_deployment" "controller" {
-  depends_on = [null_resource.controller_image_repo_secret]
+  depends_on = [
+    null_resource.controller_image_repo_secret,
+    module.nomadServerLbIpv6.ipv6s,
+    module.consulRktmqLbIpv6.ipv6s,
+  ]
   metadata {
     namespace = var.k8s_namespace
     name      = "rkq-controller-${var.cluster_id}"
@@ -347,6 +371,34 @@ resource "kubernetes_deployment" "controller" {
           env {
             name  = "TF_VAR_provision_from_kun"
             value = "true"
+          }
+          env {
+            name = "TF_VAR_nomad_access_url"
+            value = local.nomad_access_url
+          }
+          env {
+            name = "TF_VAR_consul_access_url"
+            value = local.consulRktmq_access_url
+          }
+          env {
+            name = "TF_VAR_vpcId"
+            value = local.client_vpc_id
+          }
+          env {
+            name = "TF_VAR_subnetId"
+            value = local.client_subnet_id
+          }
+          env {
+            name = "TF_VAR_region"
+            value = var.region
+          }
+          env {
+            name = "TF_VAR_az"
+            value = "[${join(",", local.quotedAz)}]"
+          }
+          env {
+            name = "TF_VAR_project_id"
+            value = var.project_id
           }
           env {
             name = "TF_VAR_ucloud_pubkey"

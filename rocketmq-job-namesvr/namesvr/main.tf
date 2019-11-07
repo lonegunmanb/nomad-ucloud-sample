@@ -7,7 +7,7 @@ variable az {
 }
 variable region {}
 variable cluster-id {}
-variable nomad-server-ip {}
+variable nomad-server-address {}
 variable allow_multiple_tasks_in_az {}
 variable ucloud_api_base_url {}
 variable projectId {}
@@ -21,7 +21,7 @@ variable internal_use {
 }
 
 provider nomad {
-  address = "http://${var.nomad-server-ip}:4646"
+  address = var.nomad-server-address
   region  = var.region
 }
 

@@ -102,8 +102,10 @@ module consul_servers {
 }
 
 locals {
-  mgr_vpc_id    = data.terraform_remote_state.network.outputs.mgrVpcId
-  mgr_subnet_id = data.terraform_remote_state.network.outputs.mgrSubnetId
+  mgr_vpc_id       = data.terraform_remote_state.network.outputs.mgrVpcId
+  mgr_subnet_id    = data.terraform_remote_state.network.outputs.mgrSubnetId
+  client_vpc_id    = data.terraform_remote_state.network.outputs.clientVpcId
+  client_subnet_id = data.terraform_remote_state.network.outputs.clientSubnetId
 }
 
 resource ucloud_lb nomad_server_lb {
@@ -499,5 +501,32 @@ resource "null_resource" "setup_loopback_for_internal_lb" {
     inline = [
       module.nameServerInternalLb0.setup_loopback_script
     ]
+  }
+}
+
+provider "consul" {
+  address = var.remote_state_backend_url
+  datacenter = var.region
+}
+
+resource "consul_keys" "client_vpcId" {
+  depends_on = [
+    data.terraform_remote_state.network
+  ]
+  key {
+    path = "terraform/rktClusterState:env-${local.cluster_id}/client_vpcId"
+    value = local.client_vpc_id
+    default = true
+  }
+}
+
+resource "consul_keys" "client_subnetId" {
+  depends_on = [
+    data.terraform_remote_state.network
+  ]
+  key {
+    path = "terraform/rktClusterState:env-${local.cluster_id}/client_subnetId"
+    value = local.client_subnet_id
+    default = true
   }
 }
